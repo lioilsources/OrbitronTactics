@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/game/presentation/screens/game_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/constants/supabase_constants.dart';
+import 'features/game/presentation/screens/lobby_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: SupabaseConstants.url,
+    anonKey: SupabaseConstants.anonKey,
+  );
+
   runApp(const ProviderScope(child: OrbitronTacticsApp()));
 }
 
@@ -21,7 +30,7 @@ class OrbitronTacticsApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const GameScreen(),
+      home: const LobbyScreen(),
     );
   }
 }

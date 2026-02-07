@@ -7,8 +7,10 @@ import '../../../core/game_logic/models/piece.dart';
 import '../../../core/game_logic/models/player.dart';
 import '../../../core/game_logic/models/position.dart';
 import '../../../core/game_logic/validators/move_validator.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'game_event.dart';
 import 'game_transport.dart';
+import 'supabase_game_transport.dart';
 
 /// Coordinates multiplayer game flow over a [GameTransport].
 ///
@@ -179,5 +181,55 @@ class GameSession {
     );
 
     return (whiteSession, blackSession);
+  }
+
+  /// Create an online game session via Supabase Broadcast.
+  static GameSession createOnlineSession({
+    required String gameId,
+    required PlayerColor localColor,
+    required String localPlayerName,
+    required String remotePlayerName,
+    required SupabaseClient client,
+  }) {
+    final transport = SupabaseGameTransport(
+      gameId: gameId,
+      client: client,
+    );
+
+    final initialState = GameEngine.createGame(
+      gameId: gameId,
+      playerWhite: Player(
+        userId: localColor == PlayerColor.white ? 'local' : 'remote',
+        displayName: localColor == PlayerColor.white
+            ? localPlayerName
+            : remotePlayerName,
+        color: PlayerColor.white,
+      ),
+      playerBlack: Player(
+        userId: localColor == PlayerColor.black ? 'local' : 'remote',
+        displayName: localColor == PlayerColor.black
+            ? localPlayerName
+            : remotePlayerName,
+        color: PlayerColor.black,
+      ),
+    );
+
+    // Apply default formations for now (formation selection comes in Phase 2)
+    var withWhite = GameEngine.applyFormation(
+      initialState,
+      PlayerColor.white,
+      GameEngine.defaultFormation(PlayerColor.white),
+    );
+    var ready = GameEngine.applyFormation(
+      withWhite,
+      PlayerColor.black,
+      GameEngine.defaultFormation(PlayerColor.black),
+    );
+
+    return GameSession(
+      localColor: localColor,
+      transport: transport,
+      initialState: ready,
+    );
   }
 }

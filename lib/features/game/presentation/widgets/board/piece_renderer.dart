@@ -18,13 +18,13 @@ class PieceRenderer {
 
   static String symbol(PieceType type) => _symbols[type] ?? '?';
 
-  static Widget build(Piece piece, double size) {
+  static Widget build(Piece piece, double size, {bool isThreatened = false}) {
     final isWhite = piece.color == PlayerColor.white;
     final bgColor = isWhite ? BoardTheme.whitePieceColor : BoardTheme.blackPieceColor;
     final borderColor = isWhite ? BoardTheme.whitePieceBorder : BoardTheme.blackPieceBorder;
     final textColor = isWhite ? Colors.black87 : Colors.white;
 
-    return Container(
+    final pieceWidget = Container(
       width: size * 0.85,
       height: size * 0.85,
       decoration: BoxDecoration(
@@ -58,6 +58,39 @@ class PieceRenderer {
           ),
         ),
       ),
+    );
+
+    if (!isThreatened) return pieceWidget;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        pieceWidget,
+        Positioned(
+          right: -2,
+          top: -2,
+          child: Container(
+            width: size * 0.3,
+            height: size * 0.3,
+            decoration: BoxDecoration(
+              color: BoardTheme.threatBadgeColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 1),
+            ),
+            child: Center(
+              child: Text(
+                '!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: size * 0.18,
+                  fontWeight: FontWeight.bold,
+                  height: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

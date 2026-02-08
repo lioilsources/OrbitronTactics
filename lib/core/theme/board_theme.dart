@@ -31,4 +31,7 @@ class BoardTheme {
   static const powerFieldWhiteBorder = Color(0xFF42A5F5);
   static const powerFieldBlackOwned = Color(0xFFF44336);
   static const powerFieldBlackBorder = Color(0xFFEF5350);
+
+  // Threat indicator
+  static const threatBadgeColor = Color(0xFFD32F2F);
 }

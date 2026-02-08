@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/game_logic/models/game_phase.dart';
 import '../../../../../core/game_logic/models/piece.dart';
 import '../../../../../core/game_logic/models/position.dart';
+import '../../../../../core/game_logic/services/threat_analyzer.dart';
 import '../../providers/board_interaction_provider.dart';
 import '../../providers/game_state_provider.dart';
 import 'board_background_painter.dart';
@@ -137,6 +138,12 @@ class _GameBoardState extends ConsumerState<GameBoard>
     final gameState = ref.watch(gameStateProvider);
     final interaction = ref.watch(boardInteractionProvider);
 
+    // Compute threatened positions (only during playing phase)
+    final threatenedPositions = gameState.phase == GamePhase.playing
+        ? ThreatAnalyzer.getThreatenedPositions(
+            gameState.board, gameState.currentTurn)
+        : <Position>{};
+
     // Get last move for highlighting
     Position? lastMoveFrom;
     Position? lastMoveTo;
@@ -199,6 +206,9 @@ class _GameBoardState extends ConsumerState<GameBoard>
                           child: PieceRenderer.build(
                             gameState.board.grid[row][col]!,
                             squareSize,
+                            isThreatened: threatenedPositions.contains(
+                              Position(row: row, col: col),
+                            ),
                           ),
                         ),
 

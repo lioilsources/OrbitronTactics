@@ -30,73 +30,81 @@ class GameScreen extends ConsumerWidget {
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Opponent info bar (Black)
-            _PlayerInfoBar(
-              name: gameState.playerBlack.displayName,
-              color: PlayerColor.black,
-              isCurrentTurn: gameState.currentTurn == PlayerColor.black,
-              hasKing: gameState.playerBlack.hasKing,
-              hasQueen: gameState.playerBlack.hasQueen,
-            ),
+            // Main game UI
+            Column(
+              children: [
+                // Opponent info bar (Black)
+                _PlayerInfoBar(
+                  name: gameState.playerBlack.displayName,
+                  color: PlayerColor.black,
+                  isCurrentTurn: gameState.currentTurn == PlayerColor.black,
+                  hasKing: gameState.playerBlack.hasKing,
+                  hasQueen: gameState.playerBlack.hasQueen,
+                ),
 
-            const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-            // Power field status
-            _PowerFieldStatusBar(
-              whitePowerFields: gameState.board.powerFieldCount(PlayerColor.white),
-              blackPowerFields: gameState.board.powerFieldCount(PlayerColor.black),
-              total: gameState.board.powerFields.length,
-            ),
+                // Power field status
+                _PowerFieldStatusBar(
+                  whitePowerFields: gameState.board.powerFieldCount(PlayerColor.white),
+                  blackPowerFields: gameState.board.powerFieldCount(PlayerColor.black),
+                  total: gameState.board.powerFields.length,
+                ),
 
-            const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-            // Game board
-            Expanded(
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.brown.shade800,
-                          width: 3,
+                // Game board
+                Expanded(
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.brown.shade800,
+                              width: 3,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: const GameBoard(),
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: const GameBoard(),
                       ),
                     ),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 4),
+
+                // Your info bar (White)
+                _PlayerInfoBar(
+                  name: gameState.playerWhite.displayName,
+                  color: PlayerColor.white,
+                  isCurrentTurn: gameState.currentTurn == PlayerColor.white,
+                  hasKing: gameState.playerWhite.hasKing,
+                  hasQueen: gameState.playerWhite.hasQueen,
+                ),
+
+                const SizedBox(height: 8),
+              ],
             ),
 
-            const SizedBox(height: 4),
-
-            // Your info bar (White)
-            _PlayerInfoBar(
-              name: gameState.playerWhite.displayName,
-              color: PlayerColor.white,
-              isCurrentTurn: gameState.currentTurn == PlayerColor.white,
-              hasKing: gameState.playerWhite.hasKing,
-              hasQueen: gameState.playerWhite.hasQueen,
-            ),
-
-            const SizedBox(height: 8),
-
-            // Game status message
+            // Game over overlay (on top of everything)
             if (gameState.phase == GamePhase.finished)
-              _GameOverBanner(
+              _GameOverOverlay(
                 winner: gameState.winner!,
                 victoryCondition: gameState.victoryCondition!,
                 onNewGame: () {
                   ref.read(gameStateProvider.notifier).startNewGame();
+                },
+                onBackToLobby: () {
+                  Navigator.of(context).maybePop();
                 },
               ),
           ],
@@ -106,7 +114,7 @@ class GameScreen extends ConsumerWidget {
   }
 }
 
-class _PlayerInfoBar extends StatelessWidget {
+class _PlayerInfoBar extends StatefulWidget {
   final String name;
   final PlayerColor color;
   final bool isCurrentTurn;
@@ -122,18 +130,59 @@ class _PlayerInfoBar extends StatelessWidget {
   });
 
   @override
+  State<_PlayerInfoBar> createState() => _PlayerInfoBarState();
+}
+
+class _PlayerInfoBarState extends State<_PlayerInfoBar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _pulseScale = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+    if (widget.isCurrentTurn) {
+      _pulseController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _PlayerInfoBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isCurrentTurn && !_pulseController.isAnimating) {
+      _pulseController.repeat(reverse: true);
+    } else if (!widget.isCurrentTurn && _pulseController.isAnimating) {
+      _pulseController.stop();
+      _pulseController.reset();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isWhite = color == PlayerColor.white;
+    final isWhite = widget.color == PlayerColor.white;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isCurrentTurn
+        color: widget.isCurrentTurn
             ? (isWhite ? Colors.white12 : Colors.white10)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
-        border: isCurrentTurn
+        border: widget.isCurrentTurn
             ? Border.all(color: Colors.green.shade400, width: 1.5)
             : null,
       ),
@@ -153,10 +202,10 @@ class _PlayerInfoBar extends StatelessWidget {
 
           // Player name
           Text(
-            name,
+            widget.name,
             style: TextStyle(
               color: Colors.white,
-              fontWeight: isCurrentTurn ? FontWeight.bold : FontWeight.normal,
+              fontWeight: widget.isCurrentTurn ? FontWeight.bold : FontWeight.normal,
               fontSize: 16,
             ),
           ),
@@ -164,31 +213,34 @@ class _PlayerInfoBar extends StatelessWidget {
           const Spacer(),
 
           // Royal status indicators
-          if (!hasKing)
+          if (!widget.hasKing)
             const Padding(
               padding: EdgeInsets.only(right: 4),
               child: Text('\u2654', style: TextStyle(fontSize: 18, color: Colors.red)),
             ),
-          if (!hasQueen)
+          if (!widget.hasQueen)
             const Padding(
               padding: EdgeInsets.only(right: 4),
               child: Text('\u2655', style: TextStyle(fontSize: 18, color: Colors.red)),
             ),
 
-          // Turn indicator
-          if (isCurrentTurn)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.green.shade700,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'TURN',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+          // Turn indicator with pulse animation
+          if (widget.isCurrentTurn)
+            ScaleTransition(
+              scale: _pulseScale,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade700,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'TURN',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -246,57 +298,141 @@ class _PowerFieldStatusBar extends StatelessWidget {
   }
 }
 
-class _GameOverBanner extends StatelessWidget {
+/// Full-screen animated overlay shown when the game ends.
+class _GameOverOverlay extends StatefulWidget {
   final PlayerColor winner;
   final VictoryCondition victoryCondition;
   final VoidCallback onNewGame;
+  final VoidCallback onBackToLobby;
 
-  const _GameOverBanner({
+  const _GameOverOverlay({
     required this.winner,
     required this.victoryCondition,
     required this.onNewGame,
+    required this.onBackToLobby,
   });
 
+  @override
+  State<_GameOverOverlay> createState() => _GameOverOverlayState();
+}
+
+class _GameOverOverlayState extends State<_GameOverOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  IconData get _victoryIcon {
+    return widget.victoryCondition.when(
+      powerFieldDomination: () => Icons.diamond,
+      royalElimination: () => Icons.dangerous,
+      infiltration: (_) => Icons.flag,
+    );
+  }
+
   String get _victoryText {
-    return victoryCondition.when(
+    return widget.victoryCondition.when(
       powerFieldDomination: () => 'Power Field Domination!',
       royalElimination: () => 'Royal Elimination!',
-      infiltration: (pos) => 'Infiltration!',
+      infiltration: (_) => 'Pawn Infiltration!',
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.indigo.shade900,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber, width: 2),
-      ),
-      child: Column(
-        children: [
-          Text(
-            '${winner == PlayerColor.white ? "White" : "Black"} Wins!',
-            style: const TextStyle(
-              color: Colors.amber,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        color: Colors.black54,
+        child: Center(
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Container(
+              margin: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A2E),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.amber.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: 4,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _victoryIcon,
+                    size: 48,
+                    color: Colors.amber,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${widget.winner == PlayerColor.white ? "White" : "Black"} Wins!',
+                    style: const TextStyle(
+                      color: Colors.amber,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _victoryText,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: widget.onNewGame,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('New Game'),
+                      ),
+                      const SizedBox(width: 12),
+                      OutlinedButton.icon(
+                        onPressed: widget.onBackToLobby,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text('Back'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          side: const BorderSide(color: Colors.white30),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            _victoryText,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: onNewGame,
-            icon: const Icon(Icons.refresh),
-            label: const Text('New Game'),
-          ),
-        ],
+        ),
       ),
     );
   }

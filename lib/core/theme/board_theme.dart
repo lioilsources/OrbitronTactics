@@ -25,4 +25,10 @@ class BoardTheme {
 
   // Last Warrior glow
   static const lastWarriorGlow = Color(0xFFFF9800);
+
+  // Power field ownership colors
+  static const powerFieldWhiteOwned = Color(0xFF2196F3);
+  static const powerFieldWhiteBorder = Color(0xFF42A5F5);
+  static const powerFieldBlackOwned = Color(0xFFF44336);
+  static const powerFieldBlackBorder = Color(0xFFEF5350);
 }

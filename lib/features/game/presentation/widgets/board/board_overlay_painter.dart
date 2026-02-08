@@ -11,6 +11,7 @@ class BoardOverlayPainter extends CustomPainter {
   final Position? lastMoveFrom;
   final Position? lastMoveTo;
   final BoardState board;
+  final bool flipBoard;
 
   const BoardOverlayPainter({
     required this.selectedPosition,
@@ -18,7 +19,11 @@ class BoardOverlayPainter extends CustomPainter {
     required this.lastMoveFrom,
     required this.lastMoveTo,
     required this.board,
+    this.flipBoard = false,
   });
+
+  int _vRow(int r) => flipBoard ? 7 - r : r;
+  int _vCol(int c) => flipBoard ? 7 - c : c;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -58,8 +63,8 @@ class BoardOverlayPainter extends CustomPainter {
     Color color,
   ) {
     final rect = Rect.fromLTWH(
-      pos.col * squareSize,
-      pos.row * squareSize,
+      _vCol(pos.col) * squareSize,
+      _vRow(pos.row) * squareSize,
       squareSize,
       squareSize,
     );
@@ -68,8 +73,8 @@ class BoardOverlayPainter extends CustomPainter {
 
   void _drawMoveIndicator(Canvas canvas, Position pos, double squareSize) {
     final center = Offset(
-      pos.col * squareSize + squareSize / 2,
-      pos.row * squareSize + squareSize / 2,
+      _vCol(pos.col) * squareSize + squareSize / 2,
+      _vRow(pos.row) * squareSize + squareSize / 2,
     );
     canvas.drawCircle(
       center,
@@ -80,8 +85,8 @@ class BoardOverlayPainter extends CustomPainter {
 
   void _drawCaptureIndicator(Canvas canvas, Position pos, double squareSize) {
     final rect = Rect.fromLTWH(
-      pos.col * squareSize,
-      pos.row * squareSize,
+      _vCol(pos.col) * squareSize,
+      _vRow(pos.row) * squareSize,
       squareSize,
       squareSize,
     );
@@ -148,6 +153,7 @@ class BoardOverlayPainter extends CustomPainter {
     return selectedPosition != oldDelegate.selectedPosition ||
         validMoves != oldDelegate.validMoves ||
         lastMoveFrom != oldDelegate.lastMoveFrom ||
-        lastMoveTo != oldDelegate.lastMoveTo;
+        lastMoveTo != oldDelegate.lastMoveTo ||
+        flipBoard != oldDelegate.flipBoard;
   }
 }

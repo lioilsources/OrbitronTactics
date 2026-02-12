@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'game_event.dart';
 
+/// Connection status for multiplayer transport.
+enum ConnectionStatus { connected, disconnected, opponentLeft }
+
 /// Abstract transport layer for game communication.
 ///
 /// Implementations:
@@ -9,6 +12,9 @@ import 'game_event.dart';
 abstract class GameTransport {
   /// Stream of incoming events from the other player.
   Stream<GameEvent> get events;
+
+  /// Stream of connection status changes.
+  Stream<ConnectionStatus> get connectionStatus;
 
   /// Send an event to the other player.
   void send(GameEvent event);
@@ -35,6 +41,9 @@ class LocalGameTransport extends GameTransport {
 
   @override
   Stream<GameEvent> get events => _controller.stream;
+
+  @override
+  Stream<ConnectionStatus> get connectionStatus => const Stream.empty();
 
   @override
   bool get isConnected => _connected;

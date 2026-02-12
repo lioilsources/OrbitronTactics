@@ -12,6 +12,7 @@ sealed class VictoryCondition with _$VictoryCondition {
   const factory VictoryCondition.infiltration({
     required Position pawnPosition,
   }) = Infiltration;
+  const factory VictoryCondition.abandonment() = Abandonment;
 
   factory VictoryCondition.fromJson(Map<String, dynamic> json) =>
       _$VictoryConditionFromJson(json);

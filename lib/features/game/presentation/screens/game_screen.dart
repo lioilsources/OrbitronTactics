@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
+import '../../data/game_event.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/game_board.dart';
 
@@ -15,6 +16,8 @@ class GameScreen extends ConsumerWidget {
     final notifier = ref.read(gameStateProvider.notifier);
     final localColor = notifier.localColor;
     final flipBoard = localColor == PlayerColor.black;
+    final isMultiplayer = notifier.mode == GameMode.multiplayer;
+    final opponentDisconnected = notifier.opponentDisconnected;
 
     // In multiplayer, local player is always at the bottom.
     // In hot-seat, white is at the bottom.
@@ -35,6 +38,12 @@ class GameScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          if (isMultiplayer && !gameState.isFinished)
+            IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              onPressed: () => _showLeaveDialog(context, ref),
+              tooltip: 'Leave Game',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -110,6 +119,17 @@ class GameScreen extends ConsumerWidget {
               ],
             ),
 
+            // Disconnect overlay
+            if (opponentDisconnected && !gameState.isFinished)
+              _DisconnectOverlay(
+                onClaimVictory: () {
+                  notifier.claimVictory();
+                },
+                onLeave: () {
+                  Navigator.of(context).maybePop();
+                },
+              ),
+
             // Game over overlay (on top of everything)
             if (gameState.phase == GamePhase.finished)
               _GameOverOverlay(
@@ -126,6 +146,42 @@ class GameScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _showLeaveDialog(BuildContext context, WidgetRef ref) {
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A2E),
+        title: const Text('Leave Game?', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'Your opponent will be able to claim victory.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true && context.mounted) {
+        final notifier = ref.read(gameStateProvider.notifier);
+        final localColor = notifier.localColor;
+        if (localColor != null) {
+          notifier.session?.transport.send(
+            PlayerLeftEvent(color: localColor),
+          );
+        }
+        Navigator.of(context).maybePop();
+      }
+    });
   }
 }
 
@@ -326,6 +382,90 @@ class _PowerFieldStatusBar extends StatelessWidget {
   }
 }
 
+/// Overlay shown when the opponent disconnects during a game.
+class _DisconnectOverlay extends StatelessWidget {
+  final VoidCallback onClaimVictory;
+  final VoidCallback onLeave;
+
+  const _DisconnectOverlay({
+    required this.onClaimVictory,
+    required this.onLeave,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black54,
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A2E),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.orange, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withValues(alpha: 0.3),
+                blurRadius: 20,
+                spreadRadius: 4,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.wifi_off,
+                size: 48,
+                color: Colors.orange,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Opponent Disconnected',
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Your opponent has left the game.',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: onClaimVictory,
+                    icon: const Icon(Icons.emoji_events),
+                    label: const Text('Claim Victory'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade700,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: onLeave,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Leave'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                      side: const BorderSide(color: Colors.white30),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Full-screen animated overlay shown when the game ends.
 class _GameOverOverlay extends StatefulWidget {
   final PlayerColor winner;
@@ -378,6 +518,7 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
       powerFieldDomination: () => Icons.diamond,
       royalElimination: () => Icons.dangerous,
       infiltration: (_) => Icons.flag,
+      abandonment: () => Icons.person_off,
     );
   }
 
@@ -386,6 +527,7 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
       powerFieldDomination: () => 'Power Field Domination!',
       royalElimination: () => 'Royal Elimination!',
       infiltration: (_) => 'Pawn Infiltration!',
+      abandonment: () => 'Opponent Abandoned!',
     );
   }
 

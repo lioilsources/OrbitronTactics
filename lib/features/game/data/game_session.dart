@@ -6,6 +6,7 @@ import '../../../core/game_logic/models/game_state.dart';
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/game_logic/models/player.dart';
 import '../../../core/game_logic/models/position.dart';
+import '../../../core/game_logic/models/victory_condition.dart';
 import '../../../core/game_logic/validators/move_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'game_event.dart';
@@ -19,11 +20,14 @@ import 'supabase_game_transport.dart';
 /// - Sends moves to the opponent via transport
 /// - Receives and applies opponent moves
 /// - Manages formation phase
+/// - Detects opponent disconnect via transport connection status
 class GameSession {
   final PlayerColor localColor;
   final GameTransport transport;
   final _stateController = StreamController<GameState>.broadcast();
+  final _disconnectController = StreamController<void>.broadcast();
   StreamSubscription<GameEvent>? _eventSub;
+  StreamSubscription<ConnectionStatus>? _connectionSub;
 
   GameState _state;
 
@@ -39,13 +43,34 @@ class GameSession {
   /// Stream of state updates (both local and remote).
   Stream<GameState> get stateStream => _stateController.stream;
 
+  /// Fires when the opponent disconnects.
+  Stream<void> get onOpponentDisconnect => _disconnectController.stream;
+
   /// Whether it's this player's turn.
   bool get isMyTurn => _state.currentTurn == localColor && !_state.isFinished;
 
-  /// Start listening for remote events.
+  /// Start listening for remote events and connection status.
   Future<void> start() async {
     await transport.connect();
     _eventSub = transport.events.listen(_handleRemoteEvent);
+    _connectionSub = transport.connectionStatus.listen(_handleConnectionStatus);
+  }
+
+  void _handleConnectionStatus(ConnectionStatus status) {
+    if (status == ConnectionStatus.opponentLeft && !_state.isFinished) {
+      _disconnectController.add(null);
+    }
+  }
+
+  /// Claim victory by abandonment (opponent disconnected).
+  void claimVictory() {
+    if (_state.isFinished) return;
+    _state = _state.copyWith(
+      phase: GamePhase.finished,
+      winner: localColor,
+      victoryCondition: const VictoryCondition.abandonment(),
+    );
+    _stateController.add(_state);
   }
 
   /// Submit a local move. Returns true if valid and applied.
@@ -120,19 +145,22 @@ class GameSession {
         // State already reflects game over from applyMove
         break;
       case PlayerJoinedEvent():
-        // TODO: handle in lobby
+        // Handled in lobby
         break;
       case PlayerLeftEvent():
-        // TODO: handle disconnect
-        break;
+        if (!_state.isFinished) {
+          _disconnectController.add(null);
+        }
     }
   }
 
   /// Clean up resources.
   void dispose() {
     _eventSub?.cancel();
+    _connectionSub?.cancel();
     transport.dispose();
     _stateController.close();
+    _disconnectController.close();
   }
 
   /// Create a local hot-seat game with two paired sessions.
@@ -193,6 +221,7 @@ class GameSession {
   }) {
     final transport = SupabaseGameTransport(
       gameId: gameId,
+      localColorName: localColor.name,
       client: client,
     );
 

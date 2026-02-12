@@ -23,6 +23,8 @@ VictoryCondition _$VictoryConditionFromJson(Map<String, dynamic> json) {
       return RoyalElimination.fromJson(json);
     case 'infiltration':
       return Infiltration.fromJson(json);
+    case 'abandonment':
+      return Abandonment.fromJson(json);
 
     default:
       throw CheckedFromJsonException(
@@ -41,18 +43,21 @@ mixin _$VictoryCondition {
     required TResult Function() powerFieldDomination,
     required TResult Function() royalElimination,
     required TResult Function(Position pawnPosition) infiltration,
+    required TResult Function() abandonment,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? powerFieldDomination,
     TResult? Function()? royalElimination,
     TResult? Function(Position pawnPosition)? infiltration,
+    TResult? Function()? abandonment,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? powerFieldDomination,
     TResult Function()? royalElimination,
     TResult Function(Position pawnPosition)? infiltration,
+    TResult Function()? abandonment,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -60,18 +65,21 @@ mixin _$VictoryCondition {
     required TResult Function(PowerFieldDomination value) powerFieldDomination,
     required TResult Function(RoyalElimination value) royalElimination,
     required TResult Function(Infiltration value) infiltration,
+    required TResult Function(Abandonment value) abandonment,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(PowerFieldDomination value)? powerFieldDomination,
     TResult? Function(RoyalElimination value)? royalElimination,
     TResult? Function(Infiltration value)? infiltration,
+    TResult? Function(Abandonment value)? abandonment,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(PowerFieldDomination value)? powerFieldDomination,
     TResult Function(RoyalElimination value)? royalElimination,
     TResult Function(Infiltration value)? infiltration,
+    TResult Function(Abandonment value)? abandonment,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 
@@ -156,6 +164,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     required TResult Function() powerFieldDomination,
     required TResult Function() royalElimination,
     required TResult Function(Position pawnPosition) infiltration,
+    required TResult Function() abandonment,
   }) {
     return powerFieldDomination();
   }
@@ -166,6 +175,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     TResult? Function()? powerFieldDomination,
     TResult? Function()? royalElimination,
     TResult? Function(Position pawnPosition)? infiltration,
+    TResult? Function()? abandonment,
   }) {
     return powerFieldDomination?.call();
   }
@@ -176,6 +186,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     TResult Function()? powerFieldDomination,
     TResult Function()? royalElimination,
     TResult Function(Position pawnPosition)? infiltration,
+    TResult Function()? abandonment,
     required TResult orElse(),
   }) {
     if (powerFieldDomination != null) {
@@ -190,6 +201,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     required TResult Function(PowerFieldDomination value) powerFieldDomination,
     required TResult Function(RoyalElimination value) royalElimination,
     required TResult Function(Infiltration value) infiltration,
+    required TResult Function(Abandonment value) abandonment,
   }) {
     return powerFieldDomination(this);
   }
@@ -200,6 +212,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     TResult? Function(PowerFieldDomination value)? powerFieldDomination,
     TResult? Function(RoyalElimination value)? royalElimination,
     TResult? Function(Infiltration value)? infiltration,
+    TResult? Function(Abandonment value)? abandonment,
   }) {
     return powerFieldDomination?.call(this);
   }
@@ -210,6 +223,7 @@ class _$PowerFieldDominationImpl implements PowerFieldDomination {
     TResult Function(PowerFieldDomination value)? powerFieldDomination,
     TResult Function(RoyalElimination value)? royalElimination,
     TResult Function(Infiltration value)? infiltration,
+    TResult Function(Abandonment value)? abandonment,
     required TResult orElse(),
   }) {
     if (powerFieldDomination != null) {
@@ -285,6 +299,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     required TResult Function() powerFieldDomination,
     required TResult Function() royalElimination,
     required TResult Function(Position pawnPosition) infiltration,
+    required TResult Function() abandonment,
   }) {
     return royalElimination();
   }
@@ -295,6 +310,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     TResult? Function()? powerFieldDomination,
     TResult? Function()? royalElimination,
     TResult? Function(Position pawnPosition)? infiltration,
+    TResult? Function()? abandonment,
   }) {
     return royalElimination?.call();
   }
@@ -305,6 +321,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     TResult Function()? powerFieldDomination,
     TResult Function()? royalElimination,
     TResult Function(Position pawnPosition)? infiltration,
+    TResult Function()? abandonment,
     required TResult orElse(),
   }) {
     if (royalElimination != null) {
@@ -319,6 +336,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     required TResult Function(PowerFieldDomination value) powerFieldDomination,
     required TResult Function(RoyalElimination value) royalElimination,
     required TResult Function(Infiltration value) infiltration,
+    required TResult Function(Abandonment value) abandonment,
   }) {
     return royalElimination(this);
   }
@@ -329,6 +347,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     TResult? Function(PowerFieldDomination value)? powerFieldDomination,
     TResult? Function(RoyalElimination value)? royalElimination,
     TResult? Function(Infiltration value)? infiltration,
+    TResult? Function(Abandonment value)? abandonment,
   }) {
     return royalElimination?.call(this);
   }
@@ -339,6 +358,7 @@ class _$RoyalEliminationImpl implements RoyalElimination {
     TResult Function(PowerFieldDomination value)? powerFieldDomination,
     TResult Function(RoyalElimination value)? royalElimination,
     TResult Function(Infiltration value)? infiltration,
+    TResult Function(Abandonment value)? abandonment,
     required TResult orElse(),
   }) {
     if (royalElimination != null) {
@@ -454,6 +474,7 @@ class _$InfiltrationImpl implements Infiltration {
     required TResult Function() powerFieldDomination,
     required TResult Function() royalElimination,
     required TResult Function(Position pawnPosition) infiltration,
+    required TResult Function() abandonment,
   }) {
     return infiltration(pawnPosition);
   }
@@ -464,6 +485,7 @@ class _$InfiltrationImpl implements Infiltration {
     TResult? Function()? powerFieldDomination,
     TResult? Function()? royalElimination,
     TResult? Function(Position pawnPosition)? infiltration,
+    TResult? Function()? abandonment,
   }) {
     return infiltration?.call(pawnPosition);
   }
@@ -474,6 +496,7 @@ class _$InfiltrationImpl implements Infiltration {
     TResult Function()? powerFieldDomination,
     TResult Function()? royalElimination,
     TResult Function(Position pawnPosition)? infiltration,
+    TResult Function()? abandonment,
     required TResult orElse(),
   }) {
     if (infiltration != null) {
@@ -488,6 +511,7 @@ class _$InfiltrationImpl implements Infiltration {
     required TResult Function(PowerFieldDomination value) powerFieldDomination,
     required TResult Function(RoyalElimination value) royalElimination,
     required TResult Function(Infiltration value) infiltration,
+    required TResult Function(Abandonment value) abandonment,
   }) {
     return infiltration(this);
   }
@@ -498,6 +522,7 @@ class _$InfiltrationImpl implements Infiltration {
     TResult? Function(PowerFieldDomination value)? powerFieldDomination,
     TResult? Function(RoyalElimination value)? royalElimination,
     TResult? Function(Infiltration value)? infiltration,
+    TResult? Function(Abandonment value)? abandonment,
   }) {
     return infiltration?.call(this);
   }
@@ -508,6 +533,7 @@ class _$InfiltrationImpl implements Infiltration {
     TResult Function(PowerFieldDomination value)? powerFieldDomination,
     TResult Function(RoyalElimination value)? royalElimination,
     TResult Function(Infiltration value)? infiltration,
+    TResult Function(Abandonment value)? abandonment,
     required TResult orElse(),
   }) {
     if (infiltration != null) {
@@ -536,4 +562,139 @@ abstract class Infiltration implements VictoryCondition {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$InfiltrationImplCopyWith<_$InfiltrationImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$AbandonmentImplCopyWith<$Res> {
+  factory _$$AbandonmentImplCopyWith(
+    _$AbandonmentImpl value,
+    $Res Function(_$AbandonmentImpl) then,
+  ) = __$$AbandonmentImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$AbandonmentImplCopyWithImpl<$Res>
+    extends _$VictoryConditionCopyWithImpl<$Res, _$AbandonmentImpl>
+    implements _$$AbandonmentImplCopyWith<$Res> {
+  __$$AbandonmentImplCopyWithImpl(
+    _$AbandonmentImpl _value,
+    $Res Function(_$AbandonmentImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of VictoryCondition
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AbandonmentImpl implements Abandonment {
+  const _$AbandonmentImpl({final String? $type})
+    : $type = $type ?? 'abandonment';
+
+  factory _$AbandonmentImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AbandonmentImplFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'VictoryCondition.abandonment()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$AbandonmentImpl);
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() powerFieldDomination,
+    required TResult Function() royalElimination,
+    required TResult Function(Position pawnPosition) infiltration,
+    required TResult Function() abandonment,
+  }) {
+    return abandonment();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? powerFieldDomination,
+    TResult? Function()? royalElimination,
+    TResult? Function(Position pawnPosition)? infiltration,
+    TResult? Function()? abandonment,
+  }) {
+    return abandonment?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? powerFieldDomination,
+    TResult Function()? royalElimination,
+    TResult Function(Position pawnPosition)? infiltration,
+    TResult Function()? abandonment,
+    required TResult orElse(),
+  }) {
+    if (abandonment != null) {
+      return abandonment();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(PowerFieldDomination value) powerFieldDomination,
+    required TResult Function(RoyalElimination value) royalElimination,
+    required TResult Function(Infiltration value) infiltration,
+    required TResult Function(Abandonment value) abandonment,
+  }) {
+    return abandonment(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(PowerFieldDomination value)? powerFieldDomination,
+    TResult? Function(RoyalElimination value)? royalElimination,
+    TResult? Function(Infiltration value)? infiltration,
+    TResult? Function(Abandonment value)? abandonment,
+  }) {
+    return abandonment?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(PowerFieldDomination value)? powerFieldDomination,
+    TResult Function(RoyalElimination value)? royalElimination,
+    TResult Function(Infiltration value)? infiltration,
+    TResult Function(Abandonment value)? abandonment,
+    required TResult orElse(),
+  }) {
+    if (abandonment != null) {
+      return abandonment(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AbandonmentImplToJson(this);
+  }
+}
+
+abstract class Abandonment implements VictoryCondition {
+  const factory Abandonment() = _$AbandonmentImpl;
+
+  factory Abandonment.fromJson(Map<String, dynamic> json) =
+      _$AbandonmentImpl.fromJson;
 }

@@ -22,7 +22,9 @@ class GameStateNotifier extends StateNotifier<GameState> {
   GameMode _mode;
   GameSession? _session;
   StreamSubscription<GameState>? _sessionSub;
+  StreamSubscription<void>? _disconnectSub;
   PlayerColor? _localColor;
+  bool _opponentDisconnected = false;
 
   GameStateNotifier(GameState initial, {GameMode mode = GameMode.hotSeat})
       : _mode = mode,
@@ -34,17 +36,36 @@ class GameStateNotifier extends StateNotifier<GameState> {
   /// The local player's color. Null in hot-seat mode.
   PlayerColor? get localColor => _localColor;
 
+  /// Whether the opponent has disconnected.
+  bool get opponentDisconnected => _opponentDisconnected;
+
+  /// Stream that fires when the opponent disconnects.
+  Stream<void>? get onOpponentDisconnect => _session?.onOpponentDisconnect;
+
   /// Attach a multiplayer session. State updates come from the session.
   void attachSession(GameSession session) {
     _sessionSub?.cancel();
+    _disconnectSub?.cancel();
     _session = session;
     _mode = GameMode.multiplayer;
     _localColor = session.localColor;
+    _opponentDisconnected = false;
     state = session.state;
 
     _sessionSub = session.stateStream.listen((newState) {
       state = newState;
     });
+
+    _disconnectSub = session.onOpponentDisconnect.listen((_) {
+      _opponentDisconnected = true;
+      // Trigger a state rebuild by re-setting the same state
+      state = state;
+    });
+  }
+
+  /// Claim victory by abandonment (opponent disconnected).
+  void claimVictory() {
+    _session?.claimVictory();
   }
 
   /// Update the remote player's display name (e.g. after they join).
@@ -135,8 +156,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void _detachSession() {
     _sessionSub?.cancel();
     _sessionSub = null;
+    _disconnectSub?.cancel();
+    _disconnectSub = null;
     _session?.dispose();
     _session = null;
+    _opponentDisconnected = false;
   }
 
   @override

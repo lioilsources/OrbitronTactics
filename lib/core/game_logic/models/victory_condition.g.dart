@@ -35,3 +35,9 @@ Map<String, dynamic> _$$InfiltrationImplToJson(_$InfiltrationImpl instance) =>
       'pawnPosition': instance.pawnPosition,
       'runtimeType': instance.$type,
     };
+
+_$AbandonmentImpl _$$AbandonmentImplFromJson(Map<String, dynamic> json) =>
+    _$AbandonmentImpl($type: json['runtimeType'] as String?);
+
+Map<String, dynamic> _$$AbandonmentImplToJson(_$AbandonmentImpl instance) =>
+    <String, dynamic>{'runtimeType': instance.$type};

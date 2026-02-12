@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/models/game_phase.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/position.dart';
+import 'package:orbitron_tactics/core/game_logic/models/victory_condition.dart';
+import 'package:orbitron_tactics/features/game/data/game_event.dart';
 import 'package:orbitron_tactics/features/game/data/game_session.dart';
 
 void main() {
@@ -156,6 +158,92 @@ void main() {
 
       await Future.delayed(Duration.zero);
       expect(states.length, 1);
+    });
+  });
+
+  group('GameSession - Disconnect handling', () {
+    late GameSession whiteSession;
+    late GameSession blackSession;
+
+    setUp(() async {
+      final (w, b) = GameSession.createLocalGame();
+      whiteSession = w;
+      blackSession = b;
+      await whiteSession.start();
+      await blackSession.start();
+    });
+
+    tearDown(() {
+      whiteSession.dispose();
+      blackSession.dispose();
+    });
+
+    test('claimVictory sets finished state with abandonment', () {
+      expect(whiteSession.state.isFinished, isFalse);
+
+      whiteSession.claimVictory();
+
+      expect(whiteSession.state.isFinished, isTrue);
+      expect(whiteSession.state.phase, GamePhase.finished);
+      expect(whiteSession.state.winner, PlayerColor.white);
+      expect(
+        whiteSession.state.victoryCondition,
+        isA<Abandonment>(),
+      );
+    });
+
+    test('claimVictory does nothing if already finished', () {
+      whiteSession.claimVictory();
+      final stateAfterFirst = whiteSession.state;
+
+      // Claim again — should be a no-op
+      whiteSession.claimVictory();
+      expect(whiteSession.state, stateAfterFirst);
+    });
+
+    test('claimVictory emits updated state on stateStream', () async {
+      final states = <dynamic>[];
+      whiteSession.stateStream.listen(states.add);
+
+      whiteSession.claimVictory();
+      await Future.delayed(Duration.zero);
+
+      expect(states.length, 1);
+      expect(states.first.isFinished, isTrue);
+    });
+
+    test('PlayerLeftEvent triggers onOpponentDisconnect', () async {
+      final disconnects = <void>[];
+      whiteSession.onOpponentDisconnect.listen((_) => disconnects.add(null));
+
+      // Black sends PlayerLeftEvent
+      blackSession.transport.send(
+        const PlayerLeftEvent(color: PlayerColor.black),
+      );
+      await Future.delayed(Duration.zero);
+
+      expect(disconnects.length, 1);
+    });
+
+    test('PlayerLeftEvent does not trigger when game is finished', () async {
+      // Finish the game first
+      whiteSession.claimVictory();
+
+      final disconnects = <void>[];
+      whiteSession.onOpponentDisconnect.listen((_) => disconnects.add(null));
+
+      blackSession.transport.send(
+        const PlayerLeftEvent(color: PlayerColor.black),
+      );
+      await Future.delayed(Duration.zero);
+
+      expect(disconnects, isEmpty);
+    });
+
+    test('isMyTurn is false after claimVictory', () {
+      expect(whiteSession.isMyTurn, isTrue);
+      whiteSession.claimVictory();
+      expect(whiteSession.isMyTurn, isFalse);
     });
   });
 }

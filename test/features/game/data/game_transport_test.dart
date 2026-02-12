@@ -92,6 +92,21 @@ void main() {
       a.dispose();
       b.dispose();
     });
+
+    test('connectionStatus returns empty stream', () async {
+      final (a, b) = LocalGameTransport.createPair();
+
+      final statuses = <ConnectionStatus>[];
+      a.connectionStatus.listen(statuses.add);
+
+      await a.connect();
+      await Future.delayed(Duration.zero);
+
+      expect(statuses, isEmpty);
+
+      a.dispose();
+      b.dispose();
+    });
   });
 
   group('GameEvent serialization', () {
@@ -147,6 +162,15 @@ void main() {
       expect(restored, isA<PlayerJoinedEvent>());
       expect((restored as PlayerJoinedEvent).color, PlayerColor.black);
       expect(restored.displayName, 'Bob');
+    });
+
+    test('PlayerLeftEvent round-trips through JSON', () {
+      const event = PlayerLeftEvent(color: PlayerColor.white);
+
+      final json = event.toJson();
+      final restored = GameEvent.fromJson(json);
+      expect(restored, isA<PlayerLeftEvent>());
+      expect((restored as PlayerLeftEvent).color, PlayerColor.white);
     });
   });
 }

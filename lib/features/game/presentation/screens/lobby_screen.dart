@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -300,6 +302,7 @@ class _WaitingScreen extends ConsumerStatefulWidget {
 
 class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
   GameSession? _session;
+  StreamSubscription<GameEvent>? _joinSub;
 
   @override
   void initState() {
@@ -313,7 +316,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
       gameId: widget.gameId,
       localColor: PlayerColor.white,
       localPlayerName: widget.playerName,
-      remotePlayerName: 'Waiting...',
+      remotePlayerName: 'Opponent',
       client: Supabase.instance.client,
     );
 
@@ -321,10 +324,12 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
     _session = session;
 
     // Listen for opponent joining via broadcast
-    session.transport.events.listen((event) {
+    _joinSub = session.transport.events.listen((event) {
       if (event is PlayerJoinedEvent && mounted) {
-        // Opponent joined — start the game
-        ref.read(gameStateProvider.notifier).attachSession(session);
+        // Opponent joined — attach session and update their name
+        final notifier = ref.read(gameStateProvider.notifier);
+        notifier.attachSession(session);
+        notifier.updateRemotePlayerName(event.displayName);
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const GameScreen()),
@@ -336,6 +341,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
 
   @override
   void dispose() {
+    _joinSub?.cancel();
     // Only dispose if we haven't handed the session to the provider
     if (ref.read(gameStateProvider.notifier).session != _session) {
       _session?.dispose();

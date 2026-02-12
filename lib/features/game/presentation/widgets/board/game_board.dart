@@ -271,6 +271,19 @@ class _GameBoardState extends ConsumerState<GameBoard>
     );
   }
 
+  /// Whether the given piece can be selected by the local player.
+  /// In hot-seat mode, the current turn player can select their pieces.
+  /// In multiplayer mode, only the local player's pieces can be selected on their turn.
+  bool _canSelectPiece(Piece piece, GameStateNotifier notifier) {
+    final localColor = notifier.localColor;
+    if (localColor != null) {
+      // Multiplayer: only select own pieces, and only on own turn
+      return piece.color == localColor;
+    }
+    // Hot-seat: select current turn player's pieces
+    return piece.color == ref.read(gameStateProvider).currentTurn;
+  }
+
   void _handleTap(Offset localPosition, double squareSize) {
     // Block input during animation
     if (_moveController.isAnimating) return;
@@ -289,6 +302,13 @@ class _GameBoardState extends ConsumerState<GameBoard>
     final interactionNotifier = ref.read(boardInteractionProvider.notifier);
 
     if (gameState.phase != GamePhase.playing) return;
+
+    // In multiplayer, block input when it's not our turn
+    if (gameNotifier.localColor != null &&
+        gameState.currentTurn != gameNotifier.localColor) {
+      interactionNotifier.clearSelection();
+      return;
+    }
 
     // If a piece is already selected
     if (interaction.selectedPosition != null) {
@@ -334,7 +354,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
       // If tapping another friendly piece, select it instead
       final piece = gameState.board.pieceAt(tappedPos);
-      if (piece != null && piece.color == gameState.currentTurn) {
+      if (piece != null && _canSelectPiece(piece, gameNotifier)) {
         final validMoves = gameNotifier.getLegalMoves(tappedPos);
         interactionNotifier.selectPiece(tappedPos, validMoves);
         return;
@@ -347,7 +367,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
     // No piece selected — try to select one
     final piece = gameState.board.pieceAt(tappedPos);
-    if (piece != null && piece.color == gameState.currentTurn) {
+    if (piece != null && _canSelectPiece(piece, gameNotifier)) {
       final validMoves = gameNotifier.getLegalMoves(tappedPos);
       interactionNotifier.selectPiece(tappedPos, validMoves);
     }

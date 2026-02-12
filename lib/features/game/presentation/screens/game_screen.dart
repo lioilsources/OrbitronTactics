@@ -12,6 +12,21 @@ class GameScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
+    final notifier = ref.read(gameStateProvider.notifier);
+    final localColor = notifier.localColor;
+    final flipBoard = localColor == PlayerColor.black;
+
+    // In multiplayer, local player is always at the bottom.
+    // In hot-seat, white is at the bottom.
+    final bottomColor = flipBoard ? PlayerColor.black : PlayerColor.white;
+    final topColor = bottomColor.opposite;
+
+    final topPlayer = topColor == PlayerColor.white
+        ? gameState.playerWhite
+        : gameState.playerBlack;
+    final bottomPlayer = bottomColor == PlayerColor.white
+        ? gameState.playerWhite
+        : gameState.playerBlack;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
@@ -35,13 +50,13 @@ class GameScreen extends ConsumerWidget {
             // Main game UI
             Column(
               children: [
-                // Opponent info bar (Black)
+                // Opponent info bar (top)
                 _PlayerInfoBar(
-                  name: gameState.playerBlack.displayName,
-                  color: PlayerColor.black,
-                  isCurrentTurn: gameState.currentTurn == PlayerColor.black,
-                  hasKing: gameState.playerBlack.hasKing,
-                  hasQueen: gameState.playerBlack.hasQueen,
+                  name: topPlayer.displayName,
+                  color: topColor,
+                  isCurrentTurn: gameState.currentTurn == topColor,
+                  hasKing: topPlayer.hasKing,
+                  hasQueen: topPlayer.hasQueen,
                 ),
 
                 const SizedBox(height: 4),
@@ -72,7 +87,7 @@ class GameScreen extends ConsumerWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(2),
-                            child: const GameBoard(),
+                            child: GameBoard(flipBoard: flipBoard),
                           ),
                         ),
                       ),
@@ -82,13 +97,13 @@ class GameScreen extends ConsumerWidget {
 
                 const SizedBox(height: 4),
 
-                // Your info bar (White)
+                // Your info bar (bottom)
                 _PlayerInfoBar(
-                  name: gameState.playerWhite.displayName,
-                  color: PlayerColor.white,
-                  isCurrentTurn: gameState.currentTurn == PlayerColor.white,
-                  hasKing: gameState.playerWhite.hasKing,
-                  hasQueen: gameState.playerWhite.hasQueen,
+                  name: bottomPlayer.displayName,
+                  color: bottomColor,
+                  isCurrentTurn: gameState.currentTurn == bottomColor,
+                  hasKing: bottomPlayer.hasKing,
+                  hasQueen: bottomPlayer.hasQueen,
                 ),
 
                 const SizedBox(height: 8),
@@ -145,7 +160,7 @@ class _PlayerInfoBarState extends State<_PlayerInfoBar>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    _pulseScale = Tween<double>(begin: 0.95, end: 1.05).animate(
+    _pulseScale = Tween<double>(begin: 0.85, end: 1.15).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     if (widget.isCurrentTurn) {
@@ -174,16 +189,29 @@ class _PlayerInfoBarState extends State<_PlayerInfoBar>
   Widget build(BuildContext context) {
     final isWhite = widget.color == PlayerColor.white;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: widget.isCurrentTurn
-            ? (isWhite ? Colors.white12 : Colors.white10)
+            ? Colors.green.withValues(alpha: 0.15)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
-        border: widget.isCurrentTurn
-            ? Border.all(color: Colors.green.shade400, width: 1.5)
+        border: Border.all(
+          color: widget.isCurrentTurn
+              ? Colors.green.shade400
+              : Colors.transparent,
+          width: 2,
+        ),
+        boxShadow: widget.isCurrentTurn
+            ? [
+                BoxShadow(
+                  color: Colors.green.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ]
             : null,
       ),
       child: Row(

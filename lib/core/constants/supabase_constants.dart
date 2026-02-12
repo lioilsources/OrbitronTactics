@@ -10,11 +10,11 @@ class SupabaseConstants {
 
   static const String url = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'http://127.0.0.1:54321',
+    defaultValue: 'https://sgyqrkaajmgpyutmmyqj.supabase.co',
   );
 
   static const String anonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: '',
+    defaultValue: 'sb_publishable_rcIp_1oaBpuuoBRO2UshNA_WvWfUiuf',
   );
 }

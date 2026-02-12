@@ -22,6 +22,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   GameMode _mode;
   GameSession? _session;
   StreamSubscription<GameState>? _sessionSub;
+  PlayerColor? _localColor;
 
   GameStateNotifier(GameState initial, {GameMode mode = GameMode.hotSeat})
       : _mode = mode,
@@ -30,16 +31,34 @@ class GameStateNotifier extends StateNotifier<GameState> {
   GameMode get mode => _mode;
   GameSession? get session => _session;
 
+  /// The local player's color. Null in hot-seat mode.
+  PlayerColor? get localColor => _localColor;
+
   /// Attach a multiplayer session. State updates come from the session.
   void attachSession(GameSession session) {
     _sessionSub?.cancel();
     _session = session;
     _mode = GameMode.multiplayer;
+    _localColor = session.localColor;
     state = session.state;
 
     _sessionSub = session.stateStream.listen((newState) {
       state = newState;
     });
+  }
+
+  /// Update the remote player's display name (e.g. after they join).
+  void updateRemotePlayerName(String name) {
+    final remoteColor = _localColor?.opposite ?? PlayerColor.black;
+    if (remoteColor == PlayerColor.black) {
+      state = state.copyWith(
+        playerBlack: state.playerBlack.copyWith(displayName: name),
+      );
+    } else {
+      state = state.copyWith(
+        playerWhite: state.playerWhite.copyWith(displayName: name),
+      );
+    }
   }
 
   /// Attempt to make a move from [from] to [to].
@@ -69,6 +88,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void startNewGame() {
     _detachSession();
     _mode = GameMode.hotSeat;
+    _localColor = null;
 
     final gameState = GameEngine.createGame(
       gameId: 'local-${DateTime.now().millisecondsSinceEpoch}',

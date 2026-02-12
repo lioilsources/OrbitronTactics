@@ -32,7 +32,7 @@ class SupabaseGameTransport extends GameTransport {
   Future<void> connect() async {
     _channel = _client.channel(
       'game:$gameId',
-      opts: const RealtimeChannelConfig(self: true),
+      opts: const RealtimeChannelConfig(self: false),
     );
 
     _channel!.onBroadcast(

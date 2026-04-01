@@ -1,16 +1,47 @@
-# orbitron_tactics
+# OrbitronTactics
 
-A new Flutter project.
+A strategic 2-player chess variant with custom piece movement rules, power field domination victory conditions, and real-time multiplayer via Supabase. Features local hot-seat mode, threat indicators, custom formations, and a cloud-based lobby system.
 
-## Getting Started
+## Platforms
 
-This project is a starting point for a Flutter application.
+| Platform | Status |
+|----------|--------|
+| iOS | Supported |
+| Android | Supported |
+| Windows | Supported |
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- 8×8 board with custom piece types and movement rules
+- 5 power fields — control majority to win
+- Real-time multiplayer via Supabase Realtime (Broadcast + Presence)
+- Local hot-seat mode
+- Threat indicators (red badge on endangered pieces)
+- Disconnect handling via Supabase Presence
+- 108 unit tests
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tech Stack
+
+- Flutter / Dart 3.10.7
+- Riverpod 2.6.1 (StateNotifier pattern)
+- Supabase Flutter 2.8.0
+- Freezed 2.x (immutable models with JSON serialization)
+- Pure Dart game logic (no Flutter dependencies)
+
+## Build
+
+```bash
+# iOS
+flutter run -d ios
+
+# Android
+flutter run -d android
+
+# Tests
+flutter test
+```
+
+## Documentation
+
+- [CHANGELOG.md](CHANGELOG.md) — development history
+- [GALLERY.md](GALLERY.md) — screenshots and videos

@@ -145,6 +145,108 @@ class GameEngine {
     );
   }
 
+  /// Apply a capture move whose outcome was decided by a real-time battle
+  /// (Archon-style). Used only in the local-network co-op mode; the regular
+  /// turn-based paths keep using [applyMove].
+  ///
+  /// The [move] must be a capturing move (`move.capturedPiece != null`).
+  ///
+  /// - [attackerWon] == true: the attacker wins the arena, so the capture
+  ///   resolves exactly like a normal move ([applyMove]).
+  /// - [attackerWon] == false: the defender survives and destroys the
+  ///   attacker. The attacking piece is removed from the board, the defender
+  ///   stays on its square, and the turn still passes to the defender.
+  static GameState applyResolvedCapture(
+    GameState state,
+    Move move, {
+    required bool attackerWon,
+  }) {
+    assert(move.capturedPiece != null,
+        'applyResolvedCapture requires a capturing move');
+
+    // Attacker wins → identical to a normal capture.
+    if (attackerWon) {
+      return applyMove(state, move);
+    }
+
+    // Defender wins → the attacking piece is destroyed, the defender remains.
+    final attackerColor = state.currentTurn;
+    final lostPiece = move.piece;
+
+    // Remove the attacker from its origin square. (For a snipe the bishop never
+    // reached the target, so we still only clear the origin.)
+    var board = state.board.setPiece(move.from, null);
+
+    // Update royal tracking for the *attacker's* lost piece.
+    var playerWhite = state.playerWhite;
+    var playerBlack = state.playerBlack;
+    if (lostPiece.type == PieceType.king) {
+      if (attackerColor == PlayerColor.white) {
+        playerWhite = playerWhite.copyWith(hasKing: false);
+      } else {
+        playerBlack = playerBlack.copyWith(hasKing: false);
+      }
+    } else if (lostPiece.type == PieceType.queen) {
+      if (attackerColor == PlayerColor.white) {
+        playerWhite = playerWhite.copyWith(hasQueen: false);
+      } else {
+        playerBlack = playerBlack.copyWith(hasQueen: false);
+      }
+    }
+
+    // The attacker may have lost their last royal → Last Warrior transformation
+    // applies to the attacker's surviving royal.
+    final transformedBoard = LastWarriorRule.apply(board, lostPiece);
+    if (transformedBoard != null) {
+      board = transformedBoard;
+    }
+
+    final newMoveHistory = [...state.moveHistory, move];
+
+    // Losing the attacking piece can hand victory to the defender (e.g. the
+    // attacker sacrificed their last royal). Check the defender's conditions
+    // first, then the attacker's for completeness.
+    final defenderColor = attackerColor.opposite;
+    final defenderVictory = VictoryChecker.checkVictory(board, defenderColor);
+    if (defenderVictory != null) {
+      return state.copyWith(
+        board: board,
+        playerWhite: playerWhite,
+        playerBlack: playerBlack,
+        moveHistory: newMoveHistory,
+        moveCount: state.moveCount + 1,
+        victoryCondition: defenderVictory,
+        winner: defenderColor,
+        phase: GamePhase.finished,
+      );
+    }
+
+    final attackerVictory = VictoryChecker.checkVictory(board, attackerColor);
+    if (attackerVictory != null) {
+      return state.copyWith(
+        board: board,
+        playerWhite: playerWhite,
+        playerBlack: playerBlack,
+        moveHistory: newMoveHistory,
+        moveCount: state.moveCount + 1,
+        victoryCondition: attackerVictory,
+        winner: attackerColor,
+        phase: GamePhase.finished,
+      );
+    }
+
+    // No victory: the attacker still used their turn, so it passes to the
+    // defender.
+    return state.copyWith(
+      board: board,
+      playerWhite: playerWhite,
+      playerBlack: playerBlack,
+      currentTurn: defenderColor,
+      moveHistory: newMoveHistory,
+      moveCount: state.moveCount + 1,
+    );
+  }
+
   /// Convenience: validate and apply a move in one step.
   /// Returns null if the move is illegal.
   static GameState? tryMove(

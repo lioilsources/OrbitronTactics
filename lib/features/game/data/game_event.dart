@@ -35,6 +35,15 @@ sealed class GameEvent {
         return PlayerLeftEvent(
           color: PlayerColor.values.byName(json['color'] as String),
         );
+      case 'battle_started':
+        return BattleStartedEvent(
+          move: Move.fromJson(json['move'] as Map<String, dynamic>),
+          seed: json['seed'] as int,
+        );
+      case 'battle_resolved':
+        return BattleResolvedEvent(
+          winner: PlayerColor.values.byName(json['winner'] as String),
+        );
       default:
         throw ArgumentError('Unknown event type: ${json['type']}');
     }
@@ -111,5 +120,37 @@ class PlayerLeftEvent extends GameEvent {
   Map<String, dynamic> toJson() => {
         'type': 'player_left',
         'color': color.name,
+      };
+}
+
+/// Sent when a capturing move triggers a real-time battle (local-network
+/// co-op mode only). Both players enter the arena. [seed] deterministically
+/// generates the asteroid field so both sides start identically. The attacker
+/// is always the colour of `move.piece`.
+class BattleStartedEvent extends GameEvent {
+  final Move move;
+  final int seed;
+
+  const BattleStartedEvent({required this.move, required this.seed});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_started',
+        'move': move.toJson(),
+        'seed': seed,
+      };
+}
+
+/// Sent by the battle host with the authoritative outcome. Both sides resolve
+/// the pending capture via [GameEngine.applyResolvedCapture].
+class BattleResolvedEvent extends GameEvent {
+  final PlayerColor winner;
+
+  const BattleResolvedEvent({required this.winner});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_resolved',
+        'winner': winner.name,
       };
 }

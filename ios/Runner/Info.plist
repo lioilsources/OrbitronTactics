@@ -45,5 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Local-network co-op (MultipeerConnectivity) -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>OrbitronTactics uses the local network to find and play with nearby players.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_orbitrontctic._tcp</string>
+		<string>_orbitrontctic._udp</string>
+	</array>
 </dict>
 </plist>

@@ -260,6 +260,10 @@ class GameSession {
       case BattleResolvedEvent(:final winner):
         // Authoritative outcome from the host — resolve the pending capture.
         _applyBattleResult(winner);
+      case BattleInputEvent():
+      case BattleSnapshotEvent():
+        // High-frequency arena traffic — consumed by the BattleLink, not here.
+        break;
     }
   }
 

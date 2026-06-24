@@ -15,6 +15,9 @@ enum GameMode {
 
   /// Each player has their own session with transport.
   multiplayer,
+
+  /// Two devices over a local network; captures open a real-time battle.
+  localNetworkCoop,
 }
 
 /// Manages the game state for both local hot-seat and multiplayer modes.
@@ -42,12 +45,19 @@ class GameStateNotifier extends StateNotifier<GameState> {
   /// Stream that fires when the opponent disconnects.
   Stream<void>? get onOpponentDisconnect => _session?.onOpponentDisconnect;
 
+  /// The pending battle request stream for the current session, if any.
+  /// The UI listens to this to open the real-time arena.
+  Stream<BattleStartRequest>? get onBattleRequested =>
+      _session?.onBattleRequested;
+
   /// Attach a multiplayer session. State updates come from the session.
   void attachSession(GameSession session) {
     _sessionSub?.cancel();
     _disconnectSub?.cancel();
     _session = session;
-    _mode = GameMode.multiplayer;
+    _mode = session.battleOnCapture
+        ? GameMode.localNetworkCoop
+        : GameMode.multiplayer;
     _localColor = session.localColor;
     _opponentDisconnected = false;
     state = session.state;
@@ -85,7 +95,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   /// Attempt to make a move from [from] to [to].
   /// Returns true if the move was successful.
   bool tryMove(Position from, Position to) {
-    if (_mode == GameMode.multiplayer && _session != null) {
+    if (_session != null) {
       final success = _session!.tryMove(from, to);
       return success;
     }
@@ -99,7 +109,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   /// Get legal moves for the piece at [position].
   List<Position> getLegalMoves(Position position) {
-    if (_mode == GameMode.multiplayer && _session != null) {
+    if (_session != null) {
       return _session!.getLegalMoves(position);
     }
     return MoveValidator.getLegalMoves(state, position);

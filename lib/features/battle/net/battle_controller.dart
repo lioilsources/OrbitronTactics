@@ -81,8 +81,15 @@ class BattleController {
           // Only the host consumes remote input (the guest's controls).
           _remoteInput = input;
         case BattleSnapshotMsg(:final snapshot):
-          // Only the guest consumes snapshots.
-          if (!isHost) _latest = snapshot;
+          // Only the guest consumes snapshots. A finished snapshot also tells
+          // the guest the outcome, so the arena can close without relying on a
+          // separate resolved message (which some links do not carry).
+          if (!isHost) {
+            _latest = snapshot;
+            if (snapshot.finished && snapshot.winner != null) {
+              _resolve(snapshot.winner!);
+            }
+          }
         case BattleResolvedMsg(:final winner):
           _resolve(winner);
         case BattleStartMsg():

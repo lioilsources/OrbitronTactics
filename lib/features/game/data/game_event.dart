@@ -1,6 +1,7 @@
 import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
+import '../../battle/model/battle_simulation.dart';
 
 /// Events exchanged between players over the transport layer.
 sealed class GameEvent {
@@ -43,6 +44,15 @@ sealed class GameEvent {
       case 'battle_resolved':
         return BattleResolvedEvent(
           winner: PlayerColor.values.byName(json['winner'] as String),
+        );
+      case 'battle_input':
+        return BattleInputEvent(
+          input: BattleInput.fromJson(json['input'] as Map<String, dynamic>),
+        );
+      case 'battle_snapshot':
+        return BattleSnapshotEvent(
+          snapshot:
+              BattleSnapshot.fromJson(json['snapshot'] as Map<String, dynamic>),
         );
       default:
         throw ArgumentError('Unknown event type: ${json['type']}');
@@ -152,5 +162,32 @@ class BattleResolvedEvent extends GameEvent {
   Map<String, dynamic> toJson() => {
         'type': 'battle_resolved',
         'winner': winner.name,
+      };
+}
+
+/// High-frequency guest → host control input during a battle. Carried over the
+/// transport so the real-time arena works on top of any [GameTransport].
+class BattleInputEvent extends GameEvent {
+  final BattleInput input;
+
+  const BattleInputEvent({required this.input});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_input',
+        'input': input.toJson(),
+      };
+}
+
+/// High-frequency host → guest authoritative arena snapshot.
+class BattleSnapshotEvent extends GameEvent {
+  final BattleSnapshot snapshot;
+
+  const BattleSnapshotEvent({required this.snapshot});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_snapshot',
+        'snapshot': snapshot.toJson(),
       };
 }

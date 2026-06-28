@@ -15,6 +15,9 @@ enum GameMode {
 
   /// Each player has their own session with transport.
   multiplayer,
+
+  /// Local WiFi coop — includes realtime battle arena.
+  localWifi,
 }
 
 /// Manages the game state for both local hot-seat and multiplayer modes.
@@ -85,9 +88,9 @@ class GameStateNotifier extends StateNotifier<GameState> {
   /// Attempt to make a move from [from] to [to].
   /// Returns true if the move was successful.
   bool tryMove(Position from, Position to) {
-    if (_mode == GameMode.multiplayer && _session != null) {
-      final success = _session!.tryMove(from, to);
-      return success;
+    if ((_mode == GameMode.multiplayer || _mode == GameMode.localWifi) &&
+        _session != null) {
+      return _session!.tryMove(from, to);
     }
 
     // Hot-seat mode: direct apply
@@ -95,6 +98,36 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (newState == null) return false;
     state = newState;
     return true;
+  }
+
+  /// Send shield activation to opponent (localWifi mode only).
+  void activateShield() {
+    _session?.sendShieldActivated();
+  }
+
+  /// Called by BattleStateNotifier when the battle ends locally.
+  void resolveBattle(PlayerColor winner) {
+    if (_session != null) {
+      _session!.resolveBattle(winner);
+    }
+  }
+
+  /// Attach a local WiFi session (host or guest).
+  void attachLocalWifiSession(GameSession session) {
+    _detachSession();
+    _session = session;
+    _mode = GameMode.localWifi;
+    _localColor = session.localColor;
+    _opponentDisconnected = false;
+    state = session.state;
+
+    _sessionSub = session.stateStream.listen((newState) {
+      state = newState;
+    });
+    _disconnectSub = session.onOpponentDisconnect.listen((_) {
+      _opponentDisconnected = true;
+      state = state;
+    });
   }
 
   /// Get legal moves for the piece at [position].

@@ -10,6 +10,7 @@ import '../models/formation.dart';
 import '../validators/move_validator.dart';
 import 'last_warrior_rule.dart';
 import 'power_field_generator.dart';
+import 'upgrade_engine.dart';
 import 'victory_checker.dart';
 
 /// The core game engine. All methods are pure functions:
@@ -77,8 +78,18 @@ class GameEngine {
   }
 
   /// Apply a validated move to the game state.
-  /// Returns the new game state after the move.
-  static GameState applyMove(GameState state, Move move) {
+  /// When [triggerBattle] is true and a capture occurs, transitions to
+  /// GamePhase.battle — caller is responsible for managing the battle.
+  static GameState applyMove(
+    GameState state,
+    Move move, {
+    bool triggerBattle = false,
+  }) {
+    // In localWifi mode, captures pause the board game; battle resolves it.
+    if (triggerBattle && move.capturedPiece != null) {
+      return state.copyWith(phase: GamePhase.battle);
+    }
+
     var board = state.board;
 
     // 1. Move the piece
@@ -150,11 +161,45 @@ class GameEngine {
   static GameState? tryMove(
     GameState state,
     Position from,
-    Position to,
-  ) {
+    Position to, {
+    bool triggerBattle = false,
+  }) {
     final move = MoveValidator.createMove(state, from, to);
     if (move == null) return null;
-    return applyMove(state, move);
+    return applyMove(state, move, triggerBattle: triggerBattle);
+  }
+
+  /// Resolve a pending battle. [winner] is the color of the winning unit.
+  /// [pendingMove] is the capture move that triggered the battle.
+  /// Returns (newState, creditsEarned) — caller tracks resources separately.
+  static (GameState, int) resolveBattle(
+    GameState state,
+    Move pendingMove,
+    PlayerColor winner,
+  ) {
+    assert(state.phase == GamePhase.battle);
+
+    final attackerColor = pendingMove.piece.color;
+    GameState resolved;
+
+    if (winner == attackerColor) {
+      // Attacker wins: apply the capture move normally
+      resolved = applyMove(state.copyWith(phase: GamePhase.playing), pendingMove);
+    } else {
+      // Defender wins: remove the attacker from the board
+      final board = state.board.setPiece(pendingMove.from, null);
+      resolved = state.copyWith(
+        phase: GamePhase.playing,
+        board: board,
+        currentTurn: state.currentTurn.opposite,
+        moveHistory: [...state.moveHistory, pendingMove],
+        moveCount: state.moveCount + 1,
+      );
+    }
+
+    final loserPiece = winner == attackerColor ? pendingMove.capturedPiece! : pendingMove.piece;
+    final reward = UpgradeEngine.resourcesFor(loserPiece.type);
+    return (resolved, reward);
   }
 
   /// Create a default "chess-like" formation for quick start / testing.

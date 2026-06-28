@@ -3,6 +3,7 @@ import '../../../core/game_logic/engine/game_engine.dart';
 import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/game_phase.dart';
 import '../../../core/game_logic/models/game_state.dart';
+import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/game_logic/models/player.dart';
 import '../../../core/game_logic/models/position.dart';
@@ -11,6 +12,7 @@ import '../../../core/game_logic/validators/move_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'game_event.dart';
 import 'game_transport.dart';
+import 'local_wifi_game_transport.dart';
 import 'supabase_game_transport.dart';
 
 /// Coordinates multiplayer game flow over a [GameTransport].
@@ -35,6 +37,7 @@ class GameSession {
     required this.localColor,
     required this.transport,
     required GameState initialState,
+    this.battleMode = false,
   }) : _state = initialState;
 
   /// Current game state.
@@ -73,7 +76,15 @@ class GameSession {
     _stateController.add(_state);
   }
 
+  /// Whether this session uses the battle arena (localWifi mode).
+  final bool battleMode;
+
+  /// The capture move that is pending battle resolution.
+  Move? _pendingBattleMove;
+  Move? get pendingBattleMove => _pendingBattleMove;
+
   /// Submit a local move. Returns true if valid and applied.
+  /// In battle mode, returns the pending Move when a capture triggers battle.
   bool tryMove(Position from, Position to) {
     if (!isMyTurn) return false;
 
@@ -84,8 +95,13 @@ class GameSession {
     final move = MoveValidator.createMove(_state, from, to);
     if (move == null) return false;
 
-    // Apply locally
-    _state = GameEngine.applyMove(_state, move);
+    // In battle mode, store the pending move before entering battle phase
+    if (battleMode && move.capturedPiece != null) {
+      _pendingBattleMove = move;
+    }
+
+    // Apply locally (triggers battle phase if battleMode + capture)
+    _state = GameEngine.applyMove(_state, move, triggerBattle: battleMode);
     _stateController.add(_state);
 
     // Send to opponent
@@ -100,6 +116,31 @@ class GameSession {
     }
 
     return true;
+  }
+
+  /// Signal shield activation for local player to opponent.
+  void sendShieldActivated() {
+    if (_state.phase != GamePhase.battle) return;
+    transport.send(ShieldActivatedEvent(color: localColor));
+  }
+
+  /// Resolve the current battle with the given winner.
+  void resolveBattle(PlayerColor winner) {
+    if (_state.phase != GamePhase.battle) return;
+    if (_pendingBattleMove == null) return;
+
+    final (newState, _) = GameEngine.resolveBattle(_state, _pendingBattleMove!, winner);
+    _pendingBattleMove = null;
+    _state = newState;
+    _stateController.add(_state);
+    transport.send(BattleResolvedEvent(winner: winner));
+
+    if (_state.isFinished) {
+      transport.send(GameOverEvent(
+        winner: _state.winner!,
+        reason: _state.victoryCondition.toString(),
+      ));
+    }
   }
 
   /// Get legal moves for a piece (only if it's our piece and our turn).
@@ -130,7 +171,8 @@ class GameSession {
       case MoveMadeEvent(:final move):
         // Validate the remote move (anti-cheat for future server mode)
         if (_state.currentTurn != localColor) {
-          _state = GameEngine.applyMove(_state, move);
+          _state =
+              GameEngine.applyMove(_state, move, triggerBattle: battleMode);
           _stateController.add(_state);
         }
       case FormationLockedEvent(:final color, :final formation):
@@ -150,6 +192,18 @@ class GameSession {
       case PlayerLeftEvent():
         if (!_state.isFinished) {
           _disconnectController.add(null);
+        }
+      case ShieldActivatedEvent():
+        // Handled by battleStateProvider via the event stream
+        break;
+      case BattleResolvedEvent(:final winner):
+        // Apply if we haven't resolved locally yet (guest receiving host result)
+        if (_state.phase == GamePhase.battle && _pendingBattleMove != null) {
+          final (newState, _) =
+              GameEngine.resolveBattle(_state, _pendingBattleMove!, winner);
+          _pendingBattleMove = null;
+          _state = newState;
+          _stateController.add(_state);
         }
     }
   }
@@ -209,6 +263,53 @@ class GameSession {
     );
 
     return (whiteSession, blackSession);
+  }
+
+  /// Create a local WiFi session for the host player.
+  static GameSession createLocalWifiHostSession({
+    required String localPlayerName,
+    required void Function(String address) onReady,
+  }) {
+    final id = 'wifi-${DateTime.now().millisecondsSinceEpoch}';
+    final transport = HostWifiTransport(onReady: onReady);
+    final initialState = _buildWifiInitialState(id, localPlayerName, 'Guest');
+    return GameSession(
+      localColor: PlayerColor.white,
+      transport: transport,
+      initialState: initialState,
+      battleMode: true,
+    );
+  }
+
+  /// Create a local WiFi session for the guest player.
+  static GameSession createLocalWifiGuestSession({
+    required String hostAddress,
+    required String localPlayerName,
+  }) {
+    final id = 'wifi-guest-${DateTime.now().millisecondsSinceEpoch}';
+    final transport = GuestWifiTransport(hostAddress: hostAddress);
+    final initialState = _buildWifiInitialState(id, 'Host', localPlayerName);
+    return GameSession(
+      localColor: PlayerColor.black,
+      transport: transport,
+      initialState: initialState,
+      battleMode: true,
+    );
+  }
+
+  static GameState _buildWifiInitialState(
+      String id, String whiteName, String blackName) {
+    final state = GameEngine.createGame(
+      gameId: id,
+      playerWhite:
+          Player(userId: 'wifi-white', displayName: whiteName, color: PlayerColor.white),
+      playerBlack:
+          Player(userId: 'wifi-black', displayName: blackName, color: PlayerColor.black),
+    );
+    var withWhite = GameEngine.applyFormation(
+        state, PlayerColor.white, GameEngine.defaultFormation(PlayerColor.white));
+    return GameEngine.applyFormation(
+        withWhite, PlayerColor.black, GameEngine.defaultFormation(PlayerColor.black));
   }
 
   /// Create an online game session via Supabase Broadcast.

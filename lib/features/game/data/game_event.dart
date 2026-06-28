@@ -2,6 +2,7 @@ import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
 
+
 /// Events exchanged between players over the transport layer.
 sealed class GameEvent {
   const GameEvent();
@@ -34,6 +35,14 @@ sealed class GameEvent {
       case 'player_left':
         return PlayerLeftEvent(
           color: PlayerColor.values.byName(json['color'] as String),
+        );
+      case 'shield_activated':
+        return ShieldActivatedEvent(
+          color: PlayerColor.values.byName(json['color'] as String),
+        );
+      case 'battle_resolved':
+        return BattleResolvedEvent(
+          winner: PlayerColor.values.byName(json['winner'] as String),
         );
       default:
         throw ArgumentError('Unknown event type: ${json['type']}');
@@ -111,5 +120,29 @@ class PlayerLeftEvent extends GameEvent {
   Map<String, dynamic> toJson() => {
         'type': 'player_left',
         'color': color.name,
+      };
+}
+
+class ShieldActivatedEvent extends GameEvent {
+  final PlayerColor color;
+
+  const ShieldActivatedEvent({required this.color});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'shield_activated',
+        'color': color.name,
+      };
+}
+
+class BattleResolvedEvent extends GameEvent {
+  final PlayerColor winner;
+
+  const BattleResolvedEvent({required this.winner});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_resolved',
+        'winner': winner.name,
       };
 }

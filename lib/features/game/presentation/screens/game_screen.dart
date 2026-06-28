@@ -1,19 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
 import '../../data/game_event.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/game_board.dart';
+import '../../../battle/presentation/providers/battle_state_provider.dart';
+import '../../../battle/presentation/screens/battle_screen.dart';
+import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  bool _battleScreenPushed = false;
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
     final notifier = ref.read(gameStateProvider.notifier);
+
+    // Push battle screen when entering battle phase
+    ref.listen(gameStateProvider, (prev, next) {
+      if (next.phase == GamePhase.battle &&
+          prev?.phase != GamePhase.battle &&
+          !_battleScreenPushed) {
+        _battleScreenPushed = true;
+
+        final session = ref.read(gameStateProvider.notifier).session;
+        final pendingMove = session?.pendingBattleMove;
+        PlayerColor? attackerColor;
+
+        if (pendingMove != null && pendingMove.capturedPiece != null) {
+          attackerColor = pendingMove.piece.color;
+          final defenderColor = pendingMove.capturedPiece!.color;
+          final attackerUpgrades =
+              ref.read(upgradeProfileProvider(attackerColor));
+          final defenderUpgrades =
+              ref.read(upgradeProfileProvider(defenderColor));
+
+          final initialBattle = BattleEngine.createBattle(
+            attacker: pendingMove.piece,
+            defender: pendingMove.capturedPiece!,
+            attackerUpgrades: attackerUpgrades,
+            defenderUpgrades: defenderUpgrades,
+          );
+
+          ref.read(battleStateProvider.notifier).startBattle(
+                initial: initialBattle,
+                attackerColor: attackerColor,
+              );
+        }
+
+        Navigator.of(context)
+            .push(MaterialPageRoute(
+          builder: (_) => BattleScreen(attackerColor: attackerColor),
+        ))
+            .then((_) => _battleScreenPushed = false);
+      }
+    });
     final localColor = notifier.localColor;
     final flipBoard = localColor == PlayerColor.black;
     final isMultiplayer = notifier.mode == GameMode.multiplayer;
@@ -44,6 +95,13 @@ class GameScreen extends ConsumerWidget {
               onPressed: () => _showLeaveDialog(context, ref),
               tooltip: 'Leave Game',
             ),
+          IconButton(
+            icon: const Icon(Icons.military_tech),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ComcenterScreen()),
+            ),
+            tooltip: 'Comcenter',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {

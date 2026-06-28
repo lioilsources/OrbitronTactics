@@ -10,6 +10,7 @@ import '../../data/game_session.dart';
 import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
+import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
@@ -115,6 +116,88 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
+  Future<void> _hostLocalWifi() async {
+    setState(() => _isLoading = true);
+    try {
+      final playerName = _nameController.text.trim().isEmpty
+          ? 'Host'
+          : _nameController.text.trim();
+
+      final session = GameSession.createLocalWifiHostSession(
+        localPlayerName: playerName,
+        onReady: (addr) {
+          if (mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => _WifiHostDialog(address: addr),
+            );
+          }
+        },
+      );
+
+      await session.start(); // blocks until guest connects
+
+      if (!mounted) {
+        session.dispose();
+        return;
+      }
+      Navigator.of(context).pop(); // close dialog
+      ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const GameScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('WiFi host error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _joinLocalWifi() async {
+    final ip = await showDialog<String>(
+      context: context,
+      builder: (_) => const _WifiJoinDialog(),
+    );
+    if (ip == null || ip.isEmpty) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final playerName = _nameController.text.trim().isEmpty
+          ? 'Guest'
+          : _nameController.text.trim();
+
+      final session = GameSession.createLocalWifiGuestSession(
+        hostAddress: ip.contains(':') ? ip : '$ip:42069',
+        localPlayerName: playerName,
+      );
+      await session.start();
+
+      if (!mounted) {
+        session.dispose();
+        return;
+      }
+      ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const GameScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('WiFi join error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final waitingGames = ref.watch(waitingGamesProvider);
@@ -125,6 +208,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         title: const Text('OrbitronTactics'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.military_tech),
+            tooltip: 'Comcenter',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ComcenterScreen()),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -180,7 +272,45 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+
+              // Local WiFi buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _hostLocalWifi,
+                      icon: const Icon(Icons.wifi, size: 16),
+                      label: const Text('Host WiFi'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.greenAccent,
+                        side: const BorderSide(color: Colors.green),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _joinLocalWifi,
+                      icon: const Icon(Icons.wifi_find, size: 16),
+                      label: const Text('Join WiFi'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.greenAccent,
+                        side: const BorderSide(color: Colors.green),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'WiFi mode includes realtime battle arena',
+                style: TextStyle(color: Colors.green.shade700, fontSize: 11),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
 
               // Waiting games list
               Text(
@@ -282,6 +412,121 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _WifiHostDialog extends StatelessWidget {
+  final String address;
+
+  const _WifiHostDialog({required this.address});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF1A1A2E),
+      title: Row(
+        children: [
+          const Icon(Icons.wifi, color: Colors.greenAccent),
+          const SizedBox(width: 8),
+          const Text('WiFi Host', style: TextStyle(color: Colors.white)),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Share this address with your opponent:',
+            style: TextStyle(color: Colors.white70),
+          ),
+          const SizedBox(height: 12),
+          SelectableText(
+            address,
+            style: const TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'monospace',
+            ),
+          ),
+          const SizedBox(height: 16),
+          const CircularProgressIndicator(color: Colors.greenAccent),
+          const SizedBox(height: 8),
+          const Text(
+            'Waiting for guest to connect...',
+            style: TextStyle(color: Colors.white54, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WifiJoinDialog extends StatefulWidget {
+  const _WifiJoinDialog();
+
+  @override
+  State<_WifiJoinDialog> createState() => _WifiJoinDialogState();
+}
+
+class _WifiJoinDialogState extends State<_WifiJoinDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF1A1A2E),
+      title: Row(
+        children: [
+          const Icon(Icons.wifi_find, color: Colors.greenAccent),
+          const SizedBox(width: 8),
+          const Text('Join WiFi Game', style: TextStyle(color: Colors.white)),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Enter the host\'s IP address:',
+            style: TextStyle(color: Colors.white70),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            style: const TextStyle(color: Colors.white),
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(
+              hintText: '192.168.1.x:42069',
+              hintStyle: TextStyle(color: Colors.grey.shade600),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade700),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.greenAccent),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          child: const Text('Connect'),
+        ),
+      ],
     );
   }
 }

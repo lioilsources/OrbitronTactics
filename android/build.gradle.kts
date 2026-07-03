@@ -22,22 +22,27 @@ subprojects {
 // Legacy plugins (e.g. flutter_nearby_connections) predate AGP 7 and declare
 // no `namespace`, which AGP 8+ requires. Backfill it from the plugin's
 // manifest `package=` attribute so they still build.
+fun backfillNamespace(project: Project) {
+    val ext = project.extensions
+        .findByType(com.android.build.gradle.LibraryExtension::class.java)
+        ?: return
+    if (ext.namespace != null) return
+    val manifest = project.file("src/main/AndroidManifest.xml")
+    if (!manifest.exists()) return
+    Regex("package=\"([^\"]+)\"")
+        .find(manifest.readText())
+        ?.groupValues
+        ?.get(1)
+        ?.let { ext.namespace = it }
+}
+
 subprojects {
-    afterEvaluate {
-        extensions.findByType(com.android.build.gradle.LibraryExtension::class.java)?.let { ext ->
-            if (ext.namespace == null) {
-                val manifest = file("${projectDir}/src/main/AndroidManifest.xml")
-                if (manifest.exists()) {
-                    val pkg = Regex("package=\"([^\"]+)\"")
-                        .find(manifest.readText())
-                        ?.groupValues
-                        ?.get(1)
-                    if (pkg != null) {
-                        ext.namespace = pkg
-                    }
-                }
-            }
-        }
+    // evaluationDependsOn(":app") above may have evaluated this project
+    // already, in which case afterEvaluate would throw.
+    if (state.executed) {
+        backfillNamespace(this)
+    } else {
+        afterEvaluate { backfillNamespace(this) }
     }
 }
 

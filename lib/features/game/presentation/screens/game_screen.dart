@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
+import '../../../battle/view/battle_coordinator.dart';
 import '../../data/game_event.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/game_board.dart';
@@ -31,7 +32,8 @@ class GameScreen extends ConsumerWidget {
         ? gameState.playerWhite
         : gameState.playerBlack;
 
-    return Scaffold(
+    return BattleCoordinator(
+      child: Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
         title: const Text('OrbitronTactics'),
@@ -145,6 +147,7 @@ class GameScreen extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 

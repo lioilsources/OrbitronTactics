@@ -1,6 +1,7 @@
 import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
+import '../../battle/model/battle_simulation.dart';
 
 /// Events exchanged between players over the transport layer.
 sealed class GameEvent {
@@ -34,6 +35,24 @@ sealed class GameEvent {
       case 'player_left':
         return PlayerLeftEvent(
           color: PlayerColor.values.byName(json['color'] as String),
+        );
+      case 'battle_started':
+        return BattleStartedEvent(
+          move: Move.fromJson(json['move'] as Map<String, dynamic>),
+          seed: json['seed'] as int,
+        );
+      case 'battle_resolved':
+        return BattleResolvedEvent(
+          winner: PlayerColor.values.byName(json['winner'] as String),
+        );
+      case 'battle_input':
+        return BattleInputEvent(
+          input: BattleInput.fromJson(json['input'] as Map<String, dynamic>),
+        );
+      case 'battle_snapshot':
+        return BattleSnapshotEvent(
+          snapshot:
+              BattleSnapshot.fromJson(json['snapshot'] as Map<String, dynamic>),
         );
       default:
         throw ArgumentError('Unknown event type: ${json['type']}');
@@ -111,5 +130,64 @@ class PlayerLeftEvent extends GameEvent {
   Map<String, dynamic> toJson() => {
         'type': 'player_left',
         'color': color.name,
+      };
+}
+
+/// Sent when a capturing move triggers a real-time battle (local-network
+/// co-op mode only). Both players enter the arena. [seed] deterministically
+/// generates the asteroid field so both sides start identically. The attacker
+/// is always the colour of `move.piece`.
+class BattleStartedEvent extends GameEvent {
+  final Move move;
+  final int seed;
+
+  const BattleStartedEvent({required this.move, required this.seed});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_started',
+        'move': move.toJson(),
+        'seed': seed,
+      };
+}
+
+/// Sent by the battle host with the authoritative outcome. Both sides resolve
+/// the pending capture via [GameEngine.applyResolvedCapture].
+class BattleResolvedEvent extends GameEvent {
+  final PlayerColor winner;
+
+  const BattleResolvedEvent({required this.winner});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_resolved',
+        'winner': winner.name,
+      };
+}
+
+/// High-frequency guest → host control input during a battle. Carried over the
+/// transport so the real-time arena works on top of any [GameTransport].
+class BattleInputEvent extends GameEvent {
+  final BattleInput input;
+
+  const BattleInputEvent({required this.input});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_input',
+        'input': input.toJson(),
+      };
+}
+
+/// High-frequency host → guest authoritative arena snapshot.
+class BattleSnapshotEvent extends GameEvent {
+  final BattleSnapshot snapshot;
+
+  const BattleSnapshotEvent({required this.snapshot});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'battle_snapshot',
+        'snapshot': snapshot.toJson(),
       };
 }

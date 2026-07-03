@@ -10,6 +10,7 @@ import '../../data/game_session.dart';
 import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
+import 'local_coop_discovery_screen.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
@@ -115,6 +116,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
+  void _startNearbyCoop() {
+    final playerName = _nameController.text.trim();
+    if (playerName.isEmpty) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LocalCoopDiscoveryScreen(playerName: playerName),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final waitingGames = ref.watch(waitingGamesProvider);
@@ -179,6 +190,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+
+              // Local-network co-op (Archon-style real-time battles on capture)
+              OutlinedButton.icon(
+                onPressed: _isLoading ? null : _startNearbyCoop,
+                icon: const Icon(Icons.wifi_tethering),
+                label: const Text('Local Co-op (nearby) — battles'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: BorderSide(color: Colors.indigo.shade400),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
               ),
               const SizedBox(height: 24),
 

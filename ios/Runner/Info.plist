@@ -28,6 +28,11 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_orbitrontctic._tcp</string>
+		<string>_orbitrontctic._udp</string>
+	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>OrbitronTactics uses local network to connect with nearby players for WiFi battle mode.</string>
 	<key>UIApplicationSceneManifest</key>

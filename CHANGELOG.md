@@ -1,5 +1,17 @@
 # Changelog
 
+## [03/07/2026]
+- Local Co-op (nearby) mode: P2P discovery + transport via Nearby Connections
+  (Android) / MultipeerConnectivity (iOS) — no shared wifi router needed.
+  Note: pairs same-platform devices only (Android↔Android, iOS↔iOS).
+- Archon-style real-time battle arena on capture (host-authoritative, Flame)
+- Unit leveling: battle credits, ComCenter upgrade screen, per-ship stats
+  (HP/damage/fire rate/defense) and an activatable shield in the arena
+- Connectivity gating: on cellular data the game is turn-based cloud play
+  only; local co-op requires wifi
+- Android: runtime Nearby/Bluetooth permissions, AGP 8 namespace backfill for
+  the legacy nearby plugin
+
 ## [12/02/2026]
 - Disconnect handling for multiplayer via Supabase Presence
 - Fix turn bar visibility and multiplayer networking bugs

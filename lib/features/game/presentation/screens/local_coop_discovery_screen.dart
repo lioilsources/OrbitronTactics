@@ -11,6 +11,7 @@ import '../../data/game_transport.dart';
 import '../../data/local_network/local_network_game_transport.dart';
 import '../../data/local_network/local_network_peer.dart';
 import '../../data/local_network/nearby_local_network_peer.dart';
+import '../providers/connectivity_providers.dart';
 import '../providers/game_state_provider.dart';
 import 'game_screen.dart';
 
@@ -129,6 +130,18 @@ class _LocalCoopDiscoveryScreenState
 
   @override
   Widget build(BuildContext context) {
+    // If wifi drops while still browsing, back out — a game that has already
+    // launched is handled by the transport's disconnect path instead.
+    ref.listen(localPlayAllowedProvider, (previous, allowed) {
+      if (!allowed && !_launching && mounted) {
+        _peer.stop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Wi-Fi is required for local co-op.')),
+        );
+        Navigator.of(context).pop();
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +8,7 @@ import '../../../../core/game_logic/models/piece.dart';
 import '../../data/game_event.dart';
 import '../../data/game_repository.dart';
 import '../../data/game_session.dart';
+import '../providers/connectivity_providers.dart';
 import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
@@ -126,9 +128,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
+  /// The nearby plugin only supports Android/iOS.
+  bool get _isMobilePlatform =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
   @override
   Widget build(BuildContext context) {
     final waitingGames = ref.watch(waitingGamesProvider);
+    final localPlayAllowed = ref.watch(localPlayAllowedProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
@@ -193,18 +202,28 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Local-network co-op (Archon-style real-time battles on capture)
-              OutlinedButton.icon(
-                onPressed: _isLoading ? null : _startNearbyCoop,
-                icon: const Icon(Icons.wifi_tethering),
-                label: const Text('Local Co-op (nearby) — battles'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white70,
-                  side: BorderSide(color: Colors.indigo.shade400),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              // Local-network co-op (Archon-style real-time battles on
+              // capture). Requires wifi — on cellular data the game is
+              // turn-based cloud play only.
+              if (_isMobilePlatform) ...[
+                OutlinedButton.icon(
+                  onPressed: (_isLoading || !localPlayAllowed)
+                      ? null
+                      : _startNearbyCoop,
+                  icon: Icon(
+                      localPlayAllowed ? Icons.wifi_tethering : Icons.wifi_off),
+                  label: Text(localPlayAllowed
+                      ? 'Local Co-op (nearby) — battles'
+                      : 'Local Co-op — requires Wi-Fi'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(color: Colors.indigo.shade400),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
+              ] else
+                const SizedBox(height: 12),
 
               // Waiting games list
               Text(

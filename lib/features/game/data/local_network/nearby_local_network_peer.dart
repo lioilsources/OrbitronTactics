@@ -36,7 +36,7 @@ class NearbyLocalNetworkPeer implements LocalNetworkPeer {
     await _service.init(
       serviceType: _serviceType,
       deviceName: displayName,
-      strategy: Strategy.P2P_Cluster,
+      strategy: Strategy.P2P_CLUSTER,
       callback: (isRunning) async {
         if (isRunning) {
           await _service.stopAdvertisingPeer();
@@ -76,8 +76,9 @@ class NearbyLocalNetworkPeer implements LocalNetworkPeer {
     });
 
     _dataSub = _service.dataReceivedSubscription(callback: (data) {
-      // data is a Map with 'deviceId' and 'message'.
-      final message = data['message'];
+      // Typically a Map with 'deviceId' and 'message', but tolerate a bare
+      // string payload — the plugin's shape differs between platforms.
+      final message = data is Map ? data['message'] : data;
       if (message is String) _messages.add(message);
     });
   }

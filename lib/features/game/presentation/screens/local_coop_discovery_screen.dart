@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/game_logic/models/piece.dart';
 import '../../data/game_session.dart';
@@ -41,6 +43,7 @@ class _LocalCoopDiscoveryScreenState
   List<DiscoveredPeer> _peers = const [];
   bool _invited = false;
   bool _launching = false;
+  bool _permissionsDenied = false;
 
   @override
   void initState() {
@@ -48,7 +51,29 @@ class _LocalCoopDiscoveryScreenState
     _start();
   }
 
+  /// Nearby Connections needs the Bluetooth/nearby-devices runtime permissions
+  /// on Android 12+; on iOS the local-network prompt is driven by Info.plist.
+  Future<bool> _requestPermissions() async {
+    if (!Platform.isAndroid) return true;
+    final statuses = await [
+      Permission.bluetoothAdvertise,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+      Permission.nearbyWifiDevices,
+      Permission.location, // required instead of nearbyWifiDevices on API <= 32
+    ].request();
+    // Older/newer Android versions report the inapplicable permissions as
+    // permanentlyDenied/restricted, so only require the ones actually granted
+    // on this OS version: all requested permissions must not be denied by the
+    // user (isDenied covers an explicit "don't allow").
+    return statuses.values.every((s) => !s.isDenied);
+  }
+
   Future<void> _start() async {
+    if (!await _requestPermissions()) {
+      if (mounted) setState(() => _permissionsDenied = true);
+      return;
+    }
     _peerSub = _peer.discoveredPeers.listen((peers) {
       if (mounted) setState(() => _peers = peers);
     });
@@ -122,6 +147,29 @@ class _LocalCoopDiscoveryScreenState
                 style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
               ),
               const SizedBox(height: 8),
+              if (_permissionsDenied)
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.block, size: 48, color: Colors.orange),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Nearby permissions are required\nto find local players.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey.shade400),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: openAppSettings,
+                          child: const Text('Open settings'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
               Expanded(
                 child: _peers.isEmpty
                     ? Center(

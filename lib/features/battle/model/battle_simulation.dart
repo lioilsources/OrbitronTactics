@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 /// Pure-Dart, dependency-free authoritative simulation for the Archon-style
 /// real-time battle arena.
 ///
@@ -9,6 +7,10 @@ import 'dart:math' as math;
 /// simulation authoritatively and broadcasts [BattleSnapshot]s; the other
 /// device renders the snapshots and only sends its [BattleInput].
 library;
+
+import 'dart:math' as math;
+
+import '../../../core/game_logic/models/unit_stats.dart';
 
 /// Which side of a battle a ship represents. The [BattleRole.attacker] is the
 /// piece that initiated the capture; [BattleRole.defender] is the piece being
@@ -26,10 +28,14 @@ class BattleInput {
   /// Whether the weapon trigger is held (respects the fire cooldown).
   final bool fire;
 
+  /// Whether the shield trigger is held (respects the shield cooldown).
+  final bool shield;
+
   const BattleInput({
     this.turn = 0,
     this.thrust = false,
     this.fire = false,
+    this.shield = false,
   });
 
   static const BattleInput idle = BattleInput();
@@ -38,12 +44,14 @@ class BattleInput {
         'turn': turn,
         'thrust': thrust,
         'fire': fire,
+        'shield': shield,
       };
 
   factory BattleInput.fromJson(Map<String, dynamic> json) => BattleInput(
         turn: (json['turn'] as num).toDouble(),
         thrust: json['thrust'] as bool,
         fire: json['fire'] as bool,
+        shield: json['shield'] as bool? ?? false,
       );
 }
 
@@ -103,7 +111,60 @@ class BattleConfig {
 /// Fixed simulation timestep (60 ticks per second).
 const double kBattleDt = 1 / 60;
 
+/// Per-ship combat parameters derived from a unit's (possibly upgraded)
+/// [UnitStats]. When absent the ship falls back to the [BattleConfig] globals,
+/// which keeps un-leveled battles and existing tests unchanged.
+class ShipSpec {
+  final double maxHp;
+  final double projectileDamage;
+  final double fireCooldown; // seconds between shots
+
+  /// Fraction of incoming damage absorbed passively (0..1).
+  final double defenseRating;
+
+  final double shieldDuration; // seconds of invulnerability per activation
+  final double shieldCooldown; // seconds between activations
+
+  const ShipSpec({
+    required this.maxHp,
+    required this.projectileDamage,
+    required this.fireCooldown,
+    this.defenseRating = 0,
+    this.shieldDuration = 1.5,
+    this.shieldCooldown = 5,
+  });
+
+  /// Derive arena parameters from a unit's (possibly upgraded) stats.
+  factory ShipSpec.fromUnitStats(UnitStats stats) => ShipSpec(
+        maxHp: stats.maxHp.toDouble(),
+        projectileDamage: stats.damage.toDouble(),
+        fireCooldown: stats.attackIntervalMs / 1000,
+        defenseRating: stats.defenseRating,
+        shieldDuration: stats.shieldDurationMs / 1000,
+        shieldCooldown: stats.shieldCooldownMs / 1000,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'hp': maxHp,
+        'dmg': projectileDamage,
+        'fcd': fireCooldown,
+        'def': defenseRating,
+        'shd': shieldDuration,
+        'shc': shieldCooldown,
+      };
+
+  factory ShipSpec.fromJson(Map<String, dynamic> j) => ShipSpec(
+        maxHp: (j['hp'] as num).toDouble(),
+        projectileDamage: (j['dmg'] as num).toDouble(),
+        fireCooldown: (j['fcd'] as num).toDouble(),
+        defenseRating: (j['def'] as num?)?.toDouble() ?? 0,
+        shieldDuration: (j['shd'] as num?)?.toDouble() ?? 1.5,
+        shieldCooldown: (j['shc'] as num?)?.toDouble() ?? 5,
+      );
+}
+
 class _Ship {
+  final ShipSpec spec;
   double x;
   double y;
   double vx = 0;
@@ -111,13 +172,17 @@ class _Ship {
   double angle; // radians
   double hp;
   double cooldown = 0;
+  double shieldRemaining = 0; // seconds of active shield left
+  double shieldCooldownRemaining = 0; // seconds until shield can re-activate
 
   _Ship({
+    required this.spec,
     required this.x,
     required this.y,
     required this.angle,
-    required this.hp,
-  });
+  }) : hp = spec.maxHp;
+
+  bool get shielded => shieldRemaining > 0;
 }
 
 class _Projectile {
@@ -160,20 +225,40 @@ class ShipSnapshot {
   final double y;
   final double angle;
   final double hp;
+  final double maxHp;
+  final bool shielded;
 
-  const ShipSnapshot(
-      {required this.x,
-      required this.y,
-      required this.angle,
-      required this.hp});
+  /// Seconds until the shield can be activated again (0 = ready).
+  final double shieldCooldownRemaining;
 
-  Map<String, dynamic> toJson() => {'x': x, 'y': y, 'a': angle, 'hp': hp};
+  const ShipSnapshot({
+    required this.x,
+    required this.y,
+    required this.angle,
+    required this.hp,
+    this.maxHp = 100,
+    this.shielded = false,
+    this.shieldCooldownRemaining = 0,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'x': x,
+        'y': y,
+        'a': angle,
+        'hp': hp,
+        'mhp': maxHp,
+        'sh': shielded,
+        'shc': shieldCooldownRemaining,
+      };
 
   factory ShipSnapshot.fromJson(Map<String, dynamic> j) => ShipSnapshot(
         x: (j['x'] as num).toDouble(),
         y: (j['y'] as num).toDouble(),
         angle: (j['a'] as num).toDouble(),
         hp: (j['hp'] as num).toDouble(),
+        maxHp: (j['mhp'] as num?)?.toDouble() ?? 100,
+        shielded: j['sh'] as bool? ?? false,
+        shieldCooldownRemaining: (j['shc'] as num?)?.toDouble() ?? 0,
       );
 }
 
@@ -274,20 +359,29 @@ class BattleSimulation {
   bool _finished = false;
   BattleRole? _winner;
 
-  BattleSimulation({required int seed, this.config = const BattleConfig()})
-      : _rng = math.Random(seed) {
+  BattleSimulation({
+    required int seed,
+    this.config = const BattleConfig(),
+    ShipSpec? attackerSpec,
+    ShipSpec? defenderSpec,
+  }) : _rng = math.Random(seed) {
+    final defaultSpec = ShipSpec(
+      maxHp: config.shipMaxHp,
+      projectileDamage: config.projectileDamage,
+      fireCooldown: config.fireCooldown,
+    );
     // Ships spawn on opposite sides facing each other.
     _attacker = _Ship(
+      spec: attackerSpec ?? defaultSpec,
       x: config.arenaWidth * 0.15,
       y: config.arenaHeight * 0.5,
       angle: 0, // facing right
-      hp: config.shipMaxHp,
     );
     _defender = _Ship(
+      spec: defenderSpec ?? defaultSpec,
       x: config.arenaWidth * 0.85,
       y: config.arenaHeight * 0.5,
       angle: math.pi, // facing left
-      hp: config.shipMaxHp,
     );
 
     for (int i = 0; i < config.asteroidCount; i++) {
@@ -334,6 +428,19 @@ class BattleSimulation {
 
   void _stepShip(_Ship ship, BattleInput input, BattleRole role, double dt) {
     if (ship.cooldown > 0) ship.cooldown -= dt;
+    if (ship.shieldRemaining > 0) ship.shieldRemaining -= dt;
+    if (ship.shieldCooldownRemaining > 0) ship.shieldCooldownRemaining -= dt;
+
+    // Shield activation. The cooldown runs from activation, so it is floored
+    // to the duration to prevent a permanently shielded ship.
+    if (input.shield &&
+        !ship.shielded &&
+        ship.shieldCooldownRemaining <= 0 &&
+        ship.spec.shieldDuration > 0) {
+      ship.shieldRemaining = ship.spec.shieldDuration;
+      ship.shieldCooldownRemaining =
+          math.max(ship.spec.shieldCooldown, ship.spec.shieldDuration);
+    }
 
     // Steering.
     final turn = input.turn.clamp(-1.0, 1.0);
@@ -364,7 +471,7 @@ class BattleSimulation {
 
     // Firing.
     if (input.fire && ship.cooldown <= 0) {
-      ship.cooldown = config.fireCooldown;
+      ship.cooldown = ship.spec.fireCooldown;
       final dirX = math.cos(ship.angle);
       final dirY = math.sin(ship.angle);
       _projectiles.add(_Projectile(
@@ -415,12 +522,17 @@ class BattleSimulation {
   }
 
   void _resolveCollisions() {
-    // Projectiles vs the opposing ship.
+    // Projectiles vs the opposing ship. An active shield absorbs the hit;
+    // otherwise damage is the shooter's, reduced by the target's defense.
     for (final p in _projectiles) {
+      final shooter = p.owner == BattleRole.attacker ? _attacker : _defender;
       final target = p.owner == BattleRole.attacker ? _defender : _attacker;
       if (_circlesOverlap(p.x, p.y, config.projectileRadius, target.x,
           target.y, config.shipRadius)) {
-        target.hp -= config.projectileDamage;
+        if (!target.shielded) {
+          target.hp -= shooter.spec.projectileDamage *
+              (1 - target.spec.defenseRating);
+        }
         p.life = 0; // consume the projectile
       }
     }
@@ -443,7 +555,9 @@ class BattleSimulation {
       for (final a in _asteroids) {
         if (_circlesOverlap(
             ship.x, ship.y, config.shipRadius, a.x, a.y, a.radius)) {
-          ship.hp -= config.asteroidDamage * kBattleDt; // continuous contact
+          if (!ship.shielded) {
+            ship.hp -= config.asteroidDamage * kBattleDt; // continuous contact
+          }
           // Push the ship out along the contact normal.
           final nx = ship.x - a.x;
           final ny = ship.y - a.y;
@@ -508,19 +622,21 @@ class BattleSimulation {
     return dx * dx + dy * dy <= r * r;
   }
 
+  ShipSnapshot _shipSnapshot(_Ship ship) => ShipSnapshot(
+        x: ship.x,
+        y: ship.y,
+        angle: ship.angle,
+        hp: ship.hp.clamp(0, ship.spec.maxHp).toDouble(),
+        maxHp: ship.spec.maxHp,
+        shielded: ship.shielded,
+        shieldCooldownRemaining: math.max(0, ship.shieldCooldownRemaining),
+      );
+
   /// Capture the current arena state for rendering / network sync.
   BattleSnapshot snapshot() => BattleSnapshot(
         tick: _tick,
-        attacker: ShipSnapshot(
-            x: _attacker.x,
-            y: _attacker.y,
-            angle: _attacker.angle,
-            hp: _attacker.hp.clamp(0, config.shipMaxHp).toDouble()),
-        defender: ShipSnapshot(
-            x: _defender.x,
-            y: _defender.y,
-            angle: _defender.angle,
-            hp: _defender.hp.clamp(0, config.shipMaxHp).toDouble()),
+        attacker: _shipSnapshot(_attacker),
+        defender: _shipSnapshot(_defender),
         projectiles: _projectiles
             .map((p) => ProjectileSnapshot(x: p.x, y: p.y))
             .toList(),

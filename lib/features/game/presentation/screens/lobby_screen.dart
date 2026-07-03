@@ -8,6 +8,7 @@ import '../../../../core/game_logic/models/piece.dart';
 import '../../data/game_event.dart';
 import '../../data/game_repository.dart';
 import '../../data/game_session.dart';
+import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 import '../providers/connectivity_providers.dart';
 import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
@@ -145,6 +146,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         title: const Text('OrbitronTactics'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            tooltip: 'ComCenter — unit upgrades',
+            icon: const Icon(Icons.rocket_launch, color: Colors.amber),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ComcenterScreen()),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/game_logic/models/piece.dart';
+import '../../../comcenter/presentation/providers/upgrade_providers.dart';
 import '../../data/game_session.dart';
 import '../../data/game_transport.dart';
 import '../../data/local_network/local_network_game_transport.dart';
@@ -104,6 +105,7 @@ class _LocalCoopDiscoveryScreenState
       localPlayerName: widget.playerName,
       remotePlayerName: 'Opponent',
       transport: transport,
+      localProfile: ref.read(upgradeProfileProvider),
     );
     await session.start();
 

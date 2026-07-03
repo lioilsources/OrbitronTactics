@@ -142,14 +142,23 @@ class _BattleScreenState extends State<BattleScreen> {
           ],
         ),
       ),
-      // Fire on the right.
+      // Fire and shield on the right.
       Positioned(
         right: 24,
         bottom: 24,
-        child: _HoldButton(
-          icon: Icons.whatshot,
-          big: true,
-          onChanged: (held) => _input.fire = held,
+        child: Column(
+          children: [
+            _HoldButton(
+              icon: Icons.shield,
+              onChanged: (held) => _input.shield = held,
+            ),
+            const SizedBox(height: 12),
+            _HoldButton(
+              icon: Icons.whatshot,
+              big: true,
+              onChanged: (held) => _input.fire = held,
+            ),
+          ],
         ),
       ),
     ];

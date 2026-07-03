@@ -1,5 +1,7 @@
 import 'dart:async';
 import '../../../core/game_logic/engine/game_engine.dart';
+import '../../../core/game_logic/engine/unit_base_stats.dart';
+import '../../../core/game_logic/engine/upgrade_engine.dart';
 import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/game_phase.dart';
 import '../../../core/game_logic/models/game_state.dart';
@@ -7,9 +9,11 @@ import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/game_logic/models/player.dart';
 import '../../../core/game_logic/models/position.dart';
+import '../../../core/game_logic/models/upgrade_profile.dart';
 import '../../../core/game_logic/models/victory_condition.dart';
 import '../../../core/game_logic/validators/move_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../battle/model/battle_simulation.dart';
 import 'game_event.dart';
 import 'game_transport.dart';
 import 'supabase_game_transport.dart';
@@ -30,11 +34,18 @@ class BattleStartRequest {
   /// Whether the local player hosts the authoritative simulation.
   final bool localIsHost;
 
+  /// Arena parameters derived from the players' upgrade profiles; null means
+  /// base stats. Identical on both devices (carried in [BattleStartedEvent]).
+  final ShipSpec? attackerSpec;
+  final ShipSpec? defenderSpec;
+
   const BattleStartRequest({
     required this.move,
     required this.seed,
     required this.localIsAttacker,
     required this.localIsHost,
+    this.attackerSpec,
+    this.defenderSpec,
   });
 }
 
@@ -57,10 +68,17 @@ class GameSession {
   /// When true, capturing moves are resolved by a real-time battle.
   final bool battleOnCapture;
 
+  /// The local player's unit upgrade levels (battle mode only).
+  final UpgradeProfile localProfile;
+
+  /// The opponent's upgrade levels, announced via [UpgradeProfileEvent].
+  UpgradeProfile _remoteProfile = UpgradeProfile.empty();
+
   final _stateController = StreamController<GameState>.broadcast();
   final _disconnectController = StreamController<void>.broadcast();
   final _battleRequestController =
       StreamController<BattleStartRequest>.broadcast();
+  final _battleRewardController = StreamController<int>.broadcast();
   StreamSubscription<GameEvent>? _eventSub;
   StreamSubscription<ConnectionStatus>? _connectionSub;
 
@@ -74,6 +92,7 @@ class GameSession {
     required this.transport,
     required GameState initialState,
     this.battleOnCapture = false,
+    this.localProfile = const UpgradeProfile(),
   }) : _state = initialState;
 
   /// Current game state.
@@ -88,6 +107,9 @@ class GameSession {
   /// Fires when a capture should open the real-time battle arena.
   Stream<BattleStartRequest> get onBattleRequested =>
       _battleRequestController.stream;
+
+  /// Fires with the credits earned by the local player from a won battle.
+  Stream<int> get onBattleReward => _battleRewardController.stream;
 
   /// Whether a battle is currently being resolved (board input suspended).
   bool get battlePending => _pendingBattleMove != null;
@@ -106,6 +128,12 @@ class GameSession {
     await transport.connect();
     _eventSub = transport.events.listen(_handleRemoteEvent);
     _connectionSub = transport.connectionStatus.listen(_handleConnectionStatus);
+    if (battleOnCapture) {
+      // Announce our upgrade levels so a capture on either side can compute
+      // both ships' arena stats.
+      transport.send(
+          UpgradeProfileEvent(color: localColor, profile: localProfile));
+    }
   }
 
   void _handleConnectionStatus(ConnectionStatus status) {
@@ -140,12 +168,24 @@ class GameSession {
     if (battleOnCapture && move.capturedPiece != null) {
       final seed = _battleSeed(move);
       _pendingBattleMove = move;
-      transport.send(BattleStartedEvent(move: move, seed: seed));
+      // The attacker is the local player (you capture with your own piece);
+      // the defender's stats come from the profile announced at connect.
+      final attackerSpec = _specFor(move.piece.type, move.piece.color);
+      final defenderSpec =
+          _specFor(move.capturedPiece!.type, move.capturedPiece!.color);
+      transport.send(BattleStartedEvent(
+        move: move,
+        seed: seed,
+        attackerSpec: attackerSpec,
+        defenderSpec: defenderSpec,
+      ));
       _battleRequestController.add(BattleStartRequest(
         move: move,
         seed: seed,
         localIsAttacker: move.piece.color == localColor,
         localIsHost: _localIsBattleHost,
+        attackerSpec: attackerSpec,
+        defenderSpec: defenderSpec,
       ));
       return true;
     }
@@ -174,6 +214,13 @@ class GameSession {
           _state.moveCount) &
       0x7fffffff;
 
+  /// Arena stats for a piece, applying its owner's upgrade profile.
+  ShipSpec _specFor(PieceType type, PlayerColor color) {
+    final profile = color == localColor ? localProfile : _remoteProfile;
+    return ShipSpec.fromUnitStats(
+        UpgradeEngine.statsFor(type, profile, unitBaseStats));
+  }
+
   /// Called by the battle **host** once the arena produces a winner. Applies
   /// the resolved capture locally and broadcasts the authoritative result.
   void submitBattleResult(PlayerColor winner) {
@@ -190,6 +237,12 @@ class GameSession {
     _state = GameEngine.applyResolvedCapture(_state, move,
         attackerWon: attackerWon);
     _stateController.add(_state);
+
+    // The battle winner earns credits for the destroyed unit.
+    if (winner == localColor) {
+      final loserPiece = attackerWon ? move.capturedPiece! : move.piece;
+      _battleRewardController.add(UpgradeEngine.resourcesFor(loserPiece.type));
+    }
 
     if (_state.isFinished) {
       transport.send(GameOverEvent(
@@ -248,15 +301,25 @@ class GameSession {
         if (!_state.isFinished) {
           _disconnectController.add(null);
         }
-      case BattleStartedEvent(:final move, :final seed):
-        // The opponent initiated a capture battle — open our arena too.
+      case BattleStartedEvent(
+          :final move,
+          :final seed,
+          :final attackerSpec,
+          :final defenderSpec
+        ):
+        // The opponent initiated a capture battle — open our arena too, with
+        // the exact ship stats the initiator computed.
         _pendingBattleMove = move;
         _battleRequestController.add(BattleStartRequest(
           move: move,
           seed: seed,
           localIsAttacker: move.piece.color == localColor,
           localIsHost: _localIsBattleHost,
+          attackerSpec: attackerSpec,
+          defenderSpec: defenderSpec,
         ));
+      case UpgradeProfileEvent(:final color, :final profile):
+        if (color != localColor) _remoteProfile = profile;
       case BattleResolvedEvent(:final winner):
         // Authoritative outcome from the host — resolve the pending capture.
         _applyBattleResult(winner);
@@ -275,6 +338,7 @@ class GameSession {
     _stateController.close();
     _disconnectController.close();
     _battleRequestController.close();
+    _battleRewardController.close();
   }
 
   /// Create a local hot-seat game with two paired sessions.
@@ -386,6 +450,7 @@ class GameSession {
     required String localPlayerName,
     required String remotePlayerName,
     required GameTransport transport,
+    UpgradeProfile localProfile = const UpgradeProfile(),
   }) {
     final initialState = GameEngine.createGame(
       gameId: gameId,
@@ -419,6 +484,7 @@ class GameSession {
       transport: transport,
       initialState: ready,
       battleOnCapture: true,
+      localProfile: localProfile,
     );
   }
 }

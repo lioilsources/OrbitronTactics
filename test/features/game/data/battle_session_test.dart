@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orbitron_tactics/core/game_logic/engine/unit_base_stats.dart';
+import 'package:orbitron_tactics/core/game_logic/engine/upgrade_engine.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
+import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
 import 'package:orbitron_tactics/features/game/data/game_session.dart';
 import 'package:orbitron_tactics/features/game/data/game_transport.dart';
 import '../../../core/game_logic/test_helpers.dart';
@@ -12,7 +15,10 @@ Future<void> _flush() async {
 
 /// Two battle-enabled sessions sharing a paired transport, set up with a
 /// white pawn able to capture a black pawn diagonally.
-Future<(GameSession, GameSession)> _pair() async {
+Future<(GameSession, GameSession)> _pair({
+  UpgradeProfile whiteProfile = const UpgradeProfile(),
+  UpgradeProfile blackProfile = const UpgradeProfile(),
+}) async {
   final (tA, tB) = LocalGameTransport.createPair();
   final state = gameStateWith(
     board: boardWith({
@@ -30,15 +36,18 @@ Future<(GameSession, GameSession)> _pair() async {
     transport: tA,
     initialState: state,
     battleOnCapture: true,
+    localProfile: whiteProfile,
   );
   final black = GameSession(
     localColor: PlayerColor.black,
     transport: tB,
     initialState: state,
     battleOnCapture: true,
+    localProfile: blackProfile,
   );
   await white.start();
   await black.start();
+  await _flush(); // deliver the upgrade-profile announcements
   return (white, black);
 }
 
@@ -115,6 +124,58 @@ void main() {
         expect(s.state.board.pieceAt(pos(4, 5)), blackPawn);
         expect(s.state.currentTurn, PlayerColor.black);
       }
+
+      white.dispose();
+      black.dispose();
+    });
+
+    test('ship specs reflect both players\' upgrade profiles on both sides',
+        () async {
+      final (white, black) = await _pair(
+        whiteProfile: const UpgradeProfile(levels: {PieceType.pawn: 2}),
+        blackProfile: const UpgradeProfile(levels: {PieceType.pawn: 1}),
+      );
+      BattleStartRequest? whiteReq;
+      BattleStartRequest? blackReq;
+      white.onBattleRequested.listen((r) => whiteReq = r);
+      black.onBattleRequested.listen((r) => blackReq = r);
+
+      white.tryMove(pos(3, 4), pos(4, 5));
+      await _flush();
+
+      final attackerStats = UpgradeEngine.applyUpgrades(
+          unitBaseStats[PieceType.pawn]!, 2);
+      final defenderStats = UpgradeEngine.applyUpgrades(
+          unitBaseStats[PieceType.pawn]!, 1);
+
+      for (final req in [whiteReq!, blackReq!]) {
+        expect(req.attackerSpec!.maxHp, attackerStats.maxHp.toDouble());
+        expect(req.attackerSpec!.projectileDamage,
+            attackerStats.damage.toDouble());
+        expect(req.defenderSpec!.maxHp, defenderStats.maxHp.toDouble());
+        expect(req.defenderSpec!.fireCooldown,
+            defenderStats.attackIntervalMs / 1000);
+      }
+
+      white.dispose();
+      black.dispose();
+    });
+
+    test('the battle winner earns credits for the destroyed unit', () async {
+      final (white, black) = await _pair();
+      final whiteRewards = <int>[];
+      final blackRewards = <int>[];
+      white.onBattleReward.listen(whiteRewards.add);
+      black.onBattleReward.listen(blackRewards.add);
+
+      white.tryMove(pos(3, 4), pos(4, 5));
+      await _flush();
+      white.submitBattleResult(PlayerColor.white);
+      await _flush();
+
+      // Only the winner is paid, for the loser's (black pawn's) value.
+      expect(whiteRewards, [UpgradeEngine.resourcesFor(PieceType.pawn)]);
+      expect(blackRewards, isEmpty);
 
       white.dispose();
       black.dispose();

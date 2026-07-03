@@ -13,9 +13,10 @@ class BattleInputState {
   double turn = 0; // -1..1
   bool thrust = false;
   bool fire = false;
+  bool shield = false;
 
   BattleInput toBattleInput() =>
-      BattleInput(turn: turn, thrust: thrust, fire: fire);
+      BattleInput(turn: turn, thrust: thrust, fire: fire, shield: shield);
 }
 
 /// Thin Flame view over the authoritative [BattleController].
@@ -72,6 +73,10 @@ class _ArenaRenderer extends Component {
   final Paint _defender = Paint()..color = const Color(0xFFFF6B6B);
   final Paint _hpBack = Paint()..color = const Color(0x55FFFFFF);
   final Paint _hpFront = Paint()..color = const Color(0xFF7CFF7C);
+  final Paint _shield = Paint()
+    ..color = const Color(0x887CE0FF)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 3;
 
   @override
   void render(Canvas canvas) {
@@ -132,8 +137,13 @@ class _ArenaRenderer extends Component {
     path.close();
     canvas.drawPath(path, paint);
 
+    // Shield ring while active.
+    if (ship.shielded) {
+      canvas.drawCircle(center, r * 1.5, _shield);
+    }
+
     // HP bar above the ship.
-    final hpFrac = (ship.hp / game.config.shipMaxHp).clamp(0.0, 1.0);
+    final hpFrac = (ship.hp / ship.maxHp).clamp(0.0, 1.0);
     final barW = r * 2.4;
     final barH = math.max(2.0, r * 0.18);
     final barLeft = center.dx - barW / 2;

@@ -1,6 +1,7 @@
 import '../../../core/game_logic/models/formation.dart';
 import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
+import '../../../core/game_logic/models/upgrade_profile.dart';
 import '../../battle/model/battle_simulation.dart';
 
 /// Events exchanged between players over the transport layer.
@@ -40,6 +41,18 @@ sealed class GameEvent {
         return BattleStartedEvent(
           move: Move.fromJson(json['move'] as Map<String, dynamic>),
           seed: json['seed'] as int,
+          attackerSpec: json['attackerSpec'] == null
+              ? null
+              : ShipSpec.fromJson(json['attackerSpec'] as Map<String, dynamic>),
+          defenderSpec: json['defenderSpec'] == null
+              ? null
+              : ShipSpec.fromJson(json['defenderSpec'] as Map<String, dynamic>),
+        );
+      case 'upgrade_profile':
+        return UpgradeProfileEvent(
+          color: PlayerColor.values.byName(json['color'] as String),
+          profile:
+              UpgradeProfile.fromJson(json['profile'] as Map<String, dynamic>),
         );
       case 'battle_resolved':
         return BattleResolvedEvent(
@@ -141,13 +154,42 @@ class BattleStartedEvent extends GameEvent {
   final Move move;
   final int seed;
 
-  const BattleStartedEvent({required this.move, required this.seed});
+  /// Arena parameters for both ships, derived from the players' upgrade
+  /// profiles by the initiating device. Carried in the event so both sides
+  /// build an identical simulation; null means base stats.
+  final ShipSpec? attackerSpec;
+  final ShipSpec? defenderSpec;
+
+  const BattleStartedEvent({
+    required this.move,
+    required this.seed,
+    this.attackerSpec,
+    this.defenderSpec,
+  });
 
   @override
   Map<String, dynamic> toJson() => {
         'type': 'battle_started',
         'move': move.toJson(),
         'seed': seed,
+        if (attackerSpec != null) 'attackerSpec': attackerSpec!.toJson(),
+        if (defenderSpec != null) 'defenderSpec': defenderSpec!.toJson(),
+      };
+}
+
+/// Announces a player's unit upgrade levels after connecting (local-network
+/// co-op only), so the capture initiator can compute both ships' arena stats.
+class UpgradeProfileEvent extends GameEvent {
+  final PlayerColor color;
+  final UpgradeProfile profile;
+
+  const UpgradeProfileEvent({required this.color, required this.profile});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'upgrade_profile',
+        'color': color.name,
+        'profile': profile.toJson(),
       };
 }
 

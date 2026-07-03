@@ -89,6 +89,100 @@ void main() {
     });
   });
 
+  group('BattleSimulation - per-ship specs', () {
+    test('ship specs override the config globals per ship', () {
+      const spec = ShipSpec(
+        maxHp: 250,
+        projectileDamage: 40,
+        fireCooldown: 0.5,
+      );
+      final sim = BattleSimulation(seed: 5, attackerSpec: spec);
+      final snap = sim.snapshot();
+
+      expect(snap.attacker.hp, 250);
+      expect(snap.attacker.maxHp, 250);
+      // Defender falls back to the config defaults.
+      expect(snap.defender.maxHp, const BattleConfig().shipMaxHp);
+    });
+
+    test('defense rating reduces incoming projectile damage', () {
+      const config = BattleConfig(asteroidCount: 0);
+      double damageTaken({required double defenseRating}) {
+        final sim = BattleSimulation(
+          seed: 3,
+          config: config,
+          defenderSpec: ShipSpec(
+            maxHp: 1000,
+            projectileDamage: config.projectileDamage,
+            fireCooldown: config.fireCooldown,
+            defenseRating: defenseRating,
+          ),
+        );
+        for (int i = 0; i < 240; i++) {
+          sim.step(const BattleInput(thrust: true, fire: true),
+              BattleInput.idle);
+        }
+        return 1000 - sim.snapshot().defender.hp;
+      }
+
+      final unarmored = damageTaken(defenseRating: 0);
+      final armored = damageTaken(defenseRating: 0.5);
+      expect(unarmored, greaterThan(0));
+      expect(armored, closeTo(unarmored * 0.5, 0.001));
+    });
+  });
+
+  group('BattleSimulation - shield', () {
+    test('an active shield absorbs projectile damage', () {
+      const config = BattleConfig(asteroidCount: 0);
+      const shielded = ShipSpec(
+        maxHp: 1000,
+        projectileDamage: 12,
+        fireCooldown: 0.25,
+        shieldDuration: 999, // effectively always on once activated
+        shieldCooldown: 999,
+      );
+      final sim =
+          BattleSimulation(seed: 3, config: config, defenderSpec: shielded);
+      for (int i = 0; i < 240; i++) {
+        sim.step(const BattleInput(thrust: true, fire: true),
+            const BattleInput(shield: true));
+      }
+      expect(sim.snapshot().defender.hp, 1000);
+      expect(sim.snapshot().defender.shielded, isTrue);
+    });
+
+    test('the shield expires and respects its cooldown', () {
+      const spec = ShipSpec(
+        maxHp: 100,
+        projectileDamage: 12,
+        fireCooldown: 0.25,
+        shieldDuration: 0.5,
+        shieldCooldown: 2,
+      );
+      final sim = BattleSimulation(seed: 3, attackerSpec: spec);
+
+      // Activate, then hold the trigger through expiry: the shield must drop
+      // after its duration and stay down until the cooldown has passed.
+      sim.step(const BattleInput(shield: true), BattleInput.idle);
+      expect(sim.snapshot().attacker.shielded, isTrue);
+
+      for (int i = 0; i < 40; i++) {
+        // ~0.67s > duration
+        sim.step(const BattleInput(shield: true), BattleInput.idle);
+      }
+      expect(sim.snapshot().attacker.shielded, isFalse);
+
+      // Holding the trigger re-activates once the 2s cooldown has passed.
+      var reShielded = false;
+      for (int i = 0; i < 150 && !reShielded; i++) {
+        sim.step(const BattleInput(shield: true), BattleInput.idle);
+        reShielded = sim.snapshot().attacker.shielded;
+      }
+      expect(reShielded, isTrue);
+    });
+  });
+
   group('BattleSimulation - snapshot serialization', () {
     test('snapshot round-trips through JSON', () {
       final sim = BattleSimulation(seed: 11);

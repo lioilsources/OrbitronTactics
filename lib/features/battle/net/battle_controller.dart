@@ -44,8 +44,15 @@ class BattleController {
     required this.seed,
     this.config = const BattleConfig(),
     this.snapshotInterval = 2,
+    ShipSpec? attackerSpec,
+    ShipSpec? defenderSpec,
   }) : isHost = true {
-    _sim = BattleSimulation(seed: seed, config: config);
+    _sim = BattleSimulation(
+      seed: seed,
+      config: config,
+      attackerSpec: attackerSpec,
+      defenderSpec: defenderSpec,
+    );
     _latest = _sim!.snapshot();
     _listen();
   }

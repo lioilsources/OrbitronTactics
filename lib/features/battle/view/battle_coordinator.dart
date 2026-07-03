@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/game_logic/models/piece.dart';
+import '../../comcenter/presentation/providers/upgrade_providers.dart';
 import '../../game/data/game_session.dart';
 import '../../game/presentation/providers/game_state_provider.dart';
 import '../model/battle_simulation.dart';
@@ -29,16 +30,20 @@ class BattleCoordinator extends ConsumerStatefulWidget {
 
 class _BattleCoordinatorState extends ConsumerState<BattleCoordinator> {
   StreamSubscription<BattleStartRequest>? _sub;
+  StreamSubscription<int>? _rewardSub;
   bool _inArena = false;
 
   @override
   void initState() {
     super.initState();
     // The session is attached before this screen is shown.
-    _sub = ref
-        .read(gameStateProvider.notifier)
-        .onBattleRequested
-        ?.listen(_openArena);
+    final notifier = ref.read(gameStateProvider.notifier);
+    _sub = notifier.onBattleRequested?.listen(_openArena);
+    // Won battles pay out credits spendable in the ComCenter.
+    _rewardSub = notifier.session?.onBattleReward.listen((credits) {
+      ref.read(playerCreditsProvider.notifier).state += credits;
+      persistUpgrades(ref);
+    });
   }
 
   Future<void> _openArena(BattleStartRequest req) async {
@@ -56,7 +61,12 @@ class _BattleCoordinatorState extends ConsumerState<BattleCoordinator> {
     final link = TransportBattleLink(session.transport);
     final controller = req.localIsHost
         ? BattleController.host(
-            link: link, localRole: localRole, seed: req.seed)
+            link: link,
+            localRole: localRole,
+            seed: req.seed,
+            attackerSpec: req.attackerSpec,
+            defenderSpec: req.defenderSpec,
+          )
         : BattleController.guest(
             link: link, localRole: localRole, seed: req.seed);
 
@@ -85,6 +95,7 @@ class _BattleCoordinatorState extends ConsumerState<BattleCoordinator> {
   @override
   void dispose() {
     _sub?.cancel();
+    _rewardSub?.cancel();
     super.dispose();
   }
 

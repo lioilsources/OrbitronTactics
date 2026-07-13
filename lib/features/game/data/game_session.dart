@@ -124,6 +124,12 @@ class GameSession {
     transport.send(ShieldActivatedEvent(color: localColor));
   }
 
+  /// Signal local ship movement to opponent.
+  void sendShipMoved(double xFraction) {
+    if (_state.phase != GamePhase.battle) return;
+    transport.send(ShipMovedEvent(color: localColor, xFraction: xFraction));
+  }
+
   /// Resolve the current battle with the given winner.
   void resolveBattle(PlayerColor winner) {
     if (_state.phase != GamePhase.battle) return;
@@ -194,6 +200,7 @@ class GameSession {
           _disconnectController.add(null);
         }
       case ShieldActivatedEvent():
+      case ShipMovedEvent():
         // Handled by battleStateProvider via the event stream
         break;
       case BattleResolvedEvent(:final winner):

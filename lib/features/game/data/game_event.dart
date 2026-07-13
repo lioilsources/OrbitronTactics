@@ -40,6 +40,11 @@ sealed class GameEvent {
         return ShieldActivatedEvent(
           color: PlayerColor.values.byName(json['color'] as String),
         );
+      case 'ship_moved':
+        return ShipMovedEvent(
+          color: PlayerColor.values.byName(json['color'] as String),
+          xFraction: (json['xFraction'] as num).toDouble(),
+        );
       case 'battle_resolved':
         return BattleResolvedEvent(
           winner: PlayerColor.values.byName(json['winner'] as String),
@@ -132,6 +137,20 @@ class ShieldActivatedEvent extends GameEvent {
   Map<String, dynamic> toJson() => {
         'type': 'shield_activated',
         'color': color.name,
+      };
+}
+
+class ShipMovedEvent extends GameEvent {
+  final PlayerColor color;
+  final double xFraction;
+
+  const ShipMovedEvent({required this.color, required this.xFraction});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'ship_moved',
+        'color': color.name,
+        'xFraction': xFraction,
       };
 }
 

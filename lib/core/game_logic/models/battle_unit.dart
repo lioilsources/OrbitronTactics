@@ -9,12 +9,16 @@ class BattleUnit {
   final ShieldState shieldState;
   final int nextAttackMs;
 
+  /// Horizontal ship position across the arena, 0.0 (left) to 1.0 (right).
+  final double xFraction;
+
   const BattleUnit({
     required this.piece,
     required this.stats,
     required this.currentHp,
     required this.shieldState,
     this.nextAttackMs = 0,
+    this.xFraction = 0.5,
   });
 
   double get hpFraction => currentHp / stats.maxHp;
@@ -26,6 +30,7 @@ class BattleUnit {
     int? currentHp,
     ShieldState? shieldState,
     int? nextAttackMs,
+    double? xFraction,
   }) {
     return BattleUnit(
       piece: piece ?? this.piece,
@@ -33,6 +38,7 @@ class BattleUnit {
       currentHp: currentHp ?? this.currentHp,
       shieldState: shieldState ?? this.shieldState,
       nextAttackMs: nextAttackMs ?? this.nextAttackMs,
+      xFraction: xFraction ?? this.xFraction,
     );
   }
 }

@@ -33,8 +33,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           !_battleScreenPushed) {
         _battleScreenPushed = true;
 
-        final session = ref.read(gameStateProvider.notifier).session;
-        final pendingMove = session?.pendingBattleMove;
+        final pendingMove =
+            ref.read(gameStateProvider.notifier).pendingBattleMove;
         PlayerColor? attackerColor;
 
         if (pendingMove != null && pendingMove.capturedPiece != null) {

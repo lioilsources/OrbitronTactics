@@ -22,6 +22,13 @@ const Map<String, double> _projectileSpeed = {
 class BattleEngine {
   const BattleEngine._();
 
+  /// A projectile hits when the target's ship center is within this
+  /// horizontal distance (arena-width fraction) of the projectile's lane.
+  static const double hitHalfWidth = 0.07;
+
+  /// Ships cannot move closer to the arena edge than this fraction.
+  static const double shipEdgeMargin = 0.06;
+
   static BattleUnit _makeUnit(Piece piece, UpgradeProfile profile) {
     final stats = UpgradeEngine.statsFor(piece.type, profile, unitBaseStats);
     return BattleUnit(
@@ -69,13 +76,13 @@ class BattleEngine {
         positionFraction: p.positionFraction + speed(p) * deltaMs,
       );
       if (moved.positionFraction >= 1.0) {
-        // Hit!
+        // Arrived at the enemy line — hits only if the target didn't dodge
         if (moved.fromAttacker) {
-          if (!defender.shieldState.isActive) {
+          if (!defender.shieldState.isActive && _isHit(defender, moved)) {
             defender = _applyHit(defender, moved);
           }
         } else {
-          if (!attacker.shieldState.isActive) {
+          if (!attacker.shieldState.isActive && _isHit(attacker, moved)) {
             attacker = _applyHit(attacker, moved);
           }
         }
@@ -118,11 +125,29 @@ class BattleEngine {
         positionFraction: 0.0,
         damage: unit.stats.damage,
         fromAttacker: isAttacker,
+        xFraction: unit.xFraction,
       ));
       return unit.copyWith(
           nextAttackMs: unit.stats.attackIntervalMs + next);
     }
     return unit.copyWith(nextAttackMs: next);
+  }
+
+  static bool _isHit(BattleUnit target, Projectile p) =>
+      (target.xFraction - p.xFraction).abs() <= hitHalfWidth;
+
+  /// Move a ship to [xFraction] (clamped to the arena, minus edge margin).
+  static BattleState moveShip(
+    BattleState state,
+    bool isAttacker,
+    double xFraction,
+  ) {
+    if (state.isFinished) return state;
+    final clamped =
+        xFraction.clamp(shipEdgeMargin, 1.0 - shipEdgeMargin).toDouble();
+    return isAttacker
+        ? state.copyWith(attacker: state.attacker.copyWith(xFraction: clamped))
+        : state.copyWith(defender: state.defender.copyWith(xFraction: clamped));
   }
 
   static BattleUnit _tickShield(BattleUnit unit, int deltaMs) {

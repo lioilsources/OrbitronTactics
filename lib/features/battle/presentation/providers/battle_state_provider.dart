@@ -14,6 +14,10 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
   bool _resolveSent = false;
   PlayerColor? _attackerColor;
   StreamSubscription<GameEvent>? _shieldSub;
+  DateTime? _lastShipSyncAt;
+
+  /// Minimum interval between ship-position sync messages.
+  static const _shipSyncIntervalMs = 50;
 
   BattleStateNotifier(this._ref) : super(null);
 
@@ -23,18 +27,24 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
   }) {
     _resolveSent = false;
     _attackerColor = attackerColor;
+    _lastShipSyncAt = null;
     state = initial;
     _lastTick = DateTime.now();
     _timer?.cancel();
     _shieldSub?.cancel();
     _timer = Timer.periodic(const Duration(milliseconds: 16), _onTick);
 
-    // Subscribe to opponent shield activations over the transport
+    // Subscribe to opponent battle actions over the transport
     final session = _ref.read(gameStateProvider.notifier).session;
     if (session != null) {
       _shieldSub = session.transport.events.listen((event) {
         if (event is ShieldActivatedEvent) {
           applyOpponentShield(isAttacker: event.color == _attackerColor);
+        } else if (event is ShipMovedEvent) {
+          applyOpponentShipMove(
+            isAttacker: event.color == _attackerColor,
+            xFraction: event.xFraction,
+          );
         }
       });
     }
@@ -72,7 +82,31 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
   void applyOpponentShield({required bool isAttacker}) {
     final current = state;
     if (current == null) return;
-    state = BattleEngine.activateShield(current, !isAttacker);
+    state = BattleEngine.activateShield(current, isAttacker);
+  }
+
+  /// Move the local player's ship and sync it to the opponent (throttled).
+  void moveLocalShip({required bool isAttacker, required double xFraction}) {
+    final current = state;
+    if (current == null || current.isFinished) return;
+    state = BattleEngine.moveShip(current, isAttacker, xFraction);
+
+    final now = DateTime.now();
+    if (_lastShipSyncAt == null ||
+        now.difference(_lastShipSyncAt!).inMilliseconds >= _shipSyncIntervalMs) {
+      _lastShipSyncAt = now;
+      final moved = isAttacker ? state!.attacker : state!.defender;
+      _ref.read(gameStateProvider.notifier).moveShip(moved.xFraction);
+    }
+  }
+
+  void applyOpponentShipMove({
+    required bool isAttacker,
+    required double xFraction,
+  }) {
+    final current = state;
+    if (current == null) return;
+    state = BattleEngine.moveShip(current, isAttacker, xFraction);
   }
 
   void stopBattle() {

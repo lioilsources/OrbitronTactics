@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/game_logic/engine/game_engine.dart';
+import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/game_state.dart';
+import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/player.dart';
 import '../../../../core/game_logic/models/position.dart';
@@ -28,6 +30,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   StreamSubscription<void>? _disconnectSub;
   PlayerColor? _localColor;
   bool _opponentDisconnected = false;
+  Move? _localPendingBattleMove;
 
   GameStateNotifier(GameState initial, {GameMode mode = GameMode.hotSeat})
       : _mode = mode,
@@ -41,6 +44,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   /// Whether the opponent has disconnected.
   bool get opponentDisconnected => _opponentDisconnected;
+
+  /// The capture move awaiting battle resolution, regardless of mode.
+  Move? get pendingBattleMove =>
+      _session?.pendingBattleMove ?? _localPendingBattleMove;
 
   /// Stream that fires when the opponent disconnects.
   Stream<void>? get onOpponentDisconnect => _session?.onOpponentDisconnect;
@@ -93,10 +100,15 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return _session!.tryMove(from, to);
     }
 
-    // Hot-seat mode: direct apply
-    final newState = GameEngine.tryMove(state, from, to);
-    if (newState == null) return false;
-    state = newState;
+    // Hot-seat mode: direct apply. Captures enter the battle arena.
+    final move = MoveValidator.createMove(state, from, to);
+    if (move == null) return false;
+    if (move.capturedPiece != null) {
+      _localPendingBattleMove = move;
+      state = GameEngine.applyMove(state, move, triggerBattle: true);
+      return true;
+    }
+    state = GameEngine.applyMove(state, move);
     return true;
   }
 
@@ -105,11 +117,24 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _session?.sendShieldActivated();
   }
 
+  /// Send local ship movement to opponent (localWifi mode only).
+  void moveShip(double xFraction) {
+    _session?.sendShipMoved(xFraction);
+  }
+
   /// Called by BattleStateNotifier when the battle ends locally.
   void resolveBattle(PlayerColor winner) {
     if (_session != null) {
       _session!.resolveBattle(winner);
+      return;
     }
+
+    // Hot-seat mode: resolve directly against the engine.
+    final pending = _localPendingBattleMove;
+    if (pending == null || state.phase != GamePhase.battle) return;
+    final (newState, _) = GameEngine.resolveBattle(state, pending, winner);
+    _localPendingBattleMove = null;
+    state = newState;
   }
 
   /// Attach a local WiFi session (host or guest).
@@ -143,6 +168,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _detachSession();
     _mode = GameMode.hotSeat;
     _localColor = null;
+    _localPendingBattleMove = null;
 
     final gameState = GameEngine.createGame(
       gameId: 'local-${DateTime.now().millisecondsSinceEpoch}',
@@ -194,6 +220,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _session?.dispose();
     _session = null;
     _opponentDisconnected = false;
+    _localPendingBattleMove = null;
   }
 
   @override

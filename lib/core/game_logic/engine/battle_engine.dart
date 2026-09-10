@@ -6,17 +6,18 @@ import '../models/piece.dart';
 import '../models/projectile.dart';
 import '../models/shield_state.dart';
 import '../models/upgrade_profile.dart';
+import '../models/weapon_type.dart';
 import 'unit_base_stats.dart';
 import 'upgrade_engine.dart';
 
 const _uuid = Uuid();
 
 // Projectile travel speed: fraction per ms (crosses arena in ~600ms base)
-const Map<String, double> _projectileSpeed = {
-  'rapidFire': 1.0 / 300,
-  'standard': 1.0 / 500,
-  'sniper': 1.0 / 250,
-  'heavyCannon': 1.0 / 700,
+const Map<WeaponType, double> _projectileSpeed = {
+  WeaponType.rapidFire: 1.0 / 300,
+  WeaponType.standard: 1.0 / 500,
+  WeaponType.sniper: 1.0 / 250,
+  WeaponType.heavyCannon: 1.0 / 700,
 };
 
 class BattleEngine {
@@ -28,6 +29,10 @@ class BattleEngine {
 
   /// Ships cannot move closer to the arena edge than this fraction.
   static const double shipEdgeMargin = 0.06;
+
+  /// Travel speed of [weapon]'s projectiles, in arena fractions per ms.
+  static double projectileSpeed(WeaponType weapon) =>
+      _projectileSpeed[weapon]!;
 
   static BattleUnit _makeUnit(Piece piece, UpgradeProfile profile) {
     final stats = UpgradeEngine.statsFor(piece.type, profile, unitBaseStats);
@@ -68,12 +73,13 @@ class BattleEngine {
     defender = _tickShield(defender, deltaMs);
 
     // Move projectiles and resolve hits
-    final speed = _speedFor(attacker.stats.weaponType.name,
-        defender.stats.weaponType.name);
+    final attackerSpeed = projectileSpeed(attacker.stats.weaponType);
+    final defenderSpeed = projectileSpeed(defender.stats.weaponType);
     final surviving = <Projectile>[];
     for (final p in projectiles) {
+      final speed = p.fromAttacker ? attackerSpeed : defenderSpeed;
       final moved = p.copyWith(
-        positionFraction: p.positionFraction + speed(p) * deltaMs,
+        positionFraction: p.positionFraction + speed * deltaMs,
       );
       if (moved.positionFraction >= 1.0) {
         // Arrived at the enemy line — hits only if the target didn't dodge
@@ -191,13 +197,5 @@ class BattleEngine {
     return isAttacker
         ? state.copyWith(attacker: activated)
         : state.copyWith(defender: activated);
-  }
-
-  static double Function(Projectile) _speedFor(
-      String attackerWeapon, String defenderWeapon) {
-    return (Projectile p) {
-      final weapon = p.fromAttacker ? attackerWeapon : defenderWeapon;
-      return _projectileSpeed[weapon] ?? (1.0 / 500);
-    };
   }
 }

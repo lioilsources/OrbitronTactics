@@ -1,39 +1,16 @@
+import '../models/board_state.dart';
 import '../models/game_state.dart';
 import '../models/move.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
 import '../models/game_phase.dart';
-import 'bishop_validator.dart';
-import 'king_validator.dart';
-import 'knight_validator.dart';
-import 'last_warrior_validator.dart';
-import 'pawn_validator.dart';
-import 'piece_validator.dart';
-import 'queen_validator.dart';
-import 'rook_validator.dart';
+import 'validator_registry.dart';
 
 /// Central move validation dispatcher.
 /// Validates a move against the full game state, then dispatches to
 /// piece-specific validators for movement rules.
 class MoveValidator {
   const MoveValidator._();
-
-  static const _validators = <PieceType, PieceValidator>{
-    PieceType.pawn: PawnValidator(),
-    PieceType.rook: RookValidator(),
-    PieceType.knight: KnightValidator(),
-    PieceType.bishop: BishopValidator(),
-    PieceType.queen: QueenValidator(),
-    PieceType.king: KingValidator(),
-  };
-
-  static const _lastWarriorValidator = LastWarriorValidator();
-
-  /// Get the appropriate validator for a piece.
-  static PieceValidator _validatorFor(Piece piece) {
-    if (piece.isLastWarrior) return _lastWarriorValidator;
-    return _validators[piece.type]!;
-  }
 
   /// Returns all legal moves for the piece at [position] in the current game state.
   static List<Position> getLegalMoves(GameState state, Position position) {
@@ -43,7 +20,7 @@ class MoveValidator {
     if (piece == null) return [];
     if (piece.color != state.currentTurn) return [];
 
-    final validator = _validatorFor(piece);
+    final validator = validatorFor(piece);
     return validator.getLegalMoves(state.board, position, piece.color);
   }
 
@@ -77,9 +54,13 @@ class MoveValidator {
   static Move? createMove(GameState state, Position from, Position to) {
     final error = validateMove(state, from, to);
     if (error != null) return null;
+    return buildMove(state.board, from, to);
+  }
 
-    final piece = state.board.pieceAt(from)!;
-    final capturedPiece = state.board.pieceAt(to);
+  /// Builds the [Move] from [from] to [to] on [board] WITHOUT checking
+  /// legality — the caller must already know the move is legal.
+  static Move buildMove(BoardState board, Position from, Position to) {
+    final piece = board.pieceAt(from)!;
 
     // Determine if this is a bishop snipe
     final isSnipe = piece.type == PieceType.bishop &&
@@ -91,7 +72,7 @@ class MoveValidator {
       from: from,
       to: to,
       piece: piece,
-      capturedPiece: capturedPiece,
+      capturedPiece: board.pieceAt(to),
       isSnipe: isSnipe,
     );
   }

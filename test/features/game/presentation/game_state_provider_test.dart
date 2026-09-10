@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orbitron_tactics/core/ai/ai_difficulty.dart';
+import 'package:orbitron_tactics/core/game_logic/engine/upgrade_engine.dart';
 import 'package:orbitron_tactics/core/game_logic/models/game_phase.dart';
+import 'package:orbitron_tactics/core/game_logic/models/move.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/game_state_provider.dart';
 
@@ -88,6 +91,109 @@ void main() {
 
       expect(notifier.pendingBattleMove, isNull);
       expect(notifier.state.phase, GamePhase.playing);
+    });
+
+    test('battle resolution reports the winner and its credits', () {
+      final notifier = notifierWithCaptureSetup();
+      final rewards = <(PlayerColor, int)>[];
+      notifier.onBattleReward =
+          (winner, credits) => rewards.add((winner, credits));
+      notifier.tryMove(pos(3, 3), pos(4, 3));
+
+      notifier.resolveBattle(PlayerColor.white);
+
+      expect(rewards, [
+        (PlayerColor.white, UpgradeEngine.resourcesFor(PieceType.pawn)),
+      ]);
+    });
+
+    test('restartCurrentMode starts a hot-seat game', () {
+      final notifier = notifierWithCaptureSetup();
+
+      notifier.restartCurrentMode();
+
+      expect(notifier.mode, GameMode.hotSeat);
+      expect(notifier.state.moveCount, 0);
+      expect(notifier.state.board.findPieces().length, 32);
+    });
+  });
+
+  group('GameStateNotifier - single player', () {
+    GameStateNotifier singlePlayer(PlayerColor humanColor) {
+      return GameStateNotifier(defaultGameState())
+        ..startSinglePlayerGame(
+          profile: AiProfile.medium,
+          humanColor: humanColor,
+          humanName: 'Ada',
+        );
+    }
+
+    test('sets up colors and players', () {
+      final notifier = singlePlayer(PlayerColor.black);
+
+      expect(notifier.mode, GameMode.singlePlayer);
+      expect(notifier.localColor, PlayerColor.black);
+      expect(notifier.aiColor, PlayerColor.white);
+      expect(notifier.aiProfile, AiProfile.medium);
+      expect(notifier.state.phase, GamePhase.playing);
+      expect(notifier.state.currentTurn, PlayerColor.white);
+      expect(notifier.state.playerBlack.displayName, 'Ada');
+      expect(notifier.state.playerWhite.userId, AiProfile.medium.identity);
+      expect(notifier.state.playerWhite.displayName,
+          AiProfile.medium.displayName);
+    });
+
+    test('the player cannot move AI pieces', () {
+      final notifier = singlePlayer(PlayerColor.black);
+
+      expect(notifier.tryMove(pos(1, 0), pos(2, 1)), isFalse);
+      expect(notifier.state.moveCount, 0);
+    });
+
+    test('applyAiMove plays only on the AI turn', () {
+      final notifier = singlePlayer(PlayerColor.white);
+      final aiMove = Move(from: pos(6, 0), to: pos(5, 1), piece: blackPawn);
+
+      expect(notifier.applyAiMove(aiMove), isFalse);
+      expect(notifier.tryMove(pos(1, 0), pos(2, 1)), isTrue);
+      expect(notifier.applyAiMove(aiMove), isTrue);
+      expect(notifier.state.currentTurn, PlayerColor.white);
+      expect(notifier.state.moveCount, 2);
+    });
+
+    test('applyAiMove rejects illegal moves', () {
+      final notifier = singlePlayer(PlayerColor.black);
+      final illegal = Move(from: pos(1, 0), to: pos(4, 0), piece: whitePawn);
+
+      expect(notifier.applyAiMove(illegal), isFalse);
+      expect(notifier.state.moveCount, 0);
+    });
+
+    test('restartCurrentMode starts a new single player game', () {
+      final notifier = singlePlayer(PlayerColor.black);
+      notifier.applyAiMove(
+          Move(from: pos(1, 0), to: pos(2, 1), piece: whitePawn));
+      final firstGameId = notifier.state.gameId;
+
+      notifier.restartCurrentMode();
+
+      expect(notifier.mode, GameMode.singlePlayer);
+      expect(notifier.aiColor, PlayerColor.white);
+      expect(notifier.aiProfile, AiProfile.medium);
+      expect(notifier.state.gameId, isNot(firstGameId));
+      expect(notifier.state.moveCount, 0);
+      expect(notifier.state.playerBlack.displayName, 'Ada');
+    });
+
+    test('startNewGame leaves single player', () {
+      final notifier = singlePlayer(PlayerColor.white);
+
+      notifier.startNewGame();
+
+      expect(notifier.mode, GameMode.hotSeat);
+      expect(notifier.localColor, isNull);
+      expect(notifier.aiColor, isNull);
+      expect(notifier.aiProfile, isNull);
     });
   });
 }

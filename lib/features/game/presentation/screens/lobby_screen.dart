@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/ai/ai_difficulty.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../data/game_event.dart';
 import '../../data/game_repository.dart';
@@ -11,6 +12,12 @@ import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
+
+// Last single-player setup picked in the lobby, kept for the app session.
+final _singlePlayerDifficultyProvider =
+    StateProvider<AiDifficulty>((ref) => AiDifficulty.medium);
+final _singlePlayerColorProvider =
+    StateProvider<PlayerColor>((ref) => PlayerColor.white);
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
@@ -27,6 +34,25 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _startSinglePlayer() async {
+    final setup =
+        await showDialog<({AiDifficulty difficulty, PlayerColor color})>(
+      context: context,
+      builder: (_) => const _SinglePlayerDialog(),
+    );
+    if (setup == null || !mounted) return;
+
+    final name = _nameController.text.trim();
+    ref.read(gameStateProvider.notifier).startSinglePlayerGame(
+          profile: AiProfile.of(setup.difficulty),
+          humanColor: setup.color,
+          humanName: name.isEmpty ? 'Player' : name,
+        );
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const GameScreen()),
+    );
   }
 
   Future<void> _createGame() async {
@@ -243,6 +269,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               const SizedBox(height: 16),
 
+              // Single player against the AI
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _startSinglePlayer,
+                icon: const Icon(Icons.smart_toy),
+                label: const Text('Single Player'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+              const SizedBox(height: 12),
+
               // Action buttons
               Row(
                 children: [
@@ -411,6 +450,100 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SinglePlayerDialog extends ConsumerWidget {
+  const _SinglePlayerDialog();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final difficulty = ref.watch(_singlePlayerDifficultyProvider);
+    final color = ref.watch(_singlePlayerColorProvider);
+
+    return AlertDialog(
+      backgroundColor: const Color(0xFF1A1A2E),
+      title: const Row(
+        children: [
+          Icon(Icons.smart_toy, color: Colors.deepPurpleAccent),
+          SizedBox(width: 8),
+          Text('Single Player', style: TextStyle(color: Colors.white)),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _DialogLabel('Difficulty'),
+          SegmentedButton<AiDifficulty>(
+            segments: const [
+              ButtonSegment(value: AiDifficulty.easy, label: Text('Easy')),
+              ButtonSegment(value: AiDifficulty.medium, label: Text('Medium')),
+              ButtonSegment(value: AiDifficulty.hard, label: Text('Hard')),
+            ],
+            selected: {difficulty},
+            showSelectedIcon: false,
+            onSelectionChanged: (selection) => ref
+                .read(_singlePlayerDifficultyProvider.notifier)
+                .state = selection.first,
+          ),
+          const SizedBox(height: 16),
+          const _DialogLabel('Your color'),
+          SegmentedButton<PlayerColor>(
+            segments: const [
+              ButtonSegment(value: PlayerColor.white, label: Text('White')),
+              ButtonSegment(value: PlayerColor.black, label: Text('Black')),
+            ],
+            selected: {color},
+            showSelectedIcon: false,
+            onSelectionChanged: (selection) => ref
+                .read(_singlePlayerColorProvider.notifier)
+                .state = selection.first,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            color == PlayerColor.white
+                ? 'You move first'
+                : 'The AI moves first',
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () => Navigator.of(context)
+              .pop((difficulty: difficulty, color: color)),
+          icon: const Icon(Icons.play_arrow),
+          label: const Text('Start'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DialogLabel extends StatelessWidget {
+  final String text;
+
+  const _DialogLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
       ),
     );
   }

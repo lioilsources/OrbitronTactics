@@ -33,7 +33,8 @@ jobs:
 
       - name: Test
         working-directory: .
-        run: flutter test
+        # Slow AI self-play runs locally: flutter test --tags slow
+        run: flutter test --exclude-tags slow
 
   build-android-debug:
     name: Android Debug Build

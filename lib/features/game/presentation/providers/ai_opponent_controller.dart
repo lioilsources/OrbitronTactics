@@ -4,9 +4,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/ai/ai_difficulty.dart';
 import '../../../../core/ai/board_ai.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/game_state.dart';
+import '../../../../core/game_logic/models/move.dart';
+import '../../../../core/game_logic/models/piece.dart';
 import 'game_state_provider.dart';
 
 /// Plays the AI side of a single-player game.
@@ -108,27 +111,28 @@ class AiOpponentController {
     );
   }
 
-  void _playMove(int generation, String gameId, int moveCount) {
+  Future<void> _playMove(int generation, String gameId, int moveCount) async {
     if (generation != _generation) return;
     _pending = null;
     try {
+      final profile = _game.aiProfile;
+      final color = _game.aiColor;
       final state = _ref.read(gameStateProvider);
-      final ai = _ai;
-      final stillCurrent =
-          state.gameId == gameId && state.moveCount == moveCount;
-      if (_battleScreenOpen ||
-          !stillCurrent ||
-          ai == null ||
-          !_isAiTurn(state)) {
+      if (profile == null ||
+          color == null ||
+          !_isCurrent(state, gameId, moveCount)) {
         return;
       }
 
-      final color = _game.aiColor!;
-      final move = ai.chooseMove(state, color);
-      if (move == null) return;
+      final move = await _chooseMove(profile, state, color);
+      // The game may have moved on while the AI was thinking.
+      if (generation != _generation || move == null) return;
+      final current = _ref.read(gameStateProvider);
+      if (!_isCurrent(current, gameId, moveCount)) return;
+
       if (!_game.applyAiMove(move)) {
         debugPrint('AI chose an illegal move $move; playing a random one');
-        final fallback = RandomAi(_random).chooseMove(state, color);
+        final fallback = RandomAi(_random).chooseMove(current, color);
         if (fallback != null) _game.applyAiMove(fallback);
       }
     } finally {
@@ -143,9 +147,55 @@ class AiOpponentController {
     }
   }
 
+  bool _isCurrent(GameState state, String gameId, int moveCount) =>
+      !_battleScreenOpen &&
+      state.gameId == gameId &&
+      state.moveCount == moveCount &&
+      _isAiTurn(state);
+
+  /// Greedy difficulties answer within a frame. A search takes far longer,
+  /// so it runs on a background isolate and the UI keeps animating.
+  Future<Move?> _chooseMove(
+    AiProfile profile,
+    GameState state,
+    PlayerColor color,
+  ) async {
+    if (profile.searchDepth == 0) return _ai?.chooseMove(state, color);
+    return compute(
+      _searchMove,
+      _SearchRequest(
+        profile: profile,
+        // The search never reads the history; don't copy it across.
+        state: state.copyWith(moveHistory: const []),
+        color: color,
+        seed: _random.nextInt(1 << 32),
+      ),
+    );
+  }
+
   void _setThinking(bool value) {
     if (!_disposed) isThinking.value = value;
   }
+}
+
+/// Everything a background search needs; all of it crosses isolates.
+class _SearchRequest {
+  const _SearchRequest({
+    required this.profile,
+    required this.state,
+    required this.color,
+    required this.seed,
+  });
+
+  final AiProfile profile;
+  final GameState state;
+  final PlayerColor color;
+  final int seed;
+}
+
+Move? _searchMove(_SearchRequest request) {
+  final ai = BoardAi.forProfile(request.profile, random: Random(request.seed));
+  return ai.chooseMove(request.state, request.color);
 }
 
 /// The AI opponent of the current single-player game; null in other modes.

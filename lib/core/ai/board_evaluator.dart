@@ -80,12 +80,16 @@ class BoardEvaluator {
 
   static final Map<int, List<double>> _valueTables = {};
 
+  /// [povMoves] and [oppMoves] may pass in [MoveGenerator.generate]'s
+  /// result for either side when the caller already has it.
   static double evaluate(
     GameState s,
     PlayerColor pov, {
     EvalWeights w = EvalWeights.standard,
     UpgradeProfile? povUpgrades,
     UpgradeProfile? oppUpgrades,
+    List<Move>? povMoves,
+    List<Move>? oppMoves,
   }) {
     if (s.isFinished) {
       if (s.winner == null) return 0;
@@ -95,8 +99,8 @@ class BoardEvaluator {
     final opp = pov.opposite;
     final myUpgrades = povUpgrades ?? const UpgradeProfile();
     final theirUpgrades = oppUpgrades ?? const UpgradeProfile();
-    final myMoves = MoveGenerator.generate(s, pov);
-    final theirMoves = MoveGenerator.generate(s, opp);
+    final myMoves = povMoves ?? MoveGenerator.generate(s, pov);
+    final theirMoves = oppMoves ?? MoveGenerator.generate(s, opp);
 
     return _side(s, pov, w, myUpgrades, theirUpgrades, myMoves, theirMoves) -
         _side(s, opp, w, theirUpgrades, myUpgrades, theirMoves, myMoves);

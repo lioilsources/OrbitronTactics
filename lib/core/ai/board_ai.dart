@@ -3,8 +3,8 @@ import 'dart:math';
 import '../game_logic/models/game_state.dart';
 import '../game_logic/models/move.dart';
 import '../game_logic/models/piece.dart';
-import '../game_logic/validators/move_validator.dart';
 import 'ai_difficulty.dart';
+import 'move_generator.dart';
 
 /// Picks board moves for an AI-controlled color.
 abstract class BoardAi {
@@ -24,12 +24,7 @@ class RandomAi implements BoardAi {
 
   @override
   Move? chooseMove(GameState state, PlayerColor color) {
-    if (state.currentTurn != color) return null;
-    final moves = [
-      for (final from in state.board.findPieces(color: color))
-        for (final to in MoveValidator.getLegalMoves(state, from))
-          MoveValidator.createMove(state, from, to)!,
-    ];
+    final moves = MoveGenerator.generate(state, color);
     if (moves.isEmpty) return null;
     return moves[_random.nextInt(moves.length)];
   }

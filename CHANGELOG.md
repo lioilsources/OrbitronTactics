@@ -1,5 +1,12 @@
 # Changelog
 
+## [10/09/2026]
+- Single Player mode against an on-device AI: Easy, Medium or Hard, playing either color
+- Board AI: one-ply greedy play (Easy, Medium) and a Hard alpha-beta search that treats captures as battle chance nodes, running on a background isolate
+- Battle AI flies its own ship in the arena: aims, dodges incoming fire, raises the shield
+- Fleet progress for the player and each AI difficulty — battle credits, upgrades, win/loss record — saved on the device; AI fleets upgrade within a rubber band of the player's fleet
+- Comcenter upgrades the saved player fleet; the board animates opponent moves
+
 ## [12/02/2026]
 - Disconnect handling for multiplayer via Supabase Presence
 - Fix turn bar visibility and multiplayer networking bugs

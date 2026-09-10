@@ -12,6 +12,7 @@ import '../providers/game_state_provider.dart';
 import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
+import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 
 // Last single-player setup picked in the lobby, kept for the app session.
 final _singlePlayerDifficultyProvider =
@@ -489,6 +490,10 @@ class _SinglePlayerDialog extends ConsumerWidget {
                 .read(_singlePlayerDifficultyProvider.notifier)
                 .state = selection.first,
           ),
+          const SizedBox(height: 12),
+          const _DialogLabel('AI fleets'),
+          for (final option in AiDifficulty.values)
+            _FleetRow(difficulty: option, selected: option == difficulty),
           const SizedBox(height: 16),
           const _DialogLabel('Your color'),
           SegmentedButton<PlayerColor>(
@@ -528,6 +533,55 @@ class _SinglePlayerDialog extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// One AI fleet's progress: upgrade levels, unspent credits and record.
+class _FleetRow extends ConsumerWidget {
+  final AiDifficulty difficulty;
+  final bool selected;
+
+  const _FleetRow({required this.difficulty, required this.selected});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fleet =
+        ref.watch(fleetProgressProvider(AiProfile.of(difficulty).identity));
+    final style = TextStyle(
+      color: selected ? Colors.white : Colors.grey.shade600,
+      fontSize: 12,
+      fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 64,
+            child: Text(
+              switch (difficulty) {
+                AiDifficulty.easy => 'Easy',
+                AiDifficulty.medium => 'Medium',
+                AiDifficulty.hard => 'Hard',
+              },
+              style: style,
+            ),
+          ),
+          Icon(
+            Icons.star,
+            size: 12,
+            color: selected ? Colors.amber : Colors.grey.shade700,
+          ),
+          const SizedBox(width: 2),
+          Text('${fleet.totalLevels}', style: style),
+          const Spacer(),
+          Text('${fleet.credits} cr', style: style),
+          const SizedBox(width: 12),
+          Text('${fleet.wins}W / ${fleet.losses}L', style: style),
+        ],
+      ),
     );
   }
 }

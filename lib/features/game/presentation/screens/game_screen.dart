@@ -55,8 +55,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (pendingMove != null && pendingMove.capturedPiece != null) {
       attackerColor = pendingMove.piece.color;
       final defenderColor = pendingMove.capturedPiece!.color;
-      final attackerUpgrades = ref.read(upgradeProfileProvider(attackerColor));
-      final defenderUpgrades = ref.read(upgradeProfileProvider(defenderColor));
+      // Single player fights with the saved fleets; other modes keep the
+      // per-color session upgrades.
+      final ai = ref.read(aiOpponentProvider);
+      final attackerUpgrades = ai != null
+          ? ai.upgradesFor(attackerColor)
+          : ref.read(upgradeProfileProvider(attackerColor));
+      final defenderUpgrades = ai != null
+          ? ai.upgradesFor(defenderColor)
+          : ref.read(upgradeProfileProvider(defenderColor));
 
       final initialBattle = BattleEngine.createBattle(
         attacker: pendingMove.piece,
@@ -253,6 +260,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               _GameOverOverlay(
                 winner: gameState.winner!,
                 victoryCondition: gameState.victoryCondition!,
+                reward: aiController != null && localColor != null
+                    ? '+${aiController.creditsEarned(localColor)} cr'
+                    : null,
                 onNewGame: () {
                   ref.read(gameStateProvider.notifier).restartCurrentMode();
                 },
@@ -610,12 +620,16 @@ class _DisconnectOverlay extends StatelessWidget {
 class _GameOverOverlay extends StatefulWidget {
   final PlayerColor winner;
   final VictoryCondition victoryCondition;
+
+  /// Credits the player earned this game, e.g. "+60 cr". Single player only.
+  final String? reward;
   final VoidCallback onNewGame;
   final VoidCallback onBackToLobby;
 
   const _GameOverOverlay({
     required this.winner,
     required this.victoryCondition,
+    this.reward,
     required this.onNewGame,
     required this.onBackToLobby,
   });
@@ -717,6 +731,25 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
                     _victoryText,
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
+                  if (widget.reward != null) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.monetization_on,
+                            color: Colors.amber, size: 18),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.reward!,
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   Row(
                     mainAxisSize: MainAxisSize.min,

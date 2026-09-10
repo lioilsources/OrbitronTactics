@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/supabase_constants.dart';
 import 'features/game/presentation/screens/lobby_screen.dart';
+import 'features/progress/data/fleet_progress_store.dart';
+import 'features/progress/presentation/providers/fleet_progress_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,8 +14,14 @@ void main() async {
     url: SupabaseConstants.url,
     anonKey: SupabaseConstants.anonKey,
   );
+  final prefs = await SharedPreferences.getInstance();
 
-  runApp(const ProviderScope(child: OrbitronTacticsApp()));
+  runApp(ProviderScope(
+    overrides: [
+      fleetProgressStoreProvider.overrideWithValue(FleetProgressStore(prefs)),
+    ],
+    child: const OrbitronTacticsApp(),
+  ));
 }
 
 class OrbitronTacticsApp extends StatelessWidget {

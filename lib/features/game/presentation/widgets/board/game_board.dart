@@ -3,6 +3,8 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/game_logic/models/game_phase.dart';
+import '../../../../../core/game_logic/models/game_state.dart';
+import '../../../../../core/game_logic/models/move.dart';
 import '../../../../../core/game_logic/models/piece.dart';
 import '../../../../../core/game_logic/models/position.dart';
 import '../../../../../core/game_logic/services/threat_analyzer.dart';
@@ -57,6 +59,10 @@ class _GameBoardState extends ConsumerState<GameBoard>
   _MoveAnimationData? _currentMoveAnim;
   _CaptureAnimationData? _currentCaptureAnim;
 
+  /// The move animated from a tap on this board; its state change must not
+  /// be animated a second time by [_onGameStateChanged].
+  ({Position from, Position to})? _locallyAnimated;
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +111,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
   void _onMoveAnimDone(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
+      _locallyAnimated = null;
       setState(() {
         _currentMoveAnim = null;
       });
@@ -117,6 +124,56 @@ class _GameBoardState extends ConsumerState<GameBoard>
         _currentCaptureAnim = null;
       });
       _captureController.reset();
+    }
+  }
+
+  /// Animates moves that did not start with a tap on this board: the AI's
+  /// moves and remote moves.
+  void _onGameStateChanged(GameState? prev, GameState next) {
+    if (prev == null) return;
+
+    final Move? move;
+    if (next.phase == GamePhase.battle && prev.phase != GamePhase.battle) {
+      // A capture reaches the move history only after its battle; play the
+      // approach now, as the arena opens.
+      move = ref.read(gameStateProvider.notifier).pendingBattleMove;
+    } else if (next.moveHistory.length > prev.moveHistory.length &&
+        prev.phase != GamePhase.battle) {
+      // History growing out of a battle is its resolution — the approach
+      // was already animated when the battle started.
+      move = next.moveHistory.last;
+    } else {
+      return;
+    }
+    if (move == null) return;
+
+    final local = _locallyAnimated;
+    if (local != null && local.from == move.from && local.to == move.to) {
+      _locallyAnimated = null;
+      return;
+    }
+    _animateMove(move);
+  }
+
+  /// Slides the moving piece to its target and fades out a captured piece.
+  void _animateMove(Move move) {
+    final captured = move.capturedPiece;
+    setState(() {
+      _currentMoveAnim = _MoveAnimationData(
+        from: move.from,
+        to: move.to,
+        piece: move.piece,
+      );
+      if (captured != null) {
+        _currentCaptureAnim = _CaptureAnimationData(
+          position: move.to,
+          piece: captured,
+        );
+      }
+    });
+    _moveController.forward(from: 0.0);
+    if (captured != null) {
+      _captureController.forward(from: 0.0);
     }
   }
 
@@ -137,6 +194,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
     final interaction = ref.watch(boardInteractionProvider);
+    ref.listen<GameState>(gameStateProvider, _onGameStateChanged);
 
     // Compute threatened positions (only during playing phase)
     final threatenedPositions = gameState.phase == GamePhase.playing
@@ -273,7 +331,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
   /// Whether the given piece can be selected by the local player.
   /// In hot-seat mode, the current turn player can select their pieces.
-  /// In multiplayer mode, only the local player's pieces can be selected on their turn.
+  /// With a local color (multiplayer, single player), only the local
+  /// player's pieces can be selected on their turn.
   bool _canSelectPiece(Piece piece, GameStateNotifier notifier) {
     final localColor = notifier.localColor;
     if (localColor != null) {
@@ -303,7 +362,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
     if (gameState.phase != GamePhase.playing) return;
 
-    // In multiplayer, block input when it's not our turn
+    // With a local color (multiplayer, single player), block input when
+    // it's not our turn
     if (gameNotifier.localColor != null &&
         gameState.currentTurn != gameNotifier.localColor) {
       interactionNotifier.clearSelection();
@@ -321,34 +381,20 @@ class _GameBoardState extends ConsumerState<GameBoard>
       // If tapping a valid move target, animate then make the move
       if (interaction.validMoves.contains(tappedPos)) {
         final from = interaction.selectedPosition!;
-        final movingPiece = gameState.board.pieceAt(from)!;
-        final capturedPiece = gameState.board.pieceAt(tappedPos);
+        final move = Move(
+          from: from,
+          to: tappedPos,
+          piece: gameState.board.pieceAt(from)!,
+          capturedPiece: gameState.board.pieceAt(tappedPos),
+        );
 
         interactionNotifier.clearSelection();
 
-        // Set up animation data BEFORE executing the move
-        setState(() {
-          _currentMoveAnim = _MoveAnimationData(
-            from: from,
-            to: tappedPos,
-            piece: movingPiece,
-          );
-          if (capturedPiece != null) {
-            _currentCaptureAnim = _CaptureAnimationData(
-              position: tappedPos,
-              piece: capturedPiece,
-            );
-          }
-        });
-
-        // Execute the move (state jumps to final position immediately)
+        // Start the animation BEFORE executing the move
+        // (state jumps to the final position immediately)
+        _locallyAnimated = (from: from, to: tappedPos);
+        _animateMove(move);
         gameNotifier.tryMove(from, tappedPos);
-
-        // Start animations
-        _moveController.forward(from: 0.0);
-        if (capturedPiece != null) {
-          _captureController.forward(from: 0.0);
-        }
         return;
       }
 

@@ -1,10 +1,15 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
+import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
 import '../../data/game_event.dart';
+import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/game_board.dart';
 import '../../../battle/presentation/providers/battle_state_provider.dart';
@@ -19,12 +24,69 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
+  /// How long the board shows an AI attack before the arena covers it.
+  static const _aiApproachDelay = Duration(milliseconds: 400);
+
   bool _battleScreenPushed = false;
+  Timer? _battleOpenTimer;
+
+  @override
+  void dispose() {
+    _battleOpenTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Starts the battle for [pendingMove] and pushes the arena.
+  void _openBattle(Move? pendingMove) {
+    _battleOpenTimer = null;
+    if (!mounted) return;
+    if (ref.read(gameStateProvider).phase != GamePhase.battle ||
+        ref.read(gameStateProvider.notifier).pendingBattleMove !=
+            pendingMove) {
+      // The game moved on (e.g. a restart) before the arena opened.
+      _onBattleScreenClosed();
+      return;
+    }
+
+    PlayerColor? attackerColor;
+
+    if (pendingMove != null && pendingMove.capturedPiece != null) {
+      attackerColor = pendingMove.piece.color;
+      final defenderColor = pendingMove.capturedPiece!.color;
+      final attackerUpgrades = ref.read(upgradeProfileProvider(attackerColor));
+      final defenderUpgrades = ref.read(upgradeProfileProvider(defenderColor));
+
+      final initialBattle = BattleEngine.createBattle(
+        attacker: pendingMove.piece,
+        defender: pendingMove.capturedPiece!,
+        attackerUpgrades: attackerUpgrades,
+        defenderUpgrades: defenderUpgrades,
+      );
+
+      ref.read(battleStateProvider.notifier).startBattle(
+            initial: initialBattle,
+            attackerColor: attackerColor,
+          );
+    }
+
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+          builder: (_) => BattleScreen(attackerColor: attackerColor),
+        ))
+        .then((_) => _onBattleScreenClosed());
+  }
+
+  void _onBattleScreenClosed() {
+    _battleScreenPushed = false;
+    if (mounted) ref.read(aiOpponentProvider)?.battleScreenOpen = false;
+  }
 
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
     final notifier = ref.read(gameStateProvider.notifier);
+    // Watching keeps the AI opponent alive as long as this screen.
+    final aiController = ref.watch(aiOpponentProvider);
 
     // Push battle screen when entering battle phase
     ref.listen(gameStateProvider, (prev, next) {
@@ -32,37 +94,19 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           prev?.phase != GamePhase.battle &&
           !_battleScreenPushed) {
         _battleScreenPushed = true;
+        ref.read(aiOpponentProvider)?.battleScreenOpen = true;
 
-        final pendingMove =
-            ref.read(gameStateProvider.notifier).pendingBattleMove;
-        PlayerColor? attackerColor;
-
-        if (pendingMove != null && pendingMove.capturedPiece != null) {
-          attackerColor = pendingMove.piece.color;
-          final defenderColor = pendingMove.capturedPiece!.color;
-          final attackerUpgrades =
-              ref.read(upgradeProfileProvider(attackerColor));
-          final defenderUpgrades =
-              ref.read(upgradeProfileProvider(defenderColor));
-
-          final initialBattle = BattleEngine.createBattle(
-            attacker: pendingMove.piece,
-            defender: pendingMove.capturedPiece!,
-            attackerUpgrades: attackerUpgrades,
-            defenderUpgrades: defenderUpgrades,
-          );
-
-          ref.read(battleStateProvider.notifier).startBattle(
-                initial: initialBattle,
-                attackerColor: attackerColor,
-              );
+        final game = ref.read(gameStateProvider.notifier);
+        final pendingMove = game.pendingBattleMove;
+        if (game.mode == GameMode.singlePlayer &&
+            pendingMove != null &&
+            pendingMove.piece.color == game.aiColor) {
+          // Let the board play the AI's approach before the arena opens.
+          _battleOpenTimer =
+              Timer(_aiApproachDelay, () => _openBattle(pendingMove));
+        } else {
+          _openBattle(pendingMove);
         }
-
-        Navigator.of(context)
-            .push(MaterialPageRoute(
-          builder: (_) => BattleScreen(attackerColor: attackerColor),
-        ))
-            .then((_) => _battleScreenPushed = false);
       }
     });
     final localColor = notifier.localColor;
@@ -105,7 +149,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.read(gameStateProvider.notifier).startNewGame();
+              ref.read(gameStateProvider.notifier).restartCurrentMode();
             },
             tooltip: 'New Game',
           ),
@@ -124,6 +168,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   isCurrentTurn: gameState.currentTurn == topColor,
                   hasKing: topPlayer.hasKing,
                   hasQueen: topPlayer.hasQueen,
+                  thinking: topColor == notifier.aiColor
+                      ? aiController?.isThinking
+                      : null,
                 ),
 
                 const SizedBox(height: 4),
@@ -171,6 +218,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   isCurrentTurn: gameState.currentTurn == bottomColor,
                   hasKing: bottomPlayer.hasKing,
                   hasQueen: bottomPlayer.hasQueen,
+                  thinking: bottomColor == notifier.aiColor
+                      ? aiController?.isThinking
+                      : null,
                 ),
 
                 const SizedBox(height: 8),
@@ -194,7 +244,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 winner: gameState.winner!,
                 victoryCondition: gameState.victoryCondition!,
                 onNewGame: () {
-                  ref.read(gameStateProvider.notifier).startNewGame();
+                  ref.read(gameStateProvider.notifier).restartCurrentMode();
                 },
                 onBackToLobby: () {
                   Navigator.of(context).maybePop();
@@ -250,12 +300,17 @@ class _PlayerInfoBar extends StatefulWidget {
   final bool hasKing;
   final bool hasQueen;
 
+  /// Set for the AI player: its turn badge reads THINKING… while it is
+  /// deliberating.
+  final ValueListenable<bool>? thinking;
+
   const _PlayerInfoBar({
     required this.name,
     required this.color,
     required this.isCurrentTurn,
     required this.hasKing,
     required this.hasQueen,
+    this.thinking,
   });
 
   @override
@@ -370,23 +425,40 @@ class _PlayerInfoBarState extends State<_PlayerInfoBar>
           if (widget.isCurrentTurn)
             ScaleTransition(
               scale: _pulseScale,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade700,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'TURN',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              child: widget.thinking == null
+                  ? const _TurnBadge(thinking: false)
+                  : ValueListenableBuilder<bool>(
+                      valueListenable: widget.thinking!,
+                      builder: (context, thinking, _) =>
+                          _TurnBadge(thinking: thinking),
+                    ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _TurnBadge extends StatelessWidget {
+  final bool thinking;
+
+  const _TurnBadge({required this.thinking});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: thinking ? Colors.deepPurple.shade400 : Colors.green.shade700,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        thinking ? 'THINKING…' : 'TURN',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

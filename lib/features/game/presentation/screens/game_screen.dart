@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ai/battle_ai.dart';
 import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/move.dart';
@@ -63,9 +65,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         defenderUpgrades: defenderUpgrades,
       );
 
+      // In single player the AI flies its own ship.
+      final game = ref.read(gameStateProvider.notifier);
+      final aiProfile =
+          game.mode == GameMode.singlePlayer ? game.aiProfile : null;
       ref.read(battleStateProvider.notifier).startBattle(
             initial: initialBattle,
             attackerColor: attackerColor,
+            ai: aiProfile == null
+                ? null
+                : BattleAi(profile: aiProfile, random: Random()),
+            aiIsAttacker: attackerColor == game.aiColor,
           );
     }
 

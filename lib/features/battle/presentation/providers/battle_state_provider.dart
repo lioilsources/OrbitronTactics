@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ai/battle_ai.dart';
 import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/piece.dart';
@@ -15,18 +16,26 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
   PlayerColor? _attackerColor;
   StreamSubscription<GameEvent>? _shieldSub;
   DateTime? _lastShipSyncAt;
+  BattleAi? _ai;
+  bool _aiIsAttacker = false;
 
   /// Minimum interval between ship-position sync messages.
   static const _shipSyncIntervalMs = 50;
 
   BattleStateNotifier(this._ref) : super(null);
 
+  /// Starts ticking [initial]. With an [ai], it pilots the attacker's ship
+  /// when [aiIsAttacker], otherwise the defender's.
   void startBattle({
     required BattleState initial,
     required PlayerColor? attackerColor,
+    BattleAi? ai,
+    bool aiIsAttacker = false,
   }) {
     _resolveSent = false;
     _attackerColor = attackerColor;
+    _ai = ai;
+    _aiIsAttacker = aiIsAttacker;
     _lastShipSyncAt = null;
     state = initial;
     _lastTick = DateTime.now();
@@ -55,10 +64,22 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
     if (current == null || current.isFinished) return;
 
     final now = DateTime.now();
-    final deltaMs = now.difference(_lastTick!).inMilliseconds;
+    final deltaMs = now.difference(_lastTick!).inMilliseconds.clamp(1, 100);
     _lastTick = now;
 
-    final next = BattleEngine.tick(current, deltaMs.clamp(1, 100));
+    var next = BattleEngine.tick(current, deltaMs);
+
+    // The AI steers straight on the engine: no transport, no throttling.
+    final ai = _ai;
+    if (ai != null) {
+      final action = ai.decide(next, isAttacker: _aiIsAttacker, deltaMs: deltaMs);
+      if (action.targetX != null) {
+        next = BattleEngine.moveShip(next, _aiIsAttacker, action.targetX!);
+      }
+      if (action.activateShield) {
+        next = BattleEngine.activateShield(next, _aiIsAttacker);
+      }
+    }
     state = next;
 
     if (next.isFinished && !_resolveSent) {
@@ -114,6 +135,7 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
     _timer = null;
     _shieldSub?.cancel();
     _shieldSub = null;
+    _ai = null;
     state = null;
   }
 

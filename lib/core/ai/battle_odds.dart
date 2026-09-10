@@ -59,4 +59,47 @@ class BattleOdds {
   /// Time a [weapon]'s projectile takes to cross the arena.
   static int travelMs(WeaponType weapon) =>
       (1 / BattleEngine.projectileSpeed(weapon)).round();
+
+  static final Map<int, OddsTable> _tables = {};
+
+  /// [attackerWinProbability] for every type pairing of a fleet with
+  /// [attackerUpgrades] attacking a fleet with [defenderUpgrades]. Cached
+  /// per pair of upgrade levels — the search asks millions of times.
+  static OddsTable table(
+    UpgradeProfile attackerUpgrades,
+    UpgradeProfile defenderUpgrades,
+  ) {
+    final key =
+        _levelsKey(attackerUpgrades) * 4096 + _levelsKey(defenderUpgrades);
+    return _tables[key] ??= OddsTable._([
+      for (final attacker in PieceType.values)
+        for (final defender in PieceType.values)
+          attackerWinProbability(
+            Piece(type: attacker, color: PlayerColor.white),
+            Piece(type: defender, color: PlayerColor.black),
+            attackerUpgrades,
+            defenderUpgrades,
+          ),
+    ]);
+  }
+
+  /// Cache key of an upgrade profile: one base-4 digit per piece type.
+  static int _levelsKey(UpgradeProfile upgrades) {
+    var key = 0;
+    for (final type in PieceType.values) {
+      key = key * 4 + upgrades.levelFor(type).clamp(0, 3);
+    }
+    return key;
+  }
+}
+
+/// Attacker win probabilities for every attacker/defender type pairing of
+/// two fleets; see [BattleOdds.table].
+class OddsTable {
+  const OddsTable._(this._probabilities);
+
+  final List<double> _probabilities;
+
+  double of(PieceType attacker, PieceType defender) => _probabilities[
+      attacker.index * PieceType.values.length + defender.index];
 }

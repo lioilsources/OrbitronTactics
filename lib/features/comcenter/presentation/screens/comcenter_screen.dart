@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/game_logic/engine/upgrade_engine.dart';
 import '../../../../core/game_logic/models/piece.dart';
-import '../../../../core/game_logic/models/upgrade_profile.dart';
+import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../widgets/upgrade_card.dart';
-
-// Simple in-memory provider for current session upgrades.
-// In production, load from UpgradeRepository on screen open.
-final _upgradeProfileProvider =
-    StateProvider<UpgradeProfile>((ref) => UpgradeProfile.empty());
-final _creditsProvider = StateProvider<int>((ref) => 0);
 
 class ComcenterScreen extends ConsumerWidget {
   const ComcenterScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(_upgradeProfileProvider);
-    final credits = ref.watch(_creditsProvider);
+    // The player's saved fleet — the upgrades single-player battles use.
+    final fleet = ref.watch(fleetProgressProvider(playerFleetIdentity));
+    final profile = fleet.profile;
+    final credits = fleet.credits;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
@@ -66,12 +61,14 @@ class ComcenterScreen extends ConsumerWidget {
                 mainAxisSpacing: 12,
                 childAspectRatio: 0.72,
                 children: PieceType.values.map((type) {
-                  final level = profile.levelFor(type);
                   return UpgradeCard(
                     pieceType: type,
-                    level: level,
+                    level: profile.levelFor(type),
                     credits: credits,
-                    onUpgrade: () => _upgrade(ref, type, level, credits),
+                    onUpgrade: () => ref
+                        .read(fleetProgressProvider(playerFleetIdentity)
+                            .notifier)
+                        .upgrade(type),
                   );
                 }).toList(),
               ),
@@ -80,18 +77,5 @@ class ComcenterScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void _upgrade(
-      WidgetRef ref, PieceType type, int currentLevel, int credits) {
-    final cost = UpgradeEngine.upgradeCost(currentLevel);
-    if (cost < 0 || credits < cost) return;
-
-    final profile = ref.read(_upgradeProfileProvider);
-    final newLevels = Map<PieceType, int>.from(profile.levels)
-      ..[type] = currentLevel + 1;
-    ref.read(_upgradeProfileProvider.notifier).state =
-        profile.copyWith(levels: newLevels);
-    ref.read(_creditsProvider.notifier).state = credits - cost;
   }
 }

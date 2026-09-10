@@ -182,8 +182,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final (newState, credits) =
         GameEngine.resolveBattle(state, pending, winner);
     _localPendingBattleMove = null;
-    state = newState;
+    // Credit the reward before listeners react to the outcome — the battle
+    // may have just ended the game.
     onBattleReward?.call(winner, credits);
+    state = newState;
   }
 
   /// Attach a local WiFi session (host or guest).

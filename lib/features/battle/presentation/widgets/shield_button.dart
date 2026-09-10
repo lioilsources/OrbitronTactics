@@ -40,7 +40,7 @@ class ShieldButton extends StatelessWidget {
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.5, end: 1.0),
                 duration: const Duration(milliseconds: 600),
-                builder: (_, v, __) => CircularProgressIndicator(
+                builder: (_, v, _) => CircularProgressIndicator(
                   value: v,
                   strokeWidth: 4,
                   color: Colors.cyanAccent,

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [11/09/2026]
+- Climbing also carries a ship a little forward, toward the enemy, and diving back, so altitude changes read at a glance
 - Altitude in the battle arena: drag forward to climb, back to dive; ships grow and cast longer shadows as they climb, and bank into their turns
 - A shot flies at the altitude it was fired from and hits only a ship at about that altitude; shots off their target's altitude are dimmed
 - Elemental shots and explosions: pawn slugs, knight water, bishop fire, rook ice, queen and king electricity; impacts scale with the shot's power, and the losing ship explodes before the result shows

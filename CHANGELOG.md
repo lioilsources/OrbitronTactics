@@ -1,6 +1,10 @@
 # Changelog
 
 ## [11/09/2026]
+- Altitude in the battle arena: drag forward to climb, back to dive; ships grow and cast longer shadows as they climb, and bank into their turns
+- A shot flies at the altitude it was fired from and hits only a ship at about that altitude; shots off their target's altitude are dimmed
+- Elemental shots and explosions: pawn slugs, knight water, bishop fire, rook ice, queen and king electricity; impacts scale with the shot's power, and the losing ship explodes before the result shows
+- The AI pilot matches its target's altitude and also dodges by climbing or diving; WiFi battles sync altitude
 - Ship art for the battle arena: ten fleets, each with a white and a black ship for every unit type
 - Pick your fleet in the Comcenter; each AI difficulty flies its own (Easy Star Nomads, Medium Iron Armada, Hard Void Hive)
 - Arena ships scale with the arena around the hit width, heavier ships larger; the unit panels show the ship

@@ -18,9 +18,10 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 - Local hot-seat mode
 - Single Player against an on-device AI, with fleet progress
 - Ten fleets of ship art for the battle arena
+- Battle arena with altitude, banking ships and elemental explosions
 - Threat indicators (red badge on endangered pieces)
 - Disconnect handling via Supabase Presence
-- 199 unit and widget tests
+- 215 unit and widget tests
 
 ## Single Player
 
@@ -35,6 +36,10 @@ Pick a difficulty and your color in the lobby. The AI plays the board and flies 
 Difficulty is skill only; unit strength comes from **fleet progress**. Battles earn credits for the winner's fleet. You spend yours in the Comcenter, while each difficulty has its own AI fleet that upgrades itself after every game — never more than 0 / 1 / 2 levels (Easy / Medium / Hard) ahead of your fleet. Credits, upgrades and win/loss records are saved on the device.
 
 Every fleet has its own ship art, a white and a black ship for each unit type. Pick one of ten fleets in the Comcenter; Easy, Medium and Hard fly Star Nomads, Iron Armada and Void Hive.
+
+## Battle
+
+A capture is decided in a realtime arena. Drag across your half to dodge, forward to climb and back to dive. A shot flies at the altitude it was fired from and only hits a ship at about that altitude, so to hit the enemy you have to fly where it can hit you too. Each unit fires its own element and explodes in it: pawns slugs, knights water, bishops fire, rooks ice, queens and kings electricity.
 
 ## Tech Stack
 

@@ -4,7 +4,10 @@ import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
+import '../../data/battle_element.dart';
 import '../../data/fleet_skin.dart';
+import '../audio/battle_audio.dart';
+import '../audio/battle_sound_cues.dart';
 import '../providers/battle_state_provider.dart';
 import '../providers/ship_sprite_provider.dart';
 import '../widgets/battle_arena_painter.dart';
@@ -57,16 +60,44 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) setState(() {});
       });
+    // The battle is set up before this screen opens.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final battle = ref.read(battleStateProvider);
+      if (mounted && battle != null) _startAudio(battle);
+    });
   }
 
   @override
   void dispose() {
+    BattleAudio.instance.stop();
     _destruction.dispose();
     super.dispose();
   }
 
+  void _startAudio(BattleState battle) {
+    final started = BattleAudio.instance.start(
+      attacker: battle.attacker.piece.type,
+      elements: {
+        BattleElement.of(battle.attacker.piece.type),
+        BattleElement.of(battle.defender.piece.type),
+      },
+    );
+    // The saved mute setting is only known once audio is up.
+    started.then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<BattleState?>(battleStateProvider, (previous, next) {
+      if (next == null) return;
+      if (previous == null) {
+        _startAudio(next);
+      } else {
+        BattleAudio.instance.play(BattleSoundCues.between(previous, next));
+      }
+    });
     final battleState = ref.watch(battleStateProvider);
     final localColor = ref.read(gameStateProvider.notifier).localColor;
     final attackerColor = widget.attackerColor;
@@ -117,7 +148,14 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
           children: [
             Column(
               children: [
-                _BattleHeader(battleState: battleState),
+                _BattleHeader(
+                  battleState: battleState,
+                  muted: BattleAudio.instance.muted,
+                  onToggleMute: () async {
+                    await BattleAudio.instance.toggleMute();
+                    if (mounted) setState(() {});
+                  },
+                ),
                 const SizedBox(height: 8),
                 // Top player: opponent (wifi) or the player sitting across
                 // the device (hot-seat, rotated to face them).
@@ -310,8 +348,14 @@ class _PlayerBattleControls extends StatelessWidget {
 
 class _BattleHeader extends StatelessWidget {
   final BattleState battleState;
+  final bool muted;
+  final VoidCallback onToggleMute;
 
-  const _BattleHeader({required this.battleState});
+  const _BattleHeader({
+    required this.battleState,
+    required this.muted,
+    required this.onToggleMute,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -341,6 +385,14 @@ class _BattleHeader extends StatelessWidget {
           Text(
             '${(battleState.elapsedMs / 1000).toStringAsFixed(1)}s',
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+          ),
+          IconButton(
+            icon: Icon(muted ? Icons.volume_off : Icons.volume_up),
+            color: Colors.grey.shade500,
+            iconSize: 20,
+            visualDensity: VisualDensity.compact,
+            tooltip: muted ? 'Sound on' : 'Sound off',
+            onPressed: onToggleMute,
           ),
         ],
       ),

@@ -1,5 +1,10 @@
 # Changelog
 
+## [11/09/2026]
+- Ship art for the battle arena: ten fleets, each with a white and a black ship for every unit type
+- Pick your fleet in the Comcenter; each AI difficulty flies its own (Easy Star Nomads, Medium Iron Armada, Hard Void Hive)
+- Arena ships scale with the arena around the hit width, heavier ships larger; the unit panels show the ship
+
 ## [10/09/2026]
 - Single Player mode against an on-device AI: Easy, Medium or Hard, playing either color
 - Board AI: one-ply greedy play (Easy, Medium) and a Hard alpha-beta search that treats captures as battle chance nodes, running on a background isolate

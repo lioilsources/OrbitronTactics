@@ -17,9 +17,10 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 - Real-time multiplayer via Supabase Realtime (Broadcast + Presence)
 - Local hot-seat mode
 - Single Player against an on-device AI, with fleet progress
+- Ten fleets of ship art for the battle arena
 - Threat indicators (red badge on endangered pieces)
 - Disconnect handling via Supabase Presence
-- 189 unit and widget tests
+- 199 unit and widget tests
 
 ## Single Player
 
@@ -32,6 +33,8 @@ Pick a difficulty and your color in the lobby. The AI plays the board and flies 
 | Hard | Searches up to three plies, captures weighed by battle odds, within an 800 ms budget on a background isolate | Fast reactions, leads its aim, dodges early, shields reliably |
 
 Difficulty is skill only; unit strength comes from **fleet progress**. Battles earn credits for the winner's fleet. You spend yours in the Comcenter, while each difficulty has its own AI fleet that upgrades itself after every game — never more than 0 / 1 / 2 levels (Easy / Medium / Hard) ahead of your fleet. Credits, upgrades and win/loss records are saved on the device.
+
+Every fleet has its own ship art, a white and a black ship for each unit type. Pick one of ten fleets in the Comcenter; Easy, Medium and Hard fly Star Nomads, Iron Armada and Void Hive.
 
 ## Tech Stack
 

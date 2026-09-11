@@ -35,6 +35,7 @@ lib/
 │   └── progress/            # Fleet progress (credits, upgrades, record) saved on device
 
 assets/fleets/               # Battle ship sprites, one folder per fleet
+assets/audio/                # Battle music and effects (tools/battle_audio)
 supabase/                    # Supabase schema and migrations
 ```
 
@@ -44,6 +45,7 @@ supabase/                    # Supabase schema and migrations
 - `freezed` / `json_serializable` — immutable game models
 - `supabase_flutter` — lobby and realtime multiplayer
 - `shared_preferences` — fleet progress, one JSON blob per fleet under `fleet_progress.<identity>`
+- `flutter_soloud` 4.x — battle music and sound effects (SoLoud decodes OGG itself on every platform; 5.x needs a newer Flutter SDK)
 
 ## Single Player AI
 
@@ -57,6 +59,7 @@ supabase/                    # Supabase schema and migrations
 - `BattleEngine` ticks the fight. Ships have `xFraction` and `altitude` (0–1); a `Projectile` keeps its shooter's lane and altitude and hits only within `hitHalfWidth` and `hitHalfAltitude`. Shots arriving on target are logged in `BattleState.impacts` for the effects.
 - `BattleScreen` input: in your half the finger's x sets the ship's position, dragging forward (toward the enemy) climbs and back dives. `ShipMovedEvent` carries both to the opponent; `BattleAi` returns a target position and altitude.
 - `BattleArenaPainter` shows altitude as size and shadow, banks ships by their sideways speed (`ShipBank`), and draws shots and `ExplosionFx` in the shooter's `BattleElement` (pawn kinetic, knight water, bishop fire, rook ice, queen and king electric). The loser's explosion plays before the result overlay.
+- `BattleAudio` (SoLoud) loops the attacker's theme and plays what `BattleSoundCues` finds between two battle states: each element's shot, the head of its explosion for an impact, the whole echoing explosion for the destroyed ship. Assets in `assets/audio/{music,sfx}/` (`BattleSounds`) come from `tools/battle_audio/`; the mute setting is saved as `battle_audio_muted`. Any audio failure only logs.
 
 ## Fleet Ship Art
 

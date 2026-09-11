@@ -9,6 +9,7 @@ import '../providers/battle_state_provider.dart';
 import '../providers/ship_sprite_provider.dart';
 import '../widgets/battle_arena_painter.dart';
 import '../widgets/shield_button.dart';
+import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
 
 class BattleScreen extends ConsumerStatefulWidget {
@@ -29,11 +30,40 @@ class BattleScreen extends ConsumerStatefulWidget {
   ConsumerState<BattleScreen> createState() => _BattleScreenState();
 }
 
-class _BattleScreenState extends ConsumerState<BattleScreen> {
+class _BattleScreenState extends ConsumerState<BattleScreen>
+    with SingleTickerProviderStateMixin {
+  /// Dragging this fraction of the arena's height forward climbs from the
+  /// lowest altitude to the highest; dragging back dives.
+  static const double _altitudeDragFraction = 0.3;
+
   /// Active arena pointers: pointer id -> started in the top half.
   /// Each finger steers the ship of the half it first touched, so two
   /// players can drag simultaneously without interfering.
   final Map<int, bool> _pointerInTopHalf = {};
+
+  final _attackerBank = ShipBank();
+  final _defenderBank = ShipBank();
+
+  /// Plays the losing ship's explosion once the battle is over; the result
+  /// shows when it has finished.
+  late final AnimationController _destruction;
+
+  @override
+  void initState() {
+    super.initState();
+    _destruction = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: BattleArenaPainter.destructionMs),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _destruction.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +100,16 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
     final topAsset = attackerAtBottom ? defenderAsset : attackerAsset;
     final bottomAsset = attackerAtBottom ? attackerAsset : defenderAsset;
 
+    final attackerBank = _attackerBank.update(
+        battleState.attacker.xFraction, battleState.elapsedMs);
+    final defenderBank = _defenderBank.update(
+        battleState.defender.xFraction, battleState.elapsedMs);
+    if (battleState.isFinished && _destruction.isDismissed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _destruction.isDismissed) _destruction.forward();
+      });
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
@@ -100,7 +140,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                     spriteAsset: topAsset,
                   ),
                 const SizedBox(height: 8),
-                // Arena — drag horizontally in your half to steer your ship
+                // Arena — in your half, drag across to dodge, forward to
+                // climb and back to dive
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -117,12 +158,22 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                               _pointerInTopHalf.remove(e.pointer),
                           onPointerCancel: (e) =>
                               _pointerInTopHalf.remove(e.pointer),
-                          child: CustomPaint(
-                            painter: BattleArenaPainter(
-                              battleState,
-                              attackerAtBottom: attackerAtBottom,
-                              attackerSprite: attackerSprite,
-                              defenderSprite: defenderSprite,
+                          child: AnimatedBuilder(
+                            animation: _destruction,
+                            builder: (context, child) => CustomPaint(
+                              painter: BattleArenaPainter(
+                                battleState,
+                                attackerAtBottom: attackerAtBottom,
+                                attackerSprite: attackerSprite,
+                                defenderSprite: defenderSprite,
+                                attackerBank: attackerBank,
+                                defenderBank: defenderBank,
+                                nowMs: battleState.elapsedMs +
+                                    (_destruction.value *
+                                            BattleArenaPainter.destructionMs)
+                                        .round(),
+                              ),
+                              child: child,
                             ),
                             child: Container(),
                           ),
@@ -146,8 +197,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                 const SizedBox(height: 12),
               ],
             ),
-            // Battle result overlay
-            if (battleState.isFinished)
+            // Battle result overlay, once the loser has exploded
+            if (battleState.isFinished && _destruction.isCompleted)
               _BattleResultOverlay(
                 winner: battleState.winner!,
                 localColor: localColor,
@@ -170,7 +221,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
     // the opponent's ship position arrives over the transport.
     if (!isHotSeat && inTopHalf) return;
     _pointerInTopHalf[e.pointer] = inTopHalf;
-    _steerShip(e.localPosition.dx, constraints, inTopHalf, attackerAtBottom);
+    _steerShip(
+        e.localPosition.dx, 0, constraints, inTopHalf, attackerAtBottom);
   }
 
   void _onArenaPointerMove(
@@ -180,11 +232,16 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
   ) {
     final inTopHalf = _pointerInTopHalf[e.pointer];
     if (inTopHalf == null) return;
-    _steerShip(e.localPosition.dx, constraints, inTopHalf, attackerAtBottom);
+    _steerShip(e.localPosition.dx, e.delta.dy, constraints, inTopHalf,
+        attackerAtBottom);
   }
 
+  /// Steers the ship of the half a finger started in: across to the finger,
+  /// and up or down by how far the finger moved [dy] forward — toward the
+  /// enemy, which is up the screen for the bottom ship and down for the top.
   void _steerShip(
     double dx,
+    double dy,
     BoxConstraints constraints,
     bool inTopHalf,
     bool attackerAtBottom,
@@ -192,9 +249,12 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
     // The top ship is the attacker exactly when the attacker is not at
     // the bottom.
     final isAttacker = inTopHalf ? !attackerAtBottom : attackerAtBottom;
+    final forward = inTopHalf ? dy : -dy;
     ref.read(battleStateProvider.notifier).moveLocalShip(
           isAttacker: isAttacker,
           xFraction: (dx / constraints.maxWidth).clamp(0.0, 1.0),
+          altitudeDelta:
+              forward / (constraints.maxHeight * _altitudeDragFraction),
         );
   }
 

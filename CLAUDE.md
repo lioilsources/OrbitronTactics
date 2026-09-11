@@ -34,6 +34,7 @@ lib/
 │   ├── game/                # Game state management
 │   └── progress/            # Fleet progress (credits, upgrades, record) saved on device
 
+assets/fleets/               # Battle ship sprites, one folder per fleet
 supabase/                    # Supabase schema and migrations
 ```
 
@@ -50,6 +51,12 @@ supabase/                    # Supabase schema and migrations
 - `AiProfile` holds all tunables per difficulty. Easy/Medium use `GreedyAi` (one ply); Hard uses `SearchAi` (alpha-beta, captures as chance nodes weighted by `BattleOdds`), run via `compute()`.
 - `BattleAi` pilots the AI ship; `BattleStateNotifier` applies its actions on the engine every tick.
 - Fleet identities: `player`, `ai-easy`, `ai-medium`, `ai-hard`. `FleetProgression.spend` keeps an AI fleet's total upgrade levels within the player's plus the profile's rubber-band offset.
+
+## Fleet Ship Art
+
+- `assets/fleets/<slug>/<unit>_<white|black>.png`: 10 fleets × 6 unit types × 2 colors, 256 px, bow up. `FleetSkin` (`features/battle/data/fleet_skin.dart`) maps slugs to asset paths; `fleet_skin_test` keeps the enum, the files and the pubspec asset folders in sync.
+- `BattleArenaPainter` draws the sprites (decoded by `shipSpriteProvider`) sized as a fraction of the arena width and turns the top ship around; without a sprite it draws the vector hull.
+- The player's fleet is `FleetProgress.skin`, picked in the Comcenter; each difficulty's is `AiProfile.fleetSkin`. Only single player uses them (`AiOpponentController.skinFor`); other modes fly `FleetSkin.fallback` (Vanguard).
 
 ## Supabase Integration
 

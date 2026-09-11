@@ -92,6 +92,10 @@ class BattleArenaPainter extends CustomPainter {
   static const double _maxRoll = 0.7;
   static const double _maxYaw = 0.14;
 
+  /// How far a ship moves forward over the full altitude range, as a
+  /// fraction of the arena height: highest is this much ahead of lowest.
+  static const double _altitudeLunge = 0.08;
+
   /// Drawn size at [altitude] relative to mid altitude: 0.7 low, 1.3 high.
   static double _altitudeScale(double altitude) => 0.7 + 0.6 * altitude;
 
@@ -123,8 +127,16 @@ class BattleArenaPainter extends CustomPainter {
     final defender = battleState.defender;
     final yTop = size.height * _shipMarginFraction;
     final yBottom = size.height * (1 - _shipMarginFraction);
-    final attackerY = attackerAtBottom ? yBottom : yTop;
-    final defenderY = attackerAtBottom ? yTop : yBottom;
+    // Climbing also carries a ship a little forward, toward the enemy, and
+    // diving back, so a change of altitude reads at a glance.
+    double shipY(BattleUnit unit, bool atBottom) =>
+        (atBottom ? yBottom : yTop) +
+        (atBottom ? -1 : 1) *
+            (unit.altitude - 0.5) *
+            size.height *
+            _altitudeLunge;
+    final attackerY = shipY(attacker, attackerAtBottom);
+    final defenderY = shipY(defender, !attackerAtBottom);
 
     // Draw projectiles (under the ships so shots emerge from the hull)
     for (final p in battleState.projectiles) {

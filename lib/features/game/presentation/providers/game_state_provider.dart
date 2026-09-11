@@ -165,8 +165,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   /// Send local ship movement to opponent (localWifi mode only).
-  void moveShip(double xFraction) {
-    _session?.sendShipMoved(xFraction);
+  void moveShip(double xFraction, double altitude) {
+    _session?.sendShipMoved(xFraction, altitude);
   }
 
   /// Called by BattleStateNotifier when the battle ends locally.

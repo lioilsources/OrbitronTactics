@@ -44,6 +44,7 @@ sealed class GameEvent {
         return ShipMovedEvent(
           color: PlayerColor.values.byName(json['color'] as String),
           xFraction: (json['xFraction'] as num).toDouble(),
+          altitude: (json['altitude'] as num?)?.toDouble() ?? 0.5,
         );
       case 'battle_resolved':
         return BattleResolvedEvent(
@@ -144,13 +145,21 @@ class ShipMovedEvent extends GameEvent {
   final PlayerColor color;
   final double xFraction;
 
-  const ShipMovedEvent({required this.color, required this.xFraction});
+  /// Sent since the arena got altitude; older apps fly at the middle.
+  final double altitude;
+
+  const ShipMovedEvent({
+    required this.color,
+    required this.xFraction,
+    this.altitude = 0.5,
+  });
 
   @override
   Map<String, dynamic> toJson() => {
         'type': 'ship_moved',
         'color': color.name,
         'xFraction': xFraction,
+        'altitude': altitude,
       };
 }
 

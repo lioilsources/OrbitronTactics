@@ -24,8 +24,11 @@ void main() {
   BattleState apply(BattleState state, BattleAiAction action,
       {required bool isAttacker}) {
     var next = state;
-    if (action.targetX != null) {
-      next = BattleEngine.moveShip(next, isAttacker, action.targetX!);
+    if (action.targetX != null || action.targetAltitude != null) {
+      final me = isAttacker ? next.attacker : next.defender;
+      next = BattleEngine.moveShip(
+          next, isAttacker, action.targetX ?? me.xFraction,
+          altitude: action.targetAltitude);
     }
     if (action.activateShield) {
       next = BattleEngine.activateShield(next, isAttacker);
@@ -58,31 +61,33 @@ void main() {
     return state;
   }
 
+  final knightStats = unitBaseStats[PieceType.knight]!;
+
+  /// A knight at the middle of the arena that never fires.
+  BattleUnit idleKnight(PlayerColor color) => BattleUnit(
+        piece: Piece(type: PieceType.knight, color: color),
+        stats: knightStats,
+        currentHp: knightStats.maxHp,
+        shieldState: const ShieldState(),
+        nextAttackMs: 1 << 30,
+      );
+
+  /// An attacker shot in the lane at [x], [position] of the way across.
+  Projectile shot(String id, double position, {double x = 0.5}) => Projectile(
+        id: id,
+        positionFraction: position,
+        damage: knightStats.damage,
+        fromAttacker: true,
+        xFraction: x,
+      );
+
   /// Two knights that never fire; one attacker shot flies up the defender's
   /// lane, [position] of the way across.
-  BattleState incomingShot(double position) {
-    final stats = unitBaseStats[PieceType.knight]!;
-    BattleUnit knight(PlayerColor color) => BattleUnit(
-          piece: Piece(type: PieceType.knight, color: color),
-          stats: stats,
-          currentHp: stats.maxHp,
-          shieldState: const ShieldState(),
-          nextAttackMs: 1 << 30,
-        );
-    return BattleState(
-      attacker: knight(white),
-      defender: knight(black),
-      projectiles: [
-        Projectile(
-          id: 'shot',
-          positionFraction: position,
-          damage: stats.damage,
-          fromAttacker: true,
-          xFraction: 0.5,
-        ),
-      ],
-    );
-  }
+  BattleState incomingShot(double position) => BattleState(
+        attacker: idleKnight(white),
+        defender: idleKnight(black),
+        projectiles: [shot('shot', position)],
+      );
 
   /// Flies [state]'s shots home with [ai] piloting the defender. Returns the
   /// final state and whether the shield went up.
@@ -103,6 +108,50 @@ void main() {
 
       expect(state.defender.currentHp, state.defender.stats.maxHp);
       expect(shielded, isFalse, reason: 'dodged, not blocked');
+    });
+
+    test('Hard climbs or dives out of a spread it cannot sidestep', () {
+      final spread = BattleState(
+        attacker: idleKnight(white),
+        defender: idleKnight(black),
+        projectiles: [
+          shot('left', 0, x: 0.4),
+          shot('middle', 0),
+          shot('right', 0, x: 0.6),
+        ],
+      );
+
+      final (state, shielded) = defend(spread, pilot(AiProfile.hard, 1));
+
+      expect(state.defender.currentHp, state.defender.stats.maxHp);
+      expect(shielded, isFalse, reason: 'dodged, not blocked');
+      expect((state.defender.altitude - 0.5).abs(),
+          greaterThan(BattleEngine.hitHalfAltitude));
+    });
+
+    test('Hard flies to the enemy altitude and hits it there', () {
+      final knight = unitBaseStats[PieceType.knight]!;
+      var state = BattleState(
+        attacker: BattleUnit(
+          piece: const Piece(type: PieceType.knight, color: white),
+          stats: knight,
+          currentHp: knight.maxHp,
+          shieldState: const ShieldState(),
+          nextAttackMs: knight.attackIntervalMs,
+        ),
+        defender: idleKnight(black).copyWith(altitude: 0.9),
+      );
+      final hard = pilot(AiProfile.hard, 1);
+
+      while (state.elapsedMs < 3000) {
+        state = BattleEngine.tick(state, tickMs);
+        state = apply(state, hard.decide(state, isAttacker: true, deltaMs: tickMs),
+            isAttacker: true);
+      }
+
+      expect(state.attacker.altitude,
+          closeTo(0.9, BattleEngine.hitHalfAltitude / 2));
+      expect(state.defender.currentHp, lessThan(knight.maxHp));
     });
 
     test('a ship too slow to dodge raises its shield', () {

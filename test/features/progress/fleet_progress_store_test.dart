@@ -30,6 +30,25 @@ void main() {
       expect(store.load('ai-hard'), progress);
     });
 
+    test('round-trips the chosen fleet skin', () async {
+      final store = await storeWith({});
+      const progress = FleetProgress(credits: 5, skin: 'void_hive');
+
+      await store.save(playerFleetIdentity, progress);
+
+      expect(store.load(playerFleetIdentity), progress);
+    });
+
+    test('progress saved before fleet skins loads without a skin', () async {
+      final store = await storeWith({
+        'fleet_progress.player':
+            '{"credits":10,"upgrades":{},"gamesPlayed":1,"wins":0}',
+      });
+
+      expect(store.load(playerFleetIdentity),
+          const FleetProgress(credits: 10, gamesPlayed: 1));
+    });
+
     test('a missing key loads a fresh fleet', () async {
       final store = await storeWith({});
 

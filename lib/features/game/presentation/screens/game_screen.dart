@@ -14,6 +14,7 @@ import '../../data/game_event.dart';
 import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/game_board.dart';
+import '../../../battle/data/fleet_skin.dart';
 import '../../../battle/presentation/providers/battle_state_provider.dart';
 import '../../../battle/presentation/screens/battle_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
@@ -51,12 +52,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
 
     PlayerColor? attackerColor;
+    var attackerSkin = FleetSkin.fallback;
+    var defenderSkin = FleetSkin.fallback;
 
     if (pendingMove != null && pendingMove.capturedPiece != null) {
       attackerColor = pendingMove.piece.color;
       final defenderColor = pendingMove.capturedPiece!.color;
-      // Single player fights with the saved fleets; other modes keep the
-      // per-color session upgrades.
+      // Single player fights with the saved fleets and their ship art; other
+      // modes keep the per-color session upgrades and the default fleet.
       final ai = ref.read(aiOpponentProvider);
       final attackerUpgrades = ai != null
           ? ai.upgradesFor(attackerColor)
@@ -64,6 +67,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       final defenderUpgrades = ai != null
           ? ai.upgradesFor(defenderColor)
           : ref.read(upgradeProfileProvider(defenderColor));
+      if (ai != null) {
+        attackerSkin = ai.skinFor(attackerColor);
+        defenderSkin = ai.skinFor(defenderColor);
+      }
 
       final initialBattle = BattleEngine.createBattle(
         attacker: pendingMove.piece,
@@ -88,7 +95,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     Navigator.of(context)
         .push(MaterialPageRoute(
-          builder: (_) => BattleScreen(attackerColor: attackerColor),
+          builder: (_) => BattleScreen(
+            attackerColor: attackerColor,
+            attackerSkin: attackerSkin,
+            defenderSkin: defenderSkin,
+          ),
         ))
         .then((_) => _onBattleScreenClosed());
   }

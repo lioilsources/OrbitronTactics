@@ -138,6 +138,20 @@ void main() {
     expect(store.load(profile.identity), ai);
   });
 
+  testWidgets('each side flies its own fleet', (tester) async {
+    final (container, controller) = startGame(PlayerColor.white);
+
+    expect(controller.skinFor(PlayerColor.white).slug, 'vanguard');
+    expect(controller.skinFor(PlayerColor.black).slug, profile.fleetSkin);
+
+    container
+        .read(fleetProgressProvider(playerFleetIdentity).notifier)
+        .setSkin('crystal_choir');
+
+    expect(controller.skinFor(PlayerColor.white).slug, 'crystal_choir');
+    expect(controller.skinFor(PlayerColor.black).slug, profile.fleetSkin);
+  });
+
   test('no controller outside single player', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);

@@ -2,21 +2,27 @@ import '../engine/upgrade_engine.dart';
 import 'piece.dart';
 import 'upgrade_profile.dart';
 
-/// A fleet's lasting progress: unspent credits, unit upgrades and record.
+/// A fleet's lasting progress: unspent credits, unit upgrades, record and
+/// the ship art it flies.
 class FleetProgress {
   final int credits;
   final UpgradeProfile profile;
   final int gamesPlayed;
   final int wins;
 
+  /// Slug of the fleet skin the ships are drawn with; null until chosen.
+  final String? skin;
+
   const FleetProgress({
     this.credits = 0,
     this.profile = const UpgradeProfile(),
     this.gamesPlayed = 0,
     this.wins = 0,
+    this.skin,
   });
 
-  /// Reads [toJson]'s shape; missing or malformed fields fall back to zero.
+  /// Reads [toJson]'s shape; missing or malformed fields fall back to their
+  /// defaults, so progress saved before a field existed still loads.
   factory FleetProgress.fromJson(Map<String, dynamic> json) {
     int count(String key) => switch (json[key]) {
           final num value => value.toInt(),
@@ -30,6 +36,10 @@ class FleetProgress {
           : const UpgradeProfile(),
       gamesPlayed: count('gamesPlayed'),
       wins: count('wins'),
+      skin: switch (json['skin']) {
+        final String slug => slug,
+        _ => null,
+      },
     );
   }
 
@@ -56,12 +66,14 @@ class FleetProgress {
     UpgradeProfile? profile,
     int? gamesPlayed,
     int? wins,
+    String? skin,
   }) {
     return FleetProgress(
       credits: credits ?? this.credits,
       profile: profile ?? this.profile,
       gamesPlayed: gamesPlayed ?? this.gamesPlayed,
       wins: wins ?? this.wins,
+      skin: skin ?? this.skin,
     );
   }
 
@@ -70,6 +82,7 @@ class FleetProgress {
         'upgrades': profile.toJson(),
         'gamesPlayed': gamesPlayed,
         'wins': wins,
+        if (skin != null) 'skin': skin,
       };
 
   @override
@@ -78,8 +91,9 @@ class FleetProgress {
       other.credits == credits &&
       other.profile == profile &&
       other.gamesPlayed == gamesPlayed &&
-      other.wins == wins;
+      other.wins == wins &&
+      other.skin == skin;
 
   @override
-  int get hashCode => Object.hash(credits, profile, gamesPlayed, wins);
+  int get hashCode => Object.hash(credits, profile, gamesPlayed, wins, skin);
 }

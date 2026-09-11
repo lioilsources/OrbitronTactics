@@ -46,6 +46,9 @@ class FleetProgressNotifier extends StateNotifier<FleetProgress> {
         wins: state.wins + (won ? 1 : 0),
       );
 
+  /// Draws this fleet's ships with the fleet skin [slug] from now on.
+  void setSkin(String slug) => state = state.copyWith(skin: slug);
+
   void replace(FleetProgress progress) => state = progress;
 }
 

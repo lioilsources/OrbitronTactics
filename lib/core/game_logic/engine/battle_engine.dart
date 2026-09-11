@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 
 import '../models/battle_state.dart';
 import '../models/battle_unit.dart';
+import '../models/impact.dart';
 import '../models/piece.dart';
 import '../models/projectile.dart';
 import '../models/shield_state.dart';
@@ -24,11 +25,17 @@ class BattleEngine {
   const BattleEngine._();
 
   /// A projectile hits when the target's ship center is within this
-  /// horizontal distance (arena-width fraction) of the projectile's lane.
+  /// horizontal distance (arena-width fraction) of the projectile's lane…
   static const double hitHalfWidth = 0.07;
+
+  /// …and the ship flies within this altitude of the projectile's.
+  static const double hitHalfAltitude = 0.12;
 
   /// Ships cannot move closer to the arena edge than this fraction.
   static const double shipEdgeMargin = 0.06;
+
+  /// How long an impact stays in [BattleState.impacts].
+  static const int impactMemoryMs = 1500;
 
   /// Travel speed of [weapon]'s projectiles, in arena fractions per ms.
   static double projectileSpeed(WeaponType weapon) =>
@@ -60,9 +67,14 @@ class BattleEngine {
   static BattleState tick(BattleState state, int deltaMs) {
     if (state.isFinished) return state;
 
+    final elapsedMs = state.elapsedMs + deltaMs;
     var attacker = state.attacker;
     var defender = state.defender;
     var projectiles = state.projectiles.toList();
+    final impacts = [
+      for (final impact in state.impacts)
+        if (elapsedMs - impact.atMs < impactMemoryMs) impact,
+    ];
 
     // Tick attack timers and fire
     attacker = _tickAttack(attacker, deltaMs, true, projectiles);
@@ -81,19 +93,28 @@ class BattleEngine {
       final moved = p.copyWith(
         positionFraction: p.positionFraction + speed * deltaMs,
       );
-      if (moved.positionFraction >= 1.0) {
-        // Arrived at the enemy line — hits only if the target didn't dodge
-        if (moved.fromAttacker) {
-          if (!defender.shieldState.isActive && _isHit(defender, moved)) {
-            defender = _applyHit(defender, moved);
-          }
-        } else {
-          if (!attacker.shieldState.isActive && _isHit(attacker, moved)) {
-            attacker = _applyHit(attacker, moved);
-          }
-        }
-      } else {
+      if (moved.positionFraction < 1.0) {
         surviving.add(moved);
+        continue;
+      }
+      // Arrived at the enemy line — strikes only if the target didn't dodge
+      final target = moved.fromAttacker ? defender : attacker;
+      if (!_isHit(target, moved)) continue;
+      final shielded = target.shieldState.isActive;
+      impacts.add(Impact(
+        id: moved.id,
+        onAttacker: !moved.fromAttacker,
+        xFraction: moved.xFraction,
+        altitude: moved.altitude,
+        damage: moved.damage,
+        shielded: shielded,
+        atMs: elapsedMs,
+      ));
+      if (shielded) continue;
+      if (moved.fromAttacker) {
+        defender = _applyHit(defender, moved);
+      } else {
+        attacker = _applyHit(attacker, moved);
       }
     }
 
@@ -112,7 +133,8 @@ class BattleEngine {
       attacker: attacker,
       defender: defender,
       projectiles: surviving,
-      elapsedMs: state.elapsedMs + deltaMs,
+      impacts: impacts,
+      elapsedMs: elapsedMs,
       isFinished: finished,
       winner: winner,
     );
@@ -132,6 +154,7 @@ class BattleEngine {
         damage: unit.stats.damage,
         fromAttacker: isAttacker,
         xFraction: unit.xFraction,
+        altitude: unit.altitude,
       ));
       return unit.copyWith(
           nextAttackMs: unit.stats.attackIntervalMs + next);
@@ -140,20 +163,27 @@ class BattleEngine {
   }
 
   static bool _isHit(BattleUnit target, Projectile p) =>
-      (target.xFraction - p.xFraction).abs() <= hitHalfWidth;
+      (target.xFraction - p.xFraction).abs() <= hitHalfWidth &&
+      (target.altitude - p.altitude).abs() <= hitHalfAltitude;
 
-  /// Move a ship to [xFraction] (clamped to the arena, minus edge margin).
+  /// Move a ship to [xFraction] (clamped to the arena, minus edge margin)
+  /// and, when given, to [altitude] (clamped to 0–1).
   static BattleState moveShip(
     BattleState state,
     bool isAttacker,
-    double xFraction,
-  ) {
+    double xFraction, {
+    double? altitude,
+  }) {
     if (state.isFinished) return state;
-    final clamped =
-        xFraction.clamp(shipEdgeMargin, 1.0 - shipEdgeMargin).toDouble();
+    final unit = isAttacker ? state.attacker : state.defender;
+    final moved = unit.copyWith(
+      xFraction:
+          xFraction.clamp(shipEdgeMargin, 1.0 - shipEdgeMargin).toDouble(),
+      altitude: altitude?.clamp(0.0, 1.0).toDouble(),
+    );
     return isAttacker
-        ? state.copyWith(attacker: state.attacker.copyWith(xFraction: clamped))
-        : state.copyWith(defender: state.defender.copyWith(xFraction: clamped));
+        ? state.copyWith(attacker: moved)
+        : state.copyWith(defender: moved);
   }
 
   static BattleUnit _tickShield(BattleUnit unit, int deltaMs) {

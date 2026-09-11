@@ -125,9 +125,13 @@ class GameSession {
   }
 
   /// Signal local ship movement to opponent.
-  void sendShipMoved(double xFraction) {
+  void sendShipMoved(double xFraction, double altitude) {
     if (_state.phase != GamePhase.battle) return;
-    transport.send(ShipMovedEvent(color: localColor, xFraction: xFraction));
+    transport.send(ShipMovedEvent(
+      color: localColor,
+      xFraction: xFraction,
+      altitude: altitude,
+    ));
   }
 
   /// Resolve the current battle with the given winner.

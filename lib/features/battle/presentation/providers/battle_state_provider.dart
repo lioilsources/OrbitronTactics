@@ -53,6 +53,7 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
           applyOpponentShipMove(
             isAttacker: event.color == _attackerColor,
             xFraction: event.xFraction,
+            altitude: event.altitude,
           );
         }
       });
@@ -73,8 +74,14 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
     final ai = _ai;
     if (ai != null) {
       final action = ai.decide(next, isAttacker: _aiIsAttacker, deltaMs: deltaMs);
-      if (action.targetX != null) {
-        next = BattleEngine.moveShip(next, _aiIsAttacker, action.targetX!);
+      if (action.targetX != null || action.targetAltitude != null) {
+        final me = _aiIsAttacker ? next.attacker : next.defender;
+        next = BattleEngine.moveShip(
+          next,
+          _aiIsAttacker,
+          action.targetX ?? me.xFraction,
+          altitude: action.targetAltitude,
+        );
       }
       if (action.activateShield) {
         next = BattleEngine.activateShield(next, _aiIsAttacker);
@@ -106,28 +113,39 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
     state = BattleEngine.activateShield(current, isAttacker);
   }
 
-  /// Move the local player's ship and sync it to the opponent (throttled).
-  void moveLocalShip({required bool isAttacker, required double xFraction}) {
+  /// Move the local player's ship across to [xFraction] and up or down by
+  /// [altitudeDelta], and sync it to the opponent (throttled).
+  void moveLocalShip({
+    required bool isAttacker,
+    required double xFraction,
+    double altitudeDelta = 0,
+  }) {
     final current = state;
     if (current == null || current.isFinished) return;
-    state = BattleEngine.moveShip(current, isAttacker, xFraction);
+    final unit = isAttacker ? current.attacker : current.defender;
+    state = BattleEngine.moveShip(current, isAttacker, xFraction,
+        altitude: unit.altitude + altitudeDelta);
 
     final now = DateTime.now();
     if (_lastShipSyncAt == null ||
         now.difference(_lastShipSyncAt!).inMilliseconds >= _shipSyncIntervalMs) {
       _lastShipSyncAt = now;
       final moved = isAttacker ? state!.attacker : state!.defender;
-      _ref.read(gameStateProvider.notifier).moveShip(moved.xFraction);
+      _ref
+          .read(gameStateProvider.notifier)
+          .moveShip(moved.xFraction, moved.altitude);
     }
   }
 
   void applyOpponentShipMove({
     required bool isAttacker,
     required double xFraction,
+    required double altitude,
   }) {
     final current = state;
     if (current == null) return;
-    state = BattleEngine.moveShip(current, isAttacker, xFraction);
+    state = BattleEngine.moveShip(current, isAttacker, xFraction,
+        altitude: altitude);
   }
 
   void stopBattle() {

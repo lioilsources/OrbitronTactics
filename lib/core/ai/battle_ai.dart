@@ -11,13 +11,25 @@ import 'battle_odds.dart';
 class BattleAiAction {
   /// The ship's new position, or null to hold still.
   final double? targetX;
+
+  /// The ship's new altitude, or null to hold it.
+  final double? targetAltitude;
+
   final bool activateShield;
 
-  const BattleAiAction({this.targetX, this.activateShield = false});
+  const BattleAiAction({
+    this.targetX,
+    this.targetAltitude,
+    this.activateShield = false,
+  });
 }
 
-/// Pilots one ship in the battle arena: aims at the enemy ship, dodges
-/// incoming fire and raises the shield against hits it cannot avoid.
+/// A point of the arena's flight space: position across and altitude.
+typedef _Spot = ({double x, double altitude});
+
+/// Pilots one ship in the battle arena: flies at the enemy ship's altitude
+/// and aims at it, dodges incoming fire sideways or by climbing and diving,
+/// and raises the shield against hits it cannot avoid.
 ///
 /// Acts on the real [BattleState] through the same engine calls as a
 /// player's input. Skill comes entirely from the [AiProfile].
@@ -26,8 +38,12 @@ class BattleAi {
       : _profile = profile,
         _random = random;
 
-  /// Clearance beyond a shot's hit zone when stepping out of its lane.
+  /// Clearance beyond a shot's hit zone when getting out of its way.
   static const double _dodgeClearance = 0.03;
+
+  /// Altitude aim is as sloppy as aim across, relative to each hit zone.
+  static const double _altitudeErrorScale =
+      BattleEngine.hitHalfAltitude / BattleEngine.hitHalfWidth;
 
   /// The shield goes up only this close to impact, so it also covers the
   /// shots that follow.
@@ -37,10 +53,10 @@ class BattleAi {
   final Random _random;
 
   int _sinceDecisionMs = 0;
-  double? _targetX;
+  _Spot? _target;
 
-  /// The enemy's last positions as (elapsedMs, x), oldest first.
-  final List<(int, double)> _enemyTrack = [];
+  /// The enemy's last spots with their elapsedMs, oldest first.
+  final List<(int, _Spot)> _enemyTrack = [];
 
   /// Shots the shield was already considered against — one roll per shot.
   final Set<String> _shieldRolled = {};
@@ -54,7 +70,7 @@ class BattleAi {
     final me = isAttacker ? state.attacker : state.defender;
     final enemy = isAttacker ? state.defender : state.attacker;
 
-    _enemyTrack.add((state.elapsedMs, enemy.xFraction));
+    _enemyTrack.add((state.elapsedMs, _spotOf(enemy)));
     if (_enemyTrack.length > 3) _enemyTrack.removeAt(0);
     final incoming = _incoming(state, isAttacker, enemy);
 
@@ -63,14 +79,17 @@ class BattleAi {
     _sinceDecisionMs += deltaMs;
     if (_sinceDecisionMs >= _profile.reactionMs) {
       _sinceDecisionMs = 0;
-      _targetX = _chooseTarget(me, enemy, incoming);
+      _target = _chooseTarget(me, enemy, incoming);
     }
-    final target = _targetX ?? me.xFraction;
-    final step = _profile.maxShipSpeed * deltaMs / 1000;
-    final newX = me.xFraction + (target - me.xFraction).clamp(-step, step);
+    final here = _spotOf(me);
+    final target = _target ?? here;
+    final next = _toward(here, target, _profile.maxShipSpeed * deltaMs / 1000);
 
     return BattleAiAction(
-      targetX: (newX - me.xFraction).abs() > 1e-9 ? newX : null,
+      targetX: (next.x - here.x).abs() > 1e-9 ? next.x : null,
+      targetAltitude: (next.altitude - here.altitude).abs() > 1e-9
+          ? next.altitude
+          : null,
       // The shield is reconsidered every tick: waiting for the next
       // steering decision would be too late.
       activateShield: _shouldShield(me, target, incoming),
@@ -91,22 +110,24 @@ class BattleAi {
     ];
   }
 
-  double _chooseTarget(
+  _Spot _chooseTarget(
     BattleUnit me,
     BattleUnit enemy,
     List<(Projectile, double)> incoming,
   ) {
-    var aim = enemy.xFraction;
+    var aimX = enemy.xFraction;
+    var aimAltitude = enemy.altitude;
     if (_profile.predictOpponent && _enemyTrack.length > 1) {
       // Lead the enemy by how far it moves while our shot is in flight.
-      final (fromMs, fromX) = _enemyTrack.first;
-      final (toMs, toX) = _enemyTrack.last;
+      final (fromMs, from) = _enemyTrack.first;
+      final (toMs, to) = _enemyTrack.last;
       if (toMs > fromMs) {
-        final velocity = (toX - fromX) / (toMs - fromMs);
-        aim += velocity * BattleOdds.travelMs(me.stats.weaponType);
+        final lead = BattleOdds.travelMs(me.stats.weaponType) / (toMs - fromMs);
+        aimX += (to.x - from.x) * lead;
+        aimAltitude += (to.altitude - from.altitude) * lead;
       }
     }
-    aim = _clampToArena(aim);
+    var aim = _clamp((x: aimX, altitude: aimAltitude));
 
     // Dodging comes before aiming.
     final dangerous = [
@@ -115,50 +136,63 @@ class BattleAi {
     ];
     if (_isHitBy(dangerous, aim)) aim = _dodge(aim, dangerous);
 
-    aim += _profile.aimError * (_random.nextDouble() * 2 - 1);
-    return _clampToArena(aim);
+    return _clamp((
+      x: aim.x + _profile.aimError * _jitter(),
+      altitude: aim.altitude + _profile.aimError * _altitudeErrorScale * _jitter(),
+    ));
   }
 
-  /// The nearest spot beside a dangerous shot's lane that no dangerous shot
-  /// hits, preferring the side of [aim] with fewer shots.
-  double _dodge(double aim, List<Projectile> dangerous) {
-    final clearance = BattleEngine.hitHalfWidth + _dodgeClearance;
-    final spots = [
+  /// The nearest spot out of a dangerous shot's way — beside its lane, or
+  /// above or below its altitude — that no dangerous shot hits, preferring
+  /// the side of [aim] with fewer shots.
+  _Spot _dodge(_Spot aim, List<Projectile> dangerous) {
+    final clearX = BattleEngine.hitHalfWidth + _dodgeClearance;
+    final clearAltitude = BattleEngine.hitHalfAltitude + _dodgeClearance;
+    final spots = <_Spot>[
       for (final shot in dangerous) ...[
-        shot.xFraction - clearance,
-        shot.xFraction + clearance,
+        (x: shot.xFraction - clearX, altitude: aim.altitude),
+        (x: shot.xFraction + clearX, altitude: aim.altitude),
+        (x: aim.x, altitude: shot.altitude - clearAltitude),
+        (x: aim.x, altitude: shot.altitude + clearAltitude),
       ],
-    ].where((x) => x == _clampToArena(x) && !_isHitBy(dangerous, x)).toList();
+    ].where((spot) => spot == _clamp(spot) && !_isHitBy(dangerous, spot)).toList();
     // Nowhere safe: stay, and leave it to the shield.
     if (spots.isEmpty) return aim;
 
-    int shotsOnSide(double x) =>
-        dangerous.where((shot) => (shot.xFraction < aim) == (x < aim)).length;
+    int shotsOnSide(_Spot spot) => spot.x != aim.x
+        ? dangerous
+            .where((shot) => (shot.xFraction < aim.x) == (spot.x < aim.x))
+            .length
+        : dangerous
+            .where((shot) =>
+                (shot.altitude < aim.altitude) == (spot.altitude < aim.altitude))
+            .length;
+    double distance(_Spot spot) =>
+        max((spot.x - aim.x).abs(), (spot.altitude - aim.altitude).abs());
     spots.sort((a, b) {
       final bySide = shotsOnSide(a).compareTo(shotsOnSide(b));
-      return bySide != 0 ? bySide : (a - aim).abs().compareTo((b - aim).abs());
+      return bySide != 0 ? bySide : distance(a).compareTo(distance(b));
     });
     return spots.first;
   }
 
   bool _shouldShield(
     BattleUnit me,
-    double target,
+    _Spot target,
     List<(Projectile, double)> incoming,
   ) {
     if (!me.shieldState.canActivate) return false;
+    final here = _spotOf(me);
     final speedPerMs = _profile.maxShipSpeed / 1000;
     for (final (shot, eta) in incoming) {
       if (eta > _shieldLeadMs || _shieldRolled.contains(shot.id)) continue;
 
       // Where the ship will be at impact, still heading for its target.
-      final travel = speedPerMs * eta;
-      final xAtImpact =
-          me.xFraction + (target - me.xFraction).clamp(-travel, travel);
-      final cannotDodge = _isHitBy([shot], xAtImpact);
+      final atImpact = _toward(here, target, speedPerMs * eta);
+      final cannotDodge = _isHitBy([shot], atImpact);
       final netDamage =
           shot.damage - (shot.damage * me.stats.defenseRating).round();
-      final lethal = _isHitBy([shot], me.xFraction) && netDamage >= me.currentHp;
+      final lethal = _isHitBy([shot], here) && netDamage >= me.currentHp;
       if (!cannotDodge && !lethal) continue;
 
       _shieldRolled.add(shot.id);
@@ -167,10 +201,26 @@ class BattleAi {
     return false;
   }
 
-  static bool _isHitBy(Iterable<Projectile> shots, double x) => shots
-      .any((shot) => (shot.xFraction - x).abs() <= BattleEngine.hitHalfWidth);
+  double _jitter() => _random.nextDouble() * 2 - 1;
 
-  static double _clampToArena(double x) => x
-      .clamp(BattleEngine.shipEdgeMargin, 1 - BattleEngine.shipEdgeMargin)
-      .toDouble();
+  static _Spot _spotOf(BattleUnit unit) =>
+      (x: unit.xFraction, altitude: unit.altitude);
+
+  /// [from] moved toward [to] by at most [step] along each axis.
+  static _Spot _toward(_Spot from, _Spot to, double step) => (
+        x: from.x + (to.x - from.x).clamp(-step, step),
+        altitude: from.altitude + (to.altitude - from.altitude).clamp(-step, step),
+      );
+
+  static bool _isHitBy(Iterable<Projectile> shots, _Spot spot) =>
+      shots.any((shot) =>
+          (shot.xFraction - spot.x).abs() <= BattleEngine.hitHalfWidth &&
+          (shot.altitude - spot.altitude).abs() <= BattleEngine.hitHalfAltitude);
+
+  static _Spot _clamp(_Spot spot) => (
+        x: spot.x
+            .clamp(BattleEngine.shipEdgeMargin, 1 - BattleEngine.shipEdgeMargin)
+            .toDouble(),
+        altitude: spot.altitude.clamp(0.0, 1.0).toDouble(),
+      );
 }

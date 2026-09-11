@@ -8,12 +8,17 @@ class Projectile {
   /// The projectile travels straight; the target dodges by moving away.
   final double xFraction;
 
+  /// The shooter's altitude when it fired; the projectile holds it all the
+  /// way, so the target can also dodge by climbing or diving.
+  final double altitude;
+
   const Projectile({
     required this.id,
     required this.positionFraction,
     required this.damage,
     required this.fromAttacker,
     this.xFraction = 0.5,
+    this.altitude = 0.5,
   });
 
   Projectile copyWith({
@@ -22,6 +27,7 @@ class Projectile {
     int? damage,
     bool? fromAttacker,
     double? xFraction,
+    double? altitude,
   }) {
     return Projectile(
       id: id ?? this.id,
@@ -29,6 +35,7 @@ class Projectile {
       damage: damage ?? this.damage,
       fromAttacker: fromAttacker ?? this.fromAttacker,
       xFraction: xFraction ?? this.xFraction,
+      altitude: altitude ?? this.altitude,
     );
   }
 }

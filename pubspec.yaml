@@ -32,6 +32,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    # Battle ship sprites, one folder per fleet (see FleetSkin)
+    - assets/fleets/vanguard/
+    - assets/fleets/solar_crusade/
+    - assets/fleets/void_hive/
+    - assets/fleets/neon_runners/
+    - assets/fleets/iron_armada/
+    - assets/fleets/crystal_choir/
+    - assets/fleets/ronin_blades/
+    - assets/fleets/atomic_age/
+    - assets/fleets/abyssal_tide/
+    - assets/fleets/star_nomads/
 
 flutter_launcher_icons:
   android: "ic_launcher"

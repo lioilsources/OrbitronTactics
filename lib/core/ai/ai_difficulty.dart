@@ -53,6 +53,9 @@ class AiProfile {
 
   final String displayName;
 
+  /// Slug of the fleet skin this AI's ships are drawn with.
+  final String fleetSkin;
+
   const AiProfile({
     required this.difficulty,
     required this.searchDepth,
@@ -69,6 +72,7 @@ class AiProfile {
     required this.rubberBandOffset,
     required this.identity,
     required this.displayName,
+    required this.fleetSkin,
   });
 
   static const easy = AiProfile(
@@ -87,6 +91,7 @@ class AiProfile {
     rubberBandOffset: 0,
     identity: 'ai-easy',
     displayName: 'Orbitron AI · Easy',
+    fleetSkin: 'star_nomads',
   );
 
   static const medium = AiProfile(
@@ -105,6 +110,7 @@ class AiProfile {
     rubberBandOffset: 1,
     identity: 'ai-medium',
     displayName: 'Orbitron AI · Medium',
+    fleetSkin: 'iron_armada',
   );
 
   static const hard = AiProfile(
@@ -123,6 +129,7 @@ class AiProfile {
     rubberBandOffset: 2,
     identity: 'ai-hard',
     displayName: 'Orbitron AI · Hard',
+    fleetSkin: 'void_hive',
   );
 
   static AiProfile of(AiDifficulty difficulty) => switch (difficulty) {
@@ -161,6 +168,7 @@ class AiProfile {
       rubberBandOffset: rubberBandOffset ?? this.rubberBandOffset,
       identity: identity,
       displayName: displayName,
+      fleetSkin: fleetSkin,
     );
   }
 }

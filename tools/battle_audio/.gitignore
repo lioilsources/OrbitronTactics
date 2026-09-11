@@ -1,0 +1,4 @@
+# Renders and build intermediates stay local; regenerate with gen_audio.py
+raw/
+build/
+__pycache__/

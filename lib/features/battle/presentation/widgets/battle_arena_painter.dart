@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
@@ -12,7 +15,17 @@ class BattleArenaPainter extends CustomPainter {
   /// Whether the attacker's ship sits at the bottom edge of the arena.
   final bool attackerAtBottom;
 
-  BattleArenaPainter(this.battleState, {required this.attackerAtBottom});
+  /// Fleet sprites, bow up. A ship without one — still loading, or missing —
+  /// is drawn as the plain vector hull.
+  final ui.Image? attackerSprite;
+  final ui.Image? defenderSprite;
+
+  BattleArenaPainter(
+    this.battleState, {
+    required this.attackerAtBottom,
+    this.attackerSprite,
+    this.defenderSprite,
+  });
 
   static const Map<WeaponType, Color> _projectileColors = {
     WeaponType.rapidFire: Colors.yellowAccent,
@@ -33,6 +46,19 @@ class BattleArenaPainter extends CustomPainter {
 
   static const double _shipWidth = 40.0;
   static const double _shipHeight = 48.0;
+
+  /// Sprite size per unit as a fraction of the arena width. Most hulls fill
+  /// about half their square's width, so this keeps them near the engine's
+  /// hit width (0.14) — shots land where the hull is — with the heavier
+  /// ships drawn larger.
+  static const Map<PieceType, double> _spriteWidthFractions = {
+    PieceType.pawn: 0.20,
+    PieceType.knight: 0.22,
+    PieceType.bishop: 0.22,
+    PieceType.rook: 0.24,
+    PieceType.queen: 0.26,
+    PieceType.king: 0.28,
+  };
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -105,18 +131,93 @@ class BattleArenaPainter extends CustomPainter {
     _drawShip(
       canvas,
       Offset(battleState.attacker.xFraction * size.width, attackerY),
+      arena: size,
       unit: battleState.attacker,
       facingUp: attackerAtBottom,
+      sprite: attackerSprite,
     );
     _drawShip(
       canvas,
       Offset(battleState.defender.xFraction * size.width, defenderY),
+      arena: size,
       unit: battleState.defender,
       facingUp: !attackerAtBottom,
+      sprite: defenderSprite,
     );
   }
 
   void _drawShip(
+    Canvas canvas,
+    Offset center, {
+    required Size arena,
+    required BattleUnit unit,
+    required bool facingUp,
+    required ui.Image? sprite,
+  }) {
+    final double shieldRadius;
+    if (sprite != null) {
+      // Never more than the gap to the arena edge allows.
+      final extent = math.min(
+        arena.width * _spriteWidthFractions[unit.piece.type]!,
+        arena.height * _shipMarginFraction * 2,
+      );
+      _drawSprite(canvas, center, sprite, extent, facingUp: facingUp);
+      shieldRadius = extent * 0.55;
+    } else {
+      _drawVectorShip(canvas, center, unit: unit, facingUp: facingUp);
+      shieldRadius = _shipHeight * 0.7;
+    }
+
+    // Shield bubble
+    if (unit.shieldState.isActive) {
+      canvas.drawCircle(
+        center,
+        shieldRadius,
+        Paint()
+          ..color = Colors.cyanAccent.withValues(alpha: 0.2)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+      );
+      canvas.drawCircle(
+        center,
+        shieldRadius,
+        Paint()
+          ..color = Colors.cyanAccent.withValues(alpha: 0.6)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5,
+      );
+    }
+  }
+
+  /// Sprites are drawn bow up; the ship facing down is turned half around.
+  void _drawSprite(
+    Canvas canvas,
+    Offset center,
+    ui.Image sprite,
+    double size, {
+    required bool facingUp,
+  }) {
+    // Faint halo, so dark hulls stand out against the dark arena
+    canvas.drawCircle(
+      center,
+      size * 0.4,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.1)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, size * 0.15),
+    );
+
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    if (!facingUp) canvas.rotate(math.pi);
+    canvas.drawImageRect(
+      sprite,
+      Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+      Rect.fromCenter(center: Offset.zero, width: size, height: size),
+      Paint()..filterQuality = FilterQuality.medium,
+    );
+    canvas.restore();
+  }
+
+  void _drawVectorShip(
     Canvas canvas,
     Offset center, {
     required BattleUnit unit,
@@ -160,25 +261,6 @@ class BattleArenaPainter extends CustomPainter {
       4,
       Paint()..color = Colors.cyanAccent.withValues(alpha: 0.9),
     );
-
-    // Shield bubble
-    if (unit.shieldState.isActive) {
-      canvas.drawCircle(
-        center,
-        _shipHeight * 0.7,
-        Paint()
-          ..color = Colors.cyanAccent.withValues(alpha: 0.2)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
-      );
-      canvas.drawCircle(
-        center,
-        _shipHeight * 0.7,
-        Paint()
-          ..color = Colors.cyanAccent.withValues(alpha: 0.6)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5,
-      );
-    }
   }
 
   @override

@@ -4,7 +4,9 @@ import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
+import '../../data/fleet_skin.dart';
 import '../providers/battle_state_provider.dart';
+import '../providers/ship_sprite_provider.dart';
 import '../widgets/battle_arena_painter.dart';
 import '../widgets/shield_button.dart';
 import '../widgets/unit_combat_panel.dart';
@@ -12,7 +14,16 @@ import '../widgets/unit_combat_panel.dart';
 class BattleScreen extends ConsumerStatefulWidget {
   final PlayerColor? attackerColor;
 
-  const BattleScreen({super.key, this.attackerColor});
+  /// The fleets whose ship art each side flies.
+  final FleetSkin attackerSkin;
+  final FleetSkin defenderSkin;
+
+  const BattleScreen({
+    super.key,
+    this.attackerColor,
+    this.attackerSkin = FleetSkin.fallback,
+    this.defenderSkin = FleetSkin.fallback,
+  });
 
   @override
   ConsumerState<BattleScreen> createState() => _BattleScreenState();
@@ -47,6 +58,18 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
     final bottomUnit =
         attackerAtBottom ? battleState.attacker : battleState.defender;
 
+    // Until a sprite has loaded the arena draws the plain vector hull.
+    final attackerAsset = widget.attackerSkin.assetFor(
+        battleState.attacker.piece.type, battleState.attacker.piece.color);
+    final defenderAsset = widget.defenderSkin.assetFor(
+        battleState.defender.piece.type, battleState.defender.piece.color);
+    final attackerSprite =
+        ref.watch(shipSpriteProvider(attackerAsset)).valueOrNull;
+    final defenderSprite =
+        ref.watch(shipSpriteProvider(defenderAsset)).valueOrNull;
+    final topAsset = attackerAtBottom ? defenderAsset : attackerAsset;
+    final bottomAsset = attackerAtBottom ? attackerAsset : defenderAsset;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
@@ -63,6 +86,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                     quarterTurns: 2,
                     child: _PlayerBattleControls(
                       unit: topUnit,
+                      spriteAsset: topAsset,
                       label: _shieldLabel(topUnit.piece.color),
                       onShield: () => ref
                           .read(battleStateProvider.notifier)
@@ -70,7 +94,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                     ),
                   )
                 else
-                  UnitCombatPanel(unit: topUnit, isLeft: true),
+                  UnitCombatPanel(
+                    unit: topUnit,
+                    isLeft: true,
+                    spriteAsset: topAsset,
+                  ),
                 const SizedBox(height: 8),
                 // Arena — drag horizontally in your half to steer your ship
                 Expanded(
@@ -93,6 +121,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                             painter: BattleArenaPainter(
                               battleState,
                               attackerAtBottom: attackerAtBottom,
+                              attackerSprite: attackerSprite,
+                              defenderSprite: defenderSprite,
                             ),
                             child: Container(),
                           ),
@@ -105,6 +135,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
                 // Bottom player: the local / acting player's controls.
                 _PlayerBattleControls(
                   unit: bottomUnit,
+                  spriteAsset: bottomAsset,
                   label: isHotSeat
                       ? _shieldLabel(bottomUnit.piece.color)
                       : 'YOUR SHIELD',
@@ -174,11 +205,13 @@ class _BattleScreenState extends ConsumerState<BattleScreen> {
 /// One player's battle controls: unit panel and shield button side by side.
 class _PlayerBattleControls extends StatelessWidget {
   final BattleUnit unit;
+  final String spriteAsset;
   final String label;
   final VoidCallback onShield;
 
   const _PlayerBattleControls({
     required this.unit,
+    required this.spriteAsset,
     required this.label,
     required this.onShield,
   });
@@ -191,7 +224,7 @@ class _PlayerBattleControls extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          UnitCombatPanel(unit: unit, isLeft: true),
+          UnitCombatPanel(unit: unit, isLeft: true, spriteAsset: spriteAsset),
           Column(
             children: [
               Text(

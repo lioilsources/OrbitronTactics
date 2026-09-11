@@ -12,6 +12,7 @@ import '../../../../core/game_logic/models/game_state.dart';
 import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/upgrade_profile.dart';
+import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import 'game_state_provider.dart';
 
@@ -65,6 +66,16 @@ class AiOpponentController {
   /// purchase counts from the very next battle.
   UpgradeProfile upgradesFor(PlayerColor color) =>
       _ref.read(fleetProgressProvider(_fleetOf(color))).profile;
+
+  /// Ship art of the fleet playing [color]: the skin chosen for that fleet,
+  /// else the AI difficulty's own, else the default.
+  FleetSkin skinFor(PlayerColor color) {
+    final chosen = _ref.read(fleetProgressProvider(_fleetOf(color))).skin;
+    final profile = _game.aiProfile;
+    final aiDefault =
+        profile != null && color == _game.aiColor ? profile.fleetSkin : null;
+    return FleetSkin.fromSlug(chosen ?? aiDefault);
+  }
 
   void attach() {
     _game.onBattleReward = _onBattleReward;

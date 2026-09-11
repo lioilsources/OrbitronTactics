@@ -24,16 +24,27 @@ class UnitCombatPanel extends StatelessWidget {
   final BattleUnit unit;
   final bool isLeft;
 
+  /// The unit's ship sprite; without one the avatar shows its chess symbol.
+  final String? spriteAsset;
+
   const UnitCombatPanel({
     super.key,
     required this.unit,
     required this.isLeft,
+    this.spriteAsset,
   });
 
   @override
   Widget build(BuildContext context) {
     final isWhite = unit.piece.color == PlayerColor.white;
     final shieldActive = unit.shieldState.isActive;
+    final symbol = Text(
+      _symbols[unit.piece.type] ?? '?',
+      style: TextStyle(
+        fontSize: 34,
+        color: isWhite ? Colors.white : Colors.grey.shade300,
+      ),
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -80,13 +91,14 @@ class UnitCombatPanel extends StatelessWidget {
                 : null,
           ),
           child: Center(
-            child: Text(
-              _symbols[unit.piece.type] ?? '?',
-              style: TextStyle(
-                fontSize: 34,
-                color: isWhite ? Colors.white : Colors.grey.shade300,
-              ),
-            ),
+            child: spriteAsset == null
+                ? symbol
+                : Image.asset(
+                    spriteAsset!,
+                    width: 46,
+                    height: 46,
+                    errorBuilder: (_, _, _) => symbol,
+                  ),
           ),
         ),
         const SizedBox(height: 6),

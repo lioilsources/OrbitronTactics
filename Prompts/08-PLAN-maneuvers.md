@@ -268,10 +268,16 @@ Rodiny, které lodi nesedí, vypadnou; i tak má každá ≥ 10.
 |---|---|---|---|
 | **Pěšec** (kinetic) | trvání ×0.8, energie −5, `damage` střel 0.8 ale +1 střela v každé dávce | — | **Dvojkrok** `8→5→2→1`: dva rychlé skoky vpřed (`dAlt +0.25` ×2, 1200 ms), po každém dávka 3 střel. 50 en. |
 | **Kůň** (water) | `untouchable` +100 ms, Slalom ×0.9 | Looping (kůň ho má) | **Skok** `0→3→6→7`, zrcadlo `2→5→8→7`: vyskočí (`dAlt +0.5` za 300 ms, `untouchable (.1, .6)`), dopadne o jednu dráhu vedle (`dx ±0.22`) na výšku soupeře (`enemyLive`) a vystřelí 2×. 1000 ms, 45 en. Šachový skok L. |
-| **Střelec** (fire) | trvání ×1.2, Salva = nabitá střela | Looping | **Ostřelovač** `0→4→8→5→2`: 1200 ms stojí a nabíjí (zranitelný — riziko), v t .85 jedna střela `damage 3.0`, dvojnásobná velikost projektilu. 55 en. |
+| **Střelec** (fire) | trvání ×1.2, Salva = nabitá střela | — | **Ostřelovač** `0→4→8→5→2`: 1200 ms stojí a nabíjí (zranitelný — riziko), v t .85 jedna střela `damage 3.0`, dvojnásobná velikost projektilu. 55 en. |
 | **Věž** (ice) | trvání ×1.3, Úskok = **Rošáda** (`dx ±0.4`, dlouhý skok stranou), Výpad = **Válec** (pomalý postup vpřed s palbou každých 350 ms), Salva 2 × 1.5 | Looping, Spirála | **Hradba** U `0→3→6→7→8→5→2`: štít se zapne i na cooldownu a drží celý manévr (1500 ms), 3 těžké střely `damage 1.5`. 60 en. |
 | **Dáma** (electric) | beze změny, Průlet + Stín zesílené (střely `damage 1.2`) | — | **Královský tanec** oblouk `6→3→0→1→2→5→8`: přejede celou šířku (`x 0.1 → 0.9` nebo naopak podle strany) na výšce soupeře, 6 střel, `untouchable` v rychlých úsecích (.15,.3) a (.6,.75). 1800 ms, 60 en. |
 | **Král** (electric) | trvání ×1.3, energie +5, Ústup se štítem trvá 1000 ms | Looping, Spirála | **Koruna** M `6→3→0→4→2→5→8`: drží pozici se štítem, dvakrát (t .4, .8) vystřelí ze všech baterií — 3 střely v drahách `x −0.16, x, x +0.16` (`shots 3, spread 0.16`). 1600 ms, 60 en. |
+
+Looping a Spirálu neumí jen těžké lodě (věž, král); akrobatické je mají všechny.
+Názvy v UI jsou anglicky jako zbytek aplikace (Sidestep, Strike, Retreat, Slalom,
+Loop, Barrel Roll, Feint, Shadow, Volley, Dash, Corkscrew, Overdrive; podpisové
+Double Step, Leap, Sniper Shot, Bulwark, Royal Waltz, Crown; věž má Castle místo
+Úskoku a Steamroller místo Výpadu, střelec Charged Shot místo Salvy).
 
 Vzory podpisových manévrů nekolidují s rodinami (Skok = L vs. Ústup = svislice;
 Ostřelovač = diagonála + hák vs. Průlet = holá diagonála; Koruna M vs. Slalom Z).

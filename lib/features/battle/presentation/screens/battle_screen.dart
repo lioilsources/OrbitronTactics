@@ -10,6 +10,7 @@ import '../audio/battle_audio.dart';
 import '../audio/battle_sound_cues.dart';
 import '../providers/battle_state_provider.dart';
 import '../providers/ship_sprite_provider.dart';
+import '../widgets/arena_layout.dart';
 import '../widgets/battle_arena_painter.dart';
 import '../widgets/shield_button.dart';
 import '../widgets/ship_bank.dart';
@@ -35,10 +36,6 @@ class BattleScreen extends ConsumerStatefulWidget {
 
 class _BattleScreenState extends ConsumerState<BattleScreen>
     with SingleTickerProviderStateMixin {
-  /// Dragging this fraction of the arena's height forward climbs from the
-  /// lowest altitude to the highest; dragging back dives.
-  static const double _altitudeDragFraction = 0.3;
-
   /// Active arena pointers: pointer id -> started in the top half.
   /// Each finger steers the ship of the half it first touched, so two
   /// players can drag simultaneously without interfering.
@@ -275,8 +272,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
   }
 
   /// Steers the ship of the half a finger started in: across to the finger,
-  /// and up or down by how far the finger moved [dy] forward — toward the
-  /// enemy, which is up the screen for the bottom ship and down for the top.
+  /// and forward or back by exactly as far as the finger moved [dy] — toward
+  /// the enemy is up the screen for the bottom ship and down for the top.
   void _steerShip(
     double dx,
     double dy,
@@ -292,7 +289,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
           isAttacker: isAttacker,
           xFraction: (dx / constraints.maxWidth).clamp(0.0, 1.0),
           altitudeDelta:
-              forward / (constraints.maxHeight * _altitudeDragFraction),
+              forward / (constraints.maxHeight * ArenaLayout.travelFraction),
         );
   }
 

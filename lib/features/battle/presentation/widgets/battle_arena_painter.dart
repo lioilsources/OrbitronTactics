@@ -9,6 +9,7 @@ import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/projectile.dart';
 import '../../../../core/game_logic/models/weapon_type.dart';
 import '../../data/battle_element.dart';
+import 'arena_layout.dart';
 import 'explosion_fx.dart';
 
 /// Paints the battle arena in portrait orientation: one ship at the top,
@@ -68,9 +69,6 @@ class BattleArenaPainter extends CustomPainter {
     BattleElement.electric: Colors.cyanAccent,
   };
 
-  /// Vertical distance of each ship from its arena edge.
-  static const double _shipMarginFraction = 0.12;
-
   static const double _shipWidth = 40.0;
   static const double _shipHeight = 48.0;
 
@@ -91,10 +89,6 @@ class BattleArenaPainter extends CustomPainter {
   /// radians.
   static const double _maxRoll = 0.7;
   static const double _maxYaw = 0.14;
-
-  /// How far a ship moves forward over the full altitude range, as a
-  /// fraction of the arena height: highest is this much ahead of lowest.
-  static const double _altitudeLunge = 0.08;
 
   /// Drawn size at [altitude] relative to mid altitude: 0.7 low, 1.3 high.
   static double _altitudeScale(double altitude) => 0.7 + 0.6 * altitude;
@@ -125,18 +119,12 @@ class BattleArenaPainter extends CustomPainter {
 
     final attacker = battleState.attacker;
     final defender = battleState.defender;
-    final yTop = size.height * _shipMarginFraction;
-    final yBottom = size.height * (1 - _shipMarginFraction);
-    // Climbing also carries a ship a little forward, toward the enemy, and
-    // diving back, so a change of altitude reads at a glance.
-    double shipY(BattleUnit unit, bool atBottom) =>
-        (atBottom ? yBottom : yTop) +
-        (atBottom ? -1 : 1) *
-            (unit.altitude - 0.5) *
-            size.height *
-            _altitudeLunge;
-    final attackerY = shipY(attacker, attackerAtBottom);
-    final defenderY = shipY(defender, !attackerAtBottom);
+    // Altitude is how far up its half a ship has flown: at its own edge when
+    // lowest, just short of the divider when highest.
+    final attackerY = ArenaLayout.shipY(attacker.altitude,
+        atBottom: attackerAtBottom, arena: size);
+    final defenderY = ArenaLayout.shipY(defender.altitude,
+        atBottom: !attackerAtBottom, arena: size);
 
     // Draw projectiles (under the ships so shots emerge from the hull)
     for (final p in battleState.projectiles) {
@@ -343,7 +331,7 @@ class BattleArenaPainter extends CustomPainter {
       // Never much more than the gap to the arena edge allows.
       shipSize = math.min(
         arena.width * _spriteWidthFractions[unit.piece.type]! * scale,
-        arena.height * _shipMarginFraction * 2.2,
+        arena.height * 0.2,
       );
       shieldRadius = shipSize * 0.55;
     } else {

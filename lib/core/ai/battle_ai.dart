@@ -4,6 +4,7 @@ import '../game_logic/engine/battle_engine.dart';
 import '../game_logic/models/battle_state.dart';
 import '../game_logic/models/battle_unit.dart';
 import '../game_logic/models/projectile.dart';
+import '../game_logic/models/spot.dart';
 import 'ai_difficulty.dart';
 import 'battle_odds.dart';
 
@@ -23,9 +24,6 @@ class BattleAiAction {
     this.activateShield = false,
   });
 }
-
-/// A point of the arena's flight space: position across and altitude.
-typedef _Spot = ({double x, double altitude});
 
 /// Pilots one ship in the battle arena: flies at the enemy ship's altitude
 /// and aims at it, dodges incoming fire sideways or by climbing and diving,
@@ -53,10 +51,10 @@ class BattleAi {
   final Random _random;
 
   int _sinceDecisionMs = 0;
-  _Spot? _target;
+  Spot? _target;
 
   /// The enemy's last spots with their elapsedMs, oldest first.
-  final List<(int, _Spot)> _enemyTrack = [];
+  final List<(int, Spot)> _enemyTrack = [];
 
   /// Shots the shield was already considered against — one roll per shot.
   final Set<String> _shieldRolled = {};
@@ -110,7 +108,7 @@ class BattleAi {
     ];
   }
 
-  _Spot _chooseTarget(
+  Spot _chooseTarget(
     BattleUnit me,
     BattleUnit enemy,
     List<(Projectile, double)> incoming,
@@ -145,10 +143,10 @@ class BattleAi {
   /// The nearest spot out of a dangerous shot's way — beside its lane, or
   /// above or below its altitude — that no dangerous shot hits, preferring
   /// the side of [aim] with fewer shots.
-  _Spot _dodge(_Spot aim, List<Projectile> dangerous) {
+  Spot _dodge(Spot aim, List<Projectile> dangerous) {
     final clearX = BattleEngine.hitHalfWidth + _dodgeClearance;
     final clearAltitude = BattleEngine.hitHalfAltitude + _dodgeClearance;
-    final spots = <_Spot>[
+    final spots = <Spot>[
       for (final shot in dangerous) ...[
         (x: shot.xFraction - clearX, altitude: aim.altitude),
         (x: shot.xFraction + clearX, altitude: aim.altitude),
@@ -159,7 +157,7 @@ class BattleAi {
     // Nowhere safe: stay, and leave it to the shield.
     if (spots.isEmpty) return aim;
 
-    int shotsOnSide(_Spot spot) => spot.x != aim.x
+    int shotsOnSide(Spot spot) => spot.x != aim.x
         ? dangerous
             .where((shot) => (shot.xFraction < aim.x) == (spot.x < aim.x))
             .length
@@ -167,7 +165,7 @@ class BattleAi {
             .where((shot) =>
                 (shot.altitude < aim.altitude) == (spot.altitude < aim.altitude))
             .length;
-    double distance(_Spot spot) =>
+    double distance(Spot spot) =>
         max((spot.x - aim.x).abs(), (spot.altitude - aim.altitude).abs());
     spots.sort((a, b) {
       final bySide = shotsOnSide(a).compareTo(shotsOnSide(b));
@@ -178,7 +176,7 @@ class BattleAi {
 
   bool _shouldShield(
     BattleUnit me,
-    _Spot target,
+    Spot target,
     List<(Projectile, double)> incoming,
   ) {
     if (!me.shieldState.canActivate) return false;
@@ -203,21 +201,21 @@ class BattleAi {
 
   double _jitter() => _random.nextDouble() * 2 - 1;
 
-  static _Spot _spotOf(BattleUnit unit) =>
+  static Spot _spotOf(BattleUnit unit) =>
       (x: unit.xFraction, altitude: unit.altitude);
 
   /// [from] moved toward [to] by at most [step] along each axis.
-  static _Spot _toward(_Spot from, _Spot to, double step) => (
+  static Spot _toward(Spot from, Spot to, double step) => (
         x: from.x + (to.x - from.x).clamp(-step, step),
         altitude: from.altitude + (to.altitude - from.altitude).clamp(-step, step),
       );
 
-  static bool _isHitBy(Iterable<Projectile> shots, _Spot spot) =>
+  static bool _isHitBy(Iterable<Projectile> shots, Spot spot) =>
       shots.any((shot) =>
           (shot.xFraction - spot.x).abs() <= BattleEngine.hitHalfWidth &&
           (shot.altitude - spot.altitude).abs() <= BattleEngine.hitHalfAltitude);
 
-  static _Spot _clamp(_Spot spot) => (
+  static Spot _clamp(Spot spot) => (
         x: spot.x
             .clamp(BattleEngine.shipEdgeMargin, 1 - BattleEngine.shipEdgeMargin)
             .toDouble(),

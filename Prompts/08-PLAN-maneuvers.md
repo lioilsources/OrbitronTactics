@@ -545,6 +545,19 @@ abstract class ManeuverStore {
 | 5 progres, odemykání, Comcenter, store rozhraní | 1.25 dne |
 | 6 dokumentace, zvuk volitelně | 0.25 dne |
 
+## Odchylky při implementaci (2026-09-13)
+
+- **Looping a Spirálu neumí jen věž a král**, ne kůň a střelec, jak říkala tabulka výš.
+- **Názvy manévrů jsou anglicky** jako zbytek UI (Sidestep, Strike, …).
+- **AI zvažuje manévr na vlastních hodinách (700 ms)**, ne při každém rozhodnutí o řízení.
+  Napojení na `reactionMs` znamenalo u Hard manévr skoro bez přestávky, bitvy přestaly
+  končit a testy AI běžely místo 11 s přes 10 minut.
+- **`ManeuverStore` se nepsal.** Balíček rozdává `FleetProgressNotifier.grantPack`, v debug
+  buildu ho odemkne tlačítko na kartě manévru. Nákupní tok zůstává mimo rozsah.
+- **Stopa gesta nad lodí se nekreslí**, název manévru se místo toho krátce ukáže v hlavičce.
+- **Zvuk manévru** (volitelný bod 13) se negeneroval.
+- `ArenaLayout` má `edgeMargin` 0.08 a `frontMargin` 0.06, tedy dojezd 0.36 výšky arény.
+
 ## Mimo rozsah (nezačínat, jen vědět)
 
 - Nákupní tok IAP (`in_app_purchase`, ověření účtenek), obnova nákupů.

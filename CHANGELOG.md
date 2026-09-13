@@ -1,5 +1,14 @@
 # Changelog
 
+## [13/09/2026]
+- Maneuvers: draw a gesture on the 3×3 pad and the ship flies it on its own — sidesteps, loops, barrel rolls, slaloms, dashes and a signature move for every unit type, firing from the maneuver's own plan
+- Every ship has twelve shared maneuver families in its own variant plus a signature of its own; the mirrored gesture flies the mirrored maneuver
+- Energy pays for them: 50 at the start of a battle, 100 at most, 12 a second back
+- Four armed slots per ship; new maneuvers come from battles won with that ship, credits, or a pack
+- Comcenter splits into Units and Maneuvers, where gestures are armed, bought and trained
+- Ships now travel the whole of their half of the arena: lowest at their own edge, highest just short of the divider
+- The AI pilot flies maneuvers too — how many it knows and how often it reaches for one depends on the difficulty
+
 ## [11/09/2026]
 - Battle music: every attacking unit type brings its own theme, from the pawn's fast synthwave to the king's dark orchestra
 - Sound effects per element: a shot like firing a pistol and an explosion with a long echo; impacts play the head of the explosion, a destroyed ship the whole echo

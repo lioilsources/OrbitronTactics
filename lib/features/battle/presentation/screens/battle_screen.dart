@@ -7,6 +7,7 @@ import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
+import '../../../game/presentation/providers/ai_opponent_controller.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
 import '../../data/battle_element.dart';
 import '../../data/fleet_skin.dart';
@@ -17,6 +18,7 @@ import '../providers/ship_sprite_provider.dart';
 import '../widgets/arena_layout.dart';
 import '../widgets/battle_arena_painter.dart';
 import '../widgets/maneuver_pad.dart';
+import '../widgets/pattern_glyph.dart';
 import '../widgets/shield_button.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
@@ -75,8 +77,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
       });
     // The battle is set up before this screen opens.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Anything the last battle unlocked has been announced already.
+      ref.read(aiOpponentProvider)?.lastUnlocked.value = const [];
       final battle = ref.read(battleStateProvider);
-      if (mounted && battle != null) _startAudio(battle);
+      if (battle != null) _startAudio(battle);
     });
   }
 
@@ -310,6 +315,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
               _BattleResultOverlay(
                 winner: battleState.winner!,
                 localColor: localColor,
+                unlocked:
+                    ref.read(aiOpponentProvider)?.lastUnlocked.value ?? const [],
                 onContinue: () => Navigator.of(context).pop(),
               ),
           ],
@@ -515,12 +522,16 @@ class _BattleHeader extends StatelessWidget {
 class _BattleResultOverlay extends StatelessWidget {
   final PlayerColor winner;
   final PlayerColor? localColor;
+
+  /// Maneuvers this win has just unlocked.
+  final List<Maneuver> unlocked;
   final VoidCallback onContinue;
 
   const _BattleResultOverlay({
     required this.winner,
     required this.localColor,
     required this.onContinue,
+    this.unlocked = const [],
   });
 
   @override
@@ -573,6 +584,41 @@ class _BattleResultOverlay extends StatelessWidget {
                   '${winner == PlayerColor.white ? "White" : "Black"} unit survives',
                   style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
                 ),
+                if (unlocked.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    unlocked.length > 1 ? 'NEW MANEUVERS' : 'NEW MANEUVER',
+                    style: TextStyle(
+                      color: Colors.grey.shade400,
+                      fontSize: 10,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  for (final maneuver in unlocked)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PatternGlyph(
+                            pattern: maneuver.pattern,
+                            color: BattleElement.of(maneuver.ship).color,
+                            size: 30,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            maneuver.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
                 const SizedBox(height: 16),
                 Text(
                   'Tap to continue',

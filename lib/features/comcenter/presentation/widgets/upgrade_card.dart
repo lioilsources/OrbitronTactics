@@ -55,9 +55,16 @@ class UpgradeCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        // The card is drawn at its natural size and scaled into whatever the
+        // grid gives it, so a larger text scale shrinks it instead of
+        // overflowing.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: SizedBox(
+            width: 110,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
             // Symbol
             Text(
               _symbols[pieceType] ?? '',
@@ -128,7 +135,9 @@ class UpgradeCard extends StatelessWidget {
                   ),
                 ),
               ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

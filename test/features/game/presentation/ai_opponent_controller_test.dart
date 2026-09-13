@@ -103,8 +103,8 @@ void main() {
     final (container, controller) = startGame(PlayerColor.white);
     final game = container.read(gameStateProvider.notifier);
 
-    game.onBattleReward!(PlayerColor.white, 40);
-    game.onBattleReward!(PlayerColor.black, 20);
+    game.onBattleReward!(PlayerColor.white, PieceType.knight, 40);
+    game.onBattleReward!(PlayerColor.black, PieceType.rook, 20);
 
     expect(controller.creditsEarned(PlayerColor.white), 40);
     expect(controller.creditsEarned(PlayerColor.black), 20);

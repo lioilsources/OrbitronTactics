@@ -44,8 +44,9 @@ class GameStateNotifier extends StateNotifier<GameState> {
   static int _gameSeq = 0;
 
   /// Called after a locally resolved battle (hot-seat, single player) with
-  /// the winning color and the credits the battle earned.
-  void Function(PlayerColor winner, int credits)? onBattleReward;
+  /// the winning color, the ship that won it and the credits it earned.
+  void Function(PlayerColor winner, PieceType ship, int credits)?
+      onBattleReward;
 
   GameStateNotifier(super.initial, {GameMode mode = GameMode.hotSeat})
       : _mode = mode;
@@ -200,9 +201,12 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final (newState, credits) =
         GameEngine.resolveBattle(state, pending, winner);
     _localPendingBattleMove = null;
+    final ship = winner == pending.piece.color
+        ? pending.piece.type
+        : (pending.capturedPiece?.type ?? pending.piece.type);
     // Credit the reward before listeners react to the outcome — the battle
     // may have just ended the game.
-    onBattleReward?.call(winner, credits);
+    onBattleReward?.call(winner, ship, credits);
     state = newState;
   }
 

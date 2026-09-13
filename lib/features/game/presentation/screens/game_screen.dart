@@ -10,6 +10,7 @@ import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
+import '../../../../core/maneuvers/maneuver.dart';
 import '../../data/game_event.dart';
 import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
@@ -54,6 +55,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     PlayerColor? attackerColor;
     var attackerSkin = FleetSkin.fallback;
     var defenderSkin = FleetSkin.fallback;
+    List<ManeuverSlot>? attackerManeuvers;
+    List<ManeuverSlot>? defenderManeuvers;
 
     if (pendingMove != null && pendingMove.capturedPiece != null) {
       attackerColor = pendingMove.piece.color;
@@ -70,6 +73,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       if (ai != null) {
         attackerSkin = ai.skinFor(attackerColor);
         defenderSkin = ai.skinFor(defenderColor);
+        attackerManeuvers =
+            ai.maneuversFor(attackerColor, pendingMove.piece.type);
+        defenderManeuvers =
+            ai.maneuversFor(defenderColor, pendingMove.capturedPiece!.type);
       }
 
       final initialBattle = BattleEngine.createBattle(
@@ -99,6 +106,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             attackerColor: attackerColor,
             attackerSkin: attackerSkin,
             defenderSkin: defenderSkin,
+            attackerManeuvers: attackerManeuvers,
+            defenderManeuvers: defenderManeuvers,
           ),
         ))
         .then((_) => _onBattleScreenClosed());

@@ -93,17 +93,23 @@ void main() {
       expect(notifier.state.phase, GamePhase.playing);
     });
 
-    test('battle resolution reports the winner and its credits', () {
+    test('battle resolution reports the winner, its ship and its credits',
+        () {
       final notifier = notifierWithCaptureSetup();
-      final rewards = <(PlayerColor, int)>[];
+      final rewards = <(PlayerColor, PieceType, int)>[];
       notifier.onBattleReward =
-          (winner, credits) => rewards.add((winner, credits));
+          (winner, ship, credits) => rewards.add((winner, ship, credits));
       notifier.tryMove(pos(3, 3), pos(4, 3));
 
       notifier.resolveBattle(PlayerColor.white);
 
+      // White's rook won the battle; the credits are the pawn it took.
       expect(rewards, [
-        (PlayerColor.white, UpgradeEngine.resourcesFor(PieceType.pawn)),
+        (
+          PlayerColor.white,
+          PieceType.rook,
+          UpgradeEngine.resourcesFor(PieceType.pawn),
+        ),
       ]);
     });
 

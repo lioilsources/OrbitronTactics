@@ -58,7 +58,7 @@ void main() {
     await showGame(tester, PlayerColor.white);
     final game = container.read(gameStateProvider.notifier);
 
-    game.onBattleReward!(PlayerColor.white, 60);
+    game.onBattleReward!(PlayerColor.white, PieceType.knight, 60);
     game.state = game.state.copyWith(
       phase: GamePhase.finished,
       winner: PlayerColor.white,

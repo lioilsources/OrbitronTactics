@@ -12,6 +12,8 @@ import '../../../../core/game_logic/models/game_state.dart';
 import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/upgrade_profile.dart';
+import '../../../../core/maneuvers/maneuver.dart';
+import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import 'game_state_provider.dart';
@@ -38,6 +40,10 @@ class AiOpponentController {
 
   /// True while the AI is deliberating its board move.
   final ValueNotifier<bool> isThinking = ValueNotifier(false);
+
+  /// Maneuvers the player's last won battle unlocked, for the battle's
+  /// result to announce.
+  final ValueNotifier<List<Maneuver>> lastUnlocked = ValueNotifier(const []);
 
   String? _gameId;
   Timer? _pending;
@@ -67,6 +73,16 @@ class AiOpponentController {
   UpgradeProfile upgradesFor(PlayerColor color) =>
       _ref.read(fleetProgressProvider(_fleetOf(color))).profile;
 
+  /// The maneuvers the fleet playing [color] has armed on [ship].
+  List<ManeuverSlot> maneuversFor(PlayerColor color, PieceType ship) {
+    final armed = _ref.read(fleetProgressProvider(_fleetOf(color))).maneuversFor(ship);
+    return [
+      for (final id in armed.active)
+        if (ManeuverCatalog.byId(id) case final maneuver?)
+          (maneuver: maneuver, level: armed.levelOf(id)),
+    ];
+  }
+
   /// Ship art of the fleet playing [color]: the skin chosen for that fleet,
   /// else the AI difficulty's own, else the default.
   FleetSkin skinFor(PlayerColor color) {
@@ -91,6 +107,7 @@ class AiOpponentController {
     _disposed = true;
     if (_game.onBattleReward == _onBattleReward) _game.onBattleReward = null;
     isThinking.dispose();
+    lastUnlocked.dispose();
   }
 
   String _fleetOf(PlayerColor color) {
@@ -132,13 +149,21 @@ class AiOpponentController {
         ifAbsent: () => 1);
   }
 
-  void _onBattleReward(PlayerColor winner, int credits) {
+  void _onBattleReward(PlayerColor winner, PieceType ship, int credits) {
     if (_disposed || _game.mode != GameMode.singlePlayer) return;
     _creditsEarned.update(winner, (sum) => sum + credits,
         ifAbsent: () => credits);
     _ref
         .read(fleetProgressProvider(_fleetOf(winner)).notifier)
         .addCredits(credits);
+
+    // Maneuvers are the player's to earn; the AI flies what its difficulty
+    // gives it.
+    if (winner == _game.aiColor) return;
+    final unlocked = _ref
+        .read(fleetProgressProvider(playerFleetIdentity).notifier)
+        .recordBattleWin(ship);
+    if (unlocked.isNotEmpty) lastUnlocked.value = unlocked;
   }
 
   void _recordGameEnd(GameState state) {

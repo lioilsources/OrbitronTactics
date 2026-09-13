@@ -5,6 +5,7 @@ import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/upgrade_profile.dart';
+import '../../../../core/maneuvers/maneuver.dart';
 import '../../../game/data/game_event.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
 
@@ -105,6 +106,27 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
     if (current == null) return;
     state = BattleEngine.activateShield(current, isAttacker);
     _ref.read(gameStateProvider.notifier).activateShield();
+  }
+
+  /// Hands the local player's ship over to [maneuver]; does nothing when it
+  /// is already flying one or cannot pay for it.
+  void startLocalManeuver({
+    required bool isAttacker,
+    required Maneuver maneuver,
+    int level = 1,
+    bool mirrored = false,
+  }) {
+    final current = state;
+    if (current == null) return;
+    final next = BattleEngine.startManeuver(
+      current,
+      isAttacker,
+      maneuver,
+      level: level,
+      mirrored: mirrored,
+    );
+    if (identical(next, current)) return;
+    state = next;
   }
 
   void applyOpponentShield({required bool isAttacker}) {

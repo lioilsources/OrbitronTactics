@@ -8,6 +8,7 @@ import 'package:orbitron_tactics/core/game_logic/models/impact.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/battle_arena_painter.dart';
 
 void main() {
@@ -80,6 +81,32 @@ void main() {
           attackerBank: 0.5)),
       returnsNormally,
     );
+  });
+
+  test('paints a ship through its maneuver', () {
+    for (final ship in PieceType.values) {
+      for (final maneuver in ManeuverCatalog.forShip(ship)) {
+        var flying = BattleEngine.startManeuver(
+          battleOf(ship, PieceType.knight).copyWith(
+            attacker: battleOf(ship, PieceType.knight)
+                .attacker
+                .copyWith(energy: 100),
+          ),
+          true,
+          maneuver,
+        );
+        expect(flying.attacker.maneuver, isNotNull, reason: maneuver.id);
+
+        for (var step = 0; step <= 8; step++) {
+          expect(
+            () => paint(BattleArenaPainter(flying, attackerAtBottom: true)),
+            returnsNormally,
+            reason: '${maneuver.id} at step $step',
+          );
+          flying = BattleEngine.tick(flying, maneuver.durationMs ~/ 8);
+        }
+      }
+    }
   });
 
   test('plays impacts and the losing ship explosion of every unit type', () {

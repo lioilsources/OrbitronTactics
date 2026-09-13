@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/maneuvers/maneuver.dart';
+import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
@@ -12,6 +16,7 @@ import '../providers/battle_state_provider.dart';
 import '../providers/ship_sprite_provider.dart';
 import '../widgets/arena_layout.dart';
 import '../widgets/battle_arena_painter.dart';
+import '../widgets/maneuver_pad.dart';
 import '../widgets/shield_button.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
@@ -23,11 +28,17 @@ class BattleScreen extends ConsumerStatefulWidget {
   final FleetSkin attackerSkin;
   final FleetSkin defenderSkin;
 
+  /// The maneuvers each side has armed; null arms what the ship starts with.
+  final List<ManeuverSlot>? attackerManeuvers;
+  final List<ManeuverSlot>? defenderManeuvers;
+
   const BattleScreen({
     super.key,
     this.attackerColor,
     this.attackerSkin = FleetSkin.fallback,
     this.defenderSkin = FleetSkin.fallback,
+    this.attackerManeuvers,
+    this.defenderManeuvers,
   });
 
   @override
@@ -43,6 +54,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
 
   final _attackerBank = ShipBank();
   final _defenderBank = ShipBank();
+
+  /// The maneuver just started, called out in the header for a moment.
+  String? _maneuverName;
+  Color _maneuverColor = Colors.cyanAccent;
+  Timer? _toast;
 
   /// Plays the losing ship's explosion once the battle is over; the result
   /// shows when it has finished.
@@ -67,8 +83,39 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
   @override
   void dispose() {
     BattleAudio.instance.stop();
+    _toast?.cancel();
     _destruction.dispose();
     super.dispose();
+  }
+
+  /// The maneuvers [unit] has armed, or what its ship starts with.
+  List<ManeuverSlot> _slotsFor(BattleUnit unit, List<ManeuverSlot>? armed) =>
+      armed ??
+      [
+        for (final id in ManeuverCatalog.starterIds(unit.piece.type))
+          (maneuver: ManeuverCatalog.byId(id)!, level: 1),
+      ];
+
+  void _flyManeuver(
+    bool isAttacker,
+    ManeuverSlot slot, {
+    required bool mirrored,
+    required Color accent,
+  }) {
+    ref.read(battleStateProvider.notifier).startLocalManeuver(
+          isAttacker: isAttacker,
+          maneuver: slot.maneuver,
+          level: slot.level,
+          mirrored: mirrored,
+        );
+    _toast?.cancel();
+    setState(() {
+      _maneuverName = slot.maneuver.name;
+      _maneuverColor = accent;
+    });
+    _toast = Timer(const Duration(milliseconds: 1100), () {
+      if (mounted) setState(() => _maneuverName = null);
+    });
   }
 
   void _startAudio(BattleState battle) {
@@ -147,6 +194,8 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
               children: [
                 _BattleHeader(
                   battleState: battleState,
+                  maneuver: _maneuverName,
+                  maneuverColor: _maneuverColor,
                   muted: BattleAudio.instance.muted,
                   onToggleMute: () async {
                     await BattleAudio.instance.toggleMute();
@@ -162,6 +211,18 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                     child: _PlayerBattleControls(
                       unit: topUnit,
                       spriteAsset: topAsset,
+                      slots: _slotsFor(
+                          topUnit,
+                          attackerAtBottom
+                              ? widget.defenderManeuvers
+                              : widget.attackerManeuvers),
+                      finished: battleState.isFinished,
+                      onManeuver: (slot, {required mirrored}) => _flyManeuver(
+                        !attackerAtBottom,
+                        slot,
+                        mirrored: mirrored,
+                        accent: BattleElement.of(topUnit.piece.type).color,
+                      ),
                       label: _shieldLabel(topUnit.piece.color),
                       onShield: () => ref
                           .read(battleStateProvider.notifier)
@@ -222,6 +283,18 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                 _PlayerBattleControls(
                   unit: bottomUnit,
                   spriteAsset: bottomAsset,
+                  slots: _slotsFor(
+                      bottomUnit,
+                      attackerAtBottom
+                          ? widget.attackerManeuvers
+                          : widget.defenderManeuvers),
+                  finished: battleState.isFinished,
+                  onManeuver: (slot, {required mirrored}) => _flyManeuver(
+                    attackerAtBottom,
+                    slot,
+                    mirrored: mirrored,
+                    accent: BattleElement.of(bottomUnit.piece.type).color,
+                  ),
                   label: isHotSeat
                       ? _shieldLabel(bottomUnit.piece.color)
                       : 'YOUR SHIELD',
@@ -301,12 +374,18 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
 class _PlayerBattleControls extends StatelessWidget {
   final BattleUnit unit;
   final String spriteAsset;
+  final List<ManeuverSlot> slots;
+  final bool finished;
+  final void Function(ManeuverSlot slot, {required bool mirrored}) onManeuver;
   final String label;
   final VoidCallback onShield;
 
   const _PlayerBattleControls({
     required this.unit,
     required this.spriteAsset,
+    required this.slots,
+    required this.finished,
+    required this.onManeuver,
     required this.label,
     required this.onShield,
   });
@@ -314,28 +393,45 @@ class _PlayerBattleControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           UnitCombatPanel(unit: unit, isLeft: true, spriteAsset: spriteAsset),
-          Column(
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 10,
-                  letterSpacing: 1.5,
+          ManeuverPad(
+            slots: slots,
+            energy: unit.energy,
+            accent: BattleElement.of(unit.piece.type).color,
+            // One maneuver at a time, and none once the battle is over.
+            enabled: unit.maneuver == null && !finished,
+            onManeuver: onManeuver,
+          ),
+          SizedBox(
+            // The pad needs the room, so the label keeps to the shield's
+            // width instead of pushing the row wider.
+            width: 80,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 10,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              ShieldButton(
-                shieldState: unit.shieldState,
-                onPressed: onShield,
-              ),
-            ],
+                const SizedBox(height: 8),
+                ShieldButton(
+                  shieldState: unit.shieldState,
+                  onPressed: onShield,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -345,6 +441,10 @@ class _PlayerBattleControls extends StatelessWidget {
 
 class _BattleHeader extends StatelessWidget {
   final BattleState battleState;
+
+  /// The maneuver just started, called out for a moment.
+  final String? maneuver;
+  final Color maneuverColor;
   final bool muted;
   final VoidCallback onToggleMute;
 
@@ -352,6 +452,8 @@ class _BattleHeader extends StatelessWidget {
     required this.battleState,
     required this.muted,
     required this.onToggleMute,
+    this.maneuver,
+    this.maneuverColor = Colors.cyanAccent,
   });
 
   @override
@@ -379,6 +481,19 @@ class _BattleHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          if (maneuver != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Text(
+                maneuver!.toUpperCase(),
+                style: TextStyle(
+                  color: maneuverColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
           Text(
             '${(battleState.elapsedMs / 1000).toStringAsFixed(1)}s',
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),

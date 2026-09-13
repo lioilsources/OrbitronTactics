@@ -98,8 +98,11 @@ class BattleAudio {
 
   /// Plays what happened between two battle states.
   void play(BattleSoundCues cues) {
-    if (cues.isEmpty || !_soloud.isInitialized) return;
+    if (cues.isEmpty) return;
     try {
+      // Reaching the engine at all can fail where there is no native
+      // library, so even this check belongs inside the guard.
+      if (!_soloud.isInitialized) return;
       for (final element in cues.shots) {
         _fire(BattleSounds.shot(element), _shotVolume * _jitter(), _minShotGap);
       }

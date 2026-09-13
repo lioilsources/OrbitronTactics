@@ -7,7 +7,9 @@ import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/projectile.dart';
+import '../../../../core/game_logic/models/spot.dart';
 import '../../../../core/game_logic/models/weapon_type.dart';
+import '../../../../core/maneuvers/maneuver.dart';
 import '../../data/battle_element.dart';
 import 'arena_layout.dart';
 import 'explosion_fx.dart';
@@ -59,14 +61,6 @@ class BattleArenaPainter extends CustomPainter {
     WeaponType.standard: 8.0,
     WeaponType.sniper: 4.0,
     WeaponType.heavyCannon: 12.0,
-  };
-
-  static const Map<BattleElement, Color> _elementColors = {
-    BattleElement.kinetic: Colors.yellowAccent,
-    BattleElement.water: Color(0xFF40A8FF),
-    BattleElement.fire: Colors.deepOrangeAccent,
-    BattleElement.ice: Color(0xFFB8F4FF),
-    BattleElement.electric: Colors.cyanAccent,
   };
 
   static const double _shipWidth = 40.0;
@@ -167,6 +161,7 @@ class BattleArenaPainter extends CustomPainter {
       sprite: attackerSprite,
       bank: attackerBank,
       opacity: identical(loser, attacker) ? fading : 1.0,
+      enemy: (x: defender.xFraction, altitude: defender.altitude),
     );
     final defenderSize = _drawShip(
       canvas,
@@ -177,6 +172,7 @@ class BattleArenaPainter extends CustomPainter {
       sprite: defenderSprite,
       bank: defenderBank,
       opacity: identical(loser, defender) ? fading : 1.0,
+      enemy: (x: attacker.xFraction, altitude: attacker.altitude),
     );
 
     // Impacts burst in the shooter's element, as big as the shot is strong
@@ -226,7 +222,7 @@ class BattleArenaPainter extends CustomPainter {
   }) {
     final radius =
         (_projectileSizes[weapon] ?? 8.0) / 2 * _altitudeScale(projectile.altitude);
-    final color = _elementColors[element]!;
+    final color = element.color;
     // A shot flying past its target's altitude cannot hit: it is dimmed.
     final opacity = onTarget ? 1.0 : 0.35;
     // The trail points back toward the shooter
@@ -323,6 +319,7 @@ class BattleArenaPainter extends CustomPainter {
     required ui.Image? sprite,
     required double bank,
     required double opacity,
+    required Spot enemy,
   }) {
     final scale = _altitudeScale(unit.altitude);
     final double shipSize;
@@ -340,13 +337,45 @@ class BattleArenaPainter extends CustomPainter {
     }
     if (opacity <= 0) return shipSize;
 
+    final run = unit.maneuver;
+    final attitude =
+        run?.poseAt(battleState.elapsedMs, enemy).attitude ?? Attitude.level;
+    final element = BattleElement.of(unit.piece.type);
+
+    // A maneuver leaves afterimages. Its flight is a function of time, so
+    // the ship's own poses a moment ago come straight back out of the run.
+    if (run != null) {
+      for (var back = 3; back >= 1; back--) {
+        final wasMs = battleState.elapsedMs - back * 60;
+        if (wasMs <= run.startedMs) continue;
+        final was = run.poseAt(wasMs, enemy);
+        final ghost = Offset(
+          was.x.clamp(0.0, 1.0) * arena.width,
+          ArenaLayout.shipY(was.altitude.clamp(0.0, 1.0),
+              atBottom: facingUp, arena: arena),
+        );
+        final alpha = 0.07 * (4 - back) * opacity;
+        _inShipFrame(canvas, ghost, shipSize,
+            facingUp: facingUp, bank: bank, attitude: was.attitude, () {
+          if (sprite != null) {
+            _drawSprite(canvas, sprite, shipSize,
+                Paint()..color = Colors.white.withValues(alpha: alpha));
+          } else {
+            canvas.scale(scale);
+            _drawVectorShip(canvas, unit: unit, opacity: alpha);
+          }
+        });
+      }
+    }
+
     // The higher the ship, the further off and softer its shadow falls.
     final shadowAt =
         center + const Offset(1, 1) * shipSize * (0.06 + 0.22 * unit.altitude);
     final shadowColor =
         Colors.black.withValues(alpha: (0.45 - 0.2 * unit.altitude) * opacity);
     final blur = 1 + 4 * unit.altitude;
-    _inShipFrame(canvas, shadowAt, shipSize, facingUp: facingUp, bank: bank, () {
+    _inShipFrame(canvas, shadowAt, shipSize,
+        facingUp: facingUp, bank: bank, attitude: attitude, () {
       if (sprite != null) {
         _drawSprite(
           canvas,
@@ -367,7 +396,23 @@ class BattleArenaPainter extends CustomPainter {
       }
     });
 
-    _inShipFrame(canvas, center, shipSize, facingUp: facingUp, bank: bank, () {
+    // Engines burning through a maneuver
+    if (attitude.boost > 0) {
+      _inShipFrame(canvas, center, shipSize,
+          facingUp: facingUp, bank: bank, attitude: attitude, () {
+        canvas.drawCircle(
+          Offset(0, shipSize * 0.55),
+          shipSize * 0.22 * (0.5 + attitude.boost),
+          Paint()
+            ..color = element.color
+                .withValues(alpha: 0.55 * attitude.boost * opacity)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, shipSize * 0.12),
+        );
+      });
+    }
+
+    _inShipFrame(canvas, center, shipSize,
+        facingUp: facingUp, bank: bank, attitude: attitude, () {
       if (sprite != null) {
         _drawSprite(
           canvas,
@@ -382,6 +427,19 @@ class BattleArenaPainter extends CustomPainter {
         _drawVectorShip(canvas, unit: unit, opacity: opacity);
       }
     });
+
+    // Shots pass through a ship in its untouchable window
+    if (run != null && run.untouchableAt(battleState.elapsedMs)) {
+      final pulse = 0.45 + 0.3 * math.sin(battleState.elapsedMs / 70);
+      canvas.drawCircle(
+        center,
+        shipSize * 0.62,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = element.color.withValues(alpha: pulse * opacity),
+      );
+    }
 
     // Shield bubble
     if (unit.shieldState.isActive) {
@@ -405,8 +463,8 @@ class BattleArenaPainter extends CustomPainter {
   }
 
   /// Runs [draw] in a ship's frame at [center]: banked into its turn — the
-  /// nose swings that way and the dipping wing recedes — and turned bow down
-  /// for the top ship.
+  /// nose swings that way and the dipping wing recedes — held as its
+  /// maneuver asks, and turned bow down for the top ship.
   void _inShipFrame(
     Canvas canvas,
     Offset center,
@@ -414,13 +472,15 @@ class BattleArenaPainter extends CustomPainter {
     VoidCallback draw, {
     required bool facingUp,
     required double bank,
+    Attitude attitude = Attitude.level,
   }) {
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(bank * _maxYaw * (facingUp ? 1 : -1));
     canvas.transform((Matrix4.identity()
           ..setEntry(3, 2, 0.6 / shipSize)
-          ..rotateY(-bank * _maxRoll))
+          ..rotateY(-bank * _maxRoll - attitude.roll * 2 * math.pi)
+          ..rotateX(attitude.pitch * 0.45 + attitude.flip * math.pi))
         .storage);
     if (!facingUp) canvas.rotate(math.pi);
     draw();

@@ -342,6 +342,10 @@ class Maneuver {
       };
 }
 
+/// A maneuver in one of a ship's active slots, at the level it was trained
+/// to.
+typedef ManeuverSlot = ({Maneuver maneuver, int level});
+
 /// A set of maneuvers sold together.
 class ManeuverPack {
   final String id;

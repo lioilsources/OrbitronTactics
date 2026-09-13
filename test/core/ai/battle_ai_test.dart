@@ -33,7 +33,39 @@ void main() {
     if (action.activateShield) {
       next = BattleEngine.activateShield(next, isAttacker);
     }
+    final maneuver = action.maneuver;
+    if (maneuver != null) {
+      next = BattleEngine.startManeuver(next, isAttacker, maneuver,
+          mirrored: action.mirrored);
+    }
     return next;
+  }
+
+  /// Fights [seeds] duels of knights and counts the ticks the attacker spent
+  /// flying a maneuver.
+  int maneuverTicks(AiProfile profile, {int seeds = 6}) {
+    var ticks = 0;
+    for (var seed = 0; seed < seeds && ticks == 0; seed++) {
+      var state = BattleEngine.createBattle(
+        attacker: const Piece(type: PieceType.knight, color: white),
+        defender: const Piece(type: PieceType.knight, color: black),
+        attackerUpgrades: noUpgrades,
+        defenderUpgrades: noUpgrades,
+      );
+      final attacker = pilot(profile, seed);
+      final defender = pilot(AiProfile.easy, 500 + seed);
+      while (!state.isFinished && state.elapsedMs < 30000) {
+        state = BattleEngine.tick(state, tickMs);
+        state = apply(
+            state, attacker.decide(state, isAttacker: true, deltaMs: tickMs),
+            isAttacker: true);
+        state = apply(
+            state, defender.decide(state, isAttacker: false, deltaMs: tickMs),
+            isAttacker: false);
+        if (state.attacker.maneuver != null) ticks++;
+      }
+    }
+    return ticks;
   }
 
   /// A battle between two ships of [type] at 16 ms ticks, as the arena runs
@@ -181,6 +213,14 @@ void main() {
         expect(fight(type, null, pilot(AiProfile.hard, 2)).winner, black,
             reason: 'Hard defending with ${type.name}');
       }
+    });
+
+    test('Hard reaches for a maneuver in a duel', () {
+      expect(maneuverTicks(AiProfile.hard), greaterThan(0));
+    });
+
+    test('a pilot taught none never flies one', () {
+      expect(maneuverTicks(AiProfile.hard.copyWith(maneuverCount: 0)), 0);
     });
 
     test('Hard beats Easy in more than 80% of 50 seeded battles', () {

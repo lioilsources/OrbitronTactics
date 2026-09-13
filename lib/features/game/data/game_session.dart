@@ -6,6 +6,7 @@ import '../../../core/game_logic/models/game_state.dart';
 import '../../../core/game_logic/models/move.dart';
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/game_logic/models/player.dart';
+import '../../../core/game_logic/models/spot.dart';
 import '../../../core/game_logic/models/position.dart';
 import '../../../core/game_logic/models/victory_condition.dart';
 import '../../../core/game_logic/validators/move_validator.dart';
@@ -134,6 +135,28 @@ class GameSession {
     ));
   }
 
+  /// Signal a maneuver the local player just started, with what it is flown
+  /// against, so the opponent's engine flies the same path.
+  void sendManeuverStarted({
+    required String maneuverId,
+    required int level,
+    required bool mirrored,
+    required Spot origin,
+    required Spot enemyAtStart,
+  }) {
+    if (_state.phase != GamePhase.battle) return;
+    transport.send(ManeuverStartedEvent(
+      color: localColor,
+      maneuverId: maneuverId,
+      level: level,
+      mirrored: mirrored,
+      originX: origin.x,
+      originAltitude: origin.altitude,
+      enemyX: enemyAtStart.x,
+      enemyAltitude: enemyAtStart.altitude,
+    ));
+  }
+
   /// Resolve the current battle with the given winner.
   void resolveBattle(PlayerColor winner) {
     if (_state.phase != GamePhase.battle) return;
@@ -205,6 +228,7 @@ class GameSession {
         }
       case ShieldActivatedEvent():
       case ShipMovedEvent():
+      case ManeuverStartedEvent():
         // Handled by battleStateProvider via the event stream
         break;
       case BattleResolvedEvent(:final winner):

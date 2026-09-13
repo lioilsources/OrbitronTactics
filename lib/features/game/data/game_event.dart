@@ -46,6 +46,17 @@ sealed class GameEvent {
           xFraction: (json['xFraction'] as num).toDouble(),
           altitude: (json['altitude'] as num?)?.toDouble() ?? 0.5,
         );
+      case 'maneuver_started':
+        return ManeuverStartedEvent(
+          color: PlayerColor.values.byName(json['color'] as String),
+          maneuverId: json['maneuverId'] as String,
+          level: (json['level'] as num?)?.toInt() ?? 1,
+          mirrored: json['mirrored'] as bool? ?? false,
+          originX: (json['originX'] as num?)?.toDouble() ?? 0.5,
+          originAltitude: (json['originAltitude'] as num?)?.toDouble() ?? 0.5,
+          enemyX: (json['enemyX'] as num?)?.toDouble() ?? 0.5,
+          enemyAltitude: (json['enemyAltitude'] as num?)?.toDouble() ?? 0.5,
+        );
       case 'battle_resolved':
         return BattleResolvedEvent(
           winner: PlayerColor.values.byName(json['winner'] as String),
@@ -160,6 +171,45 @@ class ShipMovedEvent extends GameEvent {
         'color': color.name,
         'xFraction': xFraction,
         'altitude': altitude,
+      };
+}
+
+/// One player's ship has been handed over to a maneuver.
+///
+/// It carries what the maneuver is flown against, so the same flight plays
+/// out on both devices even though each ticks its own engine.
+class ManeuverStartedEvent extends GameEvent {
+  final PlayerColor color;
+  final String maneuverId;
+  final int level;
+  final bool mirrored;
+  final double originX;
+  final double originAltitude;
+  final double enemyX;
+  final double enemyAltitude;
+
+  const ManeuverStartedEvent({
+    required this.color,
+    required this.maneuverId,
+    required this.originX,
+    required this.originAltitude,
+    required this.enemyX,
+    required this.enemyAltitude,
+    this.level = 1,
+    this.mirrored = false,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'maneuver_started',
+        'color': color.name,
+        'maneuverId': maneuverId,
+        'level': level,
+        'mirrored': mirrored,
+        'originX': originX,
+        'originAltitude': originAltitude,
+        'enemyX': enemyX,
+        'enemyAltitude': enemyAltitude,
       };
 }
 

@@ -44,6 +44,13 @@ class AiProfile {
   /// Lead the opponent's ship using its recent velocity.
   final bool predictOpponent;
 
+  /// Chance (0–1) of reaching for a maneuver when one would help.
+  final double maneuverSkill;
+
+  /// How many of its ship's maneuvers the pilot knows; six include the
+  /// ship's signature.
+  final int maneuverCount;
+
   // Progression
   /// How many upgrade levels the AI fleet may lead the player's fleet by.
   final int rubberBandOffset;
@@ -69,6 +76,8 @@ class AiProfile {
     required this.shieldSkill,
     required this.dodgeWindowMs,
     required this.predictOpponent,
+    required this.maneuverSkill,
+    required this.maneuverCount,
     required this.rubberBandOffset,
     required this.identity,
     required this.displayName,
@@ -88,6 +97,8 @@ class AiProfile {
     shieldSkill: 0.4,
     dodgeWindowMs: 250,
     predictOpponent: false,
+    maneuverSkill: 0.2,
+    maneuverCount: 2,
     rubberBandOffset: 0,
     identity: 'ai-easy',
     displayName: 'Orbitron AI · Easy',
@@ -107,6 +118,8 @@ class AiProfile {
     shieldSkill: 0.7,
     dodgeWindowMs: 400,
     predictOpponent: false,
+    maneuverSkill: 0.5,
+    maneuverCount: 4,
     rubberBandOffset: 1,
     identity: 'ai-medium',
     displayName: 'Orbitron AI · Medium',
@@ -126,6 +139,8 @@ class AiProfile {
     shieldSkill: 0.95,
     dodgeWindowMs: 600,
     predictOpponent: true,
+    maneuverSkill: 0.85,
+    maneuverCount: 6,
     rubberBandOffset: 2,
     identity: 'ai-hard',
     displayName: 'Orbitron AI · Hard',
@@ -150,6 +165,8 @@ class AiProfile {
     double? shieldSkill,
     int? dodgeWindowMs,
     bool? predictOpponent,
+    double? maneuverSkill,
+    int? maneuverCount,
     int? rubberBandOffset,
   }) {
     return AiProfile(
@@ -165,6 +182,8 @@ class AiProfile {
       shieldSkill: shieldSkill ?? this.shieldSkill,
       dodgeWindowMs: dodgeWindowMs ?? this.dodgeWindowMs,
       predictOpponent: predictOpponent ?? this.predictOpponent,
+      maneuverSkill: maneuverSkill ?? this.maneuverSkill,
+      maneuverCount: maneuverCount ?? this.maneuverCount,
       rubberBandOffset: rubberBandOffset ?? this.rubberBandOffset,
       identity: identity,
       displayName: displayName,

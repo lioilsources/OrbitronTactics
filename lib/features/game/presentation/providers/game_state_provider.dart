@@ -8,6 +8,7 @@ import '../../../../core/game_logic/models/move.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/player.dart';
 import '../../../../core/game_logic/models/position.dart';
+import '../../../../core/game_logic/models/spot.dart';
 import '../../../../core/game_logic/validators/move_validator.dart';
 import '../../data/game_session.dart';
 
@@ -167,6 +168,23 @@ class GameStateNotifier extends StateNotifier<GameState> {
   /// Send local ship movement to opponent (localWifi mode only).
   void moveShip(double xFraction, double altitude) {
     _session?.sendShipMoved(xFraction, altitude);
+  }
+
+  /// Send a maneuver the local player started to the opponent.
+  void startManeuver({
+    required String maneuverId,
+    required int level,
+    required bool mirrored,
+    required Spot origin,
+    required Spot enemyAtStart,
+  }) {
+    _session?.sendManeuverStarted(
+      maneuverId: maneuverId,
+      level: level,
+      mirrored: mirrored,
+      origin: origin,
+      enemyAtStart: enemyAtStart,
+    );
   }
 
   /// Called by BattleStateNotifier when the battle ends locally.

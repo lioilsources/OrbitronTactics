@@ -70,6 +70,7 @@ supabase/                    # Supabase schema and migrations
 - `ManeuverPad` recognises the gesture (`PatternRecognizer`) and `BattleStateNotifier.startLocalManeuver` runs it, sending `ManeuverStartedEvent` with the anchors so the opponent's engine flies the same path. An unknown maneuver id is ignored.
 - `BattleAi` reaches for one on its own 700 ms clock — cornered, or with the enemy in its hit zone. Tying it to the steering decision had the best pilots flying one almost without a break.
 - Progress: `FleetProgress.maneuvers` (`ShipManeuvers`: owned, four armed, trained levels) and `battleWins` per ship. `FleetProgressNotifier.recordBattleWin` unlocks what the wins are worth, `buyManeuver`/`upgradeManeuver`/`armManeuvers`/`grantPack` do the rest. Single player only, like credits and skins.
+- `dart run tools/dump_maneuvers.dart <dir>` writes the whole catalog out as a TSV plus flight paths sampled through `Maneuver.poseAt`. The olin.now store gallery animates them (`make import-fleets` there); sampling here rather than re-deriving the easing in JavaScript is what keeps the two from drifting.
 
 ## Fleet Ship Art
 

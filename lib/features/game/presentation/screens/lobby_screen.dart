@@ -13,6 +13,7 @@ import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../telemetry/presentation/telemetry_provider.dart';
 
 // Last single-player setup picked in the lobby, kept for the app session.
 final _singlePlayerDifficultyProvider =
@@ -37,6 +38,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.dispose();
   }
 
+  void _trackGameStarted(GameMode mode, [AiDifficulty? difficulty]) =>
+      ref.read(telemetryProvider).event('game_started', {
+        'mode': mode.name,
+        if (difficulty != null) 'difficulty': difficulty.name,
+      });
+
   Future<void> _startSinglePlayer() async {
     final setup =
         await showDialog<({AiDifficulty difficulty, PlayerColor color})>(
@@ -51,6 +58,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           humanColor: setup.color,
           humanName: name.isEmpty ? 'Player' : name,
         );
+    _trackGameStarted(GameMode.singlePlayer, setup.difficulty);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -120,6 +128,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
 
       ref.read(gameStateProvider.notifier).attachSession(session);
+      _trackGameStarted(GameMode.multiplayer);
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
@@ -141,6 +150,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   void _startLocalGame() {
     ref.read(gameStateProvider.notifier).startNewGame();
+    _trackGameStarted(GameMode.hotSeat);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -174,6 +184,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
       Navigator.of(context).pop(); // close dialog
       ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      _trackGameStarted(GameMode.localWifi);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
         (route) => false,
@@ -213,6 +224,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         return;
       }
       ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      _trackGameStarted(GameMode.localWifi);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
         (route) => false,

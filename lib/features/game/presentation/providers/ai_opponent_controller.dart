@@ -16,6 +16,7 @@ import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../telemetry/presentation/telemetry_provider.dart';
 import 'game_state_provider.dart';
 
 /// Plays the AI side of a single-player game and keeps both fleets' books.
@@ -171,6 +172,12 @@ class AiOpponentController {
     final profile = _game.aiProfile;
     final aiColor = _game.aiColor;
     if (profile == null || aiColor == null) return;
+
+    _ref.read(telemetryProvider).event('game_finished', {
+      'mode': GameMode.singlePlayer.name,
+      'difficulty': profile.difficulty.name,
+      'won': state.winner != aiColor,
+    });
 
     final aiWon = state.winner == aiColor;
     _ref

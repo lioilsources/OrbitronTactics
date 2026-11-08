@@ -19,6 +19,9 @@ dependencies:
   supabase_flutter: ^2.8.0
   shared_preferences: ^2.3.0
   flutter_soloud: ^4.1.7
+  purchases_flutter: ^11.0.1
+  sentry_flutter: ^8.14.2
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:

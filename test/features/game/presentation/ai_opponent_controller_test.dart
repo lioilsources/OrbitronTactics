@@ -5,10 +5,12 @@ import 'package:orbitron_tactics/core/game_logic/models/fleet_progress.dart';
 import 'package:orbitron_tactics/core/game_logic/models/game_phase.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/telemetry/telemetry.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/ai_opponent_controller.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/game_state_provider.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
+import 'package:orbitron_tactics/features/telemetry/presentation/telemetry_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/game_logic/test_helpers.dart';
@@ -17,16 +19,21 @@ void main() {
   const profile = AiProfile.easy;
   final thinkDelay = Duration(milliseconds: profile.thinkDelayMs);
   late FleetProgressStore store;
+  late RecordingTelemetry telemetry;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     store = FleetProgressStore(await SharedPreferences.getInstance());
+    telemetry = RecordingTelemetry();
   });
 
   /// A single-player game with the AI controller attached.
   (ProviderContainer, AiOpponentController) startGame(PlayerColor humanColor) {
     final container = ProviderContainer(
-      overrides: [fleetProgressStoreProvider.overrideWithValue(store)],
+      overrides: [
+        fleetProgressStoreProvider.overrideWithValue(store),
+        telemetryProvider.overrideWithValue(telemetry),
+      ],
     );
     addTearDown(container.dispose);
     container
@@ -136,6 +143,9 @@ void main() {
     expect(ai.totalLevels, 2);
     expect(ai.credits, 300);
     expect(store.load(profile.identity), ai);
+    expect(telemetry.names, ['game_finished']);
+    expect(telemetry.events.single.props,
+        {'mode': 'singlePlayer', 'difficulty': 'easy', 'won': false});
   });
 
   testWidgets('each side flies its own fleet', (tester) async {

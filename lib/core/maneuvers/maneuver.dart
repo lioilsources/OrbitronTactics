@@ -15,6 +15,8 @@ enum ManeuverFamily {
   volley,
   dash,
   spiral,
+  phantom,
+  strafe,
   overdrive,
   signature,
 }
@@ -210,6 +212,9 @@ class Maneuver {
   /// Multiplier on the attack interval while [keepsControl] runs.
   final double fireRateScale;
 
+  /// All but vanishes from sight while [untouchable] lasts.
+  final bool cloaks;
+
   final Unlock unlock;
 
   /// Credits that buy it before it is earned; null when it cannot be bought.
@@ -236,6 +241,7 @@ class Maneuver {
     this.ignoresShieldCooldown = false,
     this.keepsControl = false,
     this.fireRateScale = 1,
+    this.cloaks = false,
     this.price,
     this.levels = const [],
   });

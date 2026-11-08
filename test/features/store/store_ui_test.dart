@@ -101,15 +101,19 @@ void main() {
 
     await tester.tap(find.text('MANEUVERS'));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('GET PACK'), 200,
+    final corkscrew = find.ancestor(
+        of: find.text('Corkscrew'), matching: find.byType(ManeuverCard));
+    await tester.scrollUntilVisible(find.text('Corkscrew'), 200,
         scrollable: find
             .ancestor(
                 of: find.byType(ManeuverCard).first,
                 matching: find.byType(Scrollable))
             .first);
-    await tester.ensureVisible(find.text('GET PACK'));
+    final getPack =
+        find.descendant(of: corkscrew, matching: find.text('GET PACK'));
+    await tester.ensureVisible(getPack);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('GET PACK'));
+    await tester.tap(getPack);
     await tester.pumpAndSettle();
 
     expect(find.text(StoreCatalog.forPack('ace').title), findsWidgets);

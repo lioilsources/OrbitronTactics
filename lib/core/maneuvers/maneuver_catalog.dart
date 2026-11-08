@@ -16,6 +16,16 @@ class ManeuverCatalog {
       name: 'Ace pack',
       description: 'The corkscrew, for every ship that can fly it.',
     ),
+    ManeuverPack(
+      id: 'phantom',
+      name: 'Phantom pack',
+      description: 'Phantom, for every ship: fade from sight and slip aside.',
+    ),
+    ManeuverPack(
+      id: 'striker',
+      name: 'Striker pack',
+      description: 'Strafing Run, for every ship: two passes on the enemy.',
+    ),
   ];
 
   static final Map<PieceType, List<Maneuver>> _byShip = {
@@ -70,6 +80,8 @@ class ManeuverCatalog {
       ManeuverFamily.overdrive: _overdrive,
       ManeuverFamily.loop: _loop,
       ManeuverFamily.spiral: _spiral,
+      ManeuverFamily.phantom: _phantom,
+      ManeuverFamily.strafe: _strafe,
       ManeuverFamily.signature: _signature,
     };
     return [
@@ -128,6 +140,8 @@ const _tiers = {
   ManeuverFamily.loop: ManeuverTier.signature,
   ManeuverFamily.signature: ManeuverTier.signature,
   ManeuverFamily.spiral: ManeuverTier.pack,
+  ManeuverFamily.phantom: ManeuverTier.pack,
+  ManeuverFamily.strafe: ManeuverTier.pack,
 };
 
 const _unlocks = {
@@ -144,6 +158,8 @@ const _unlocks = {
   ManeuverFamily.loop: WinsUnlock(16),
   ManeuverFamily.signature: WinsUnlock(20),
   ManeuverFamily.spiral: PackUnlock('ace'),
+  ManeuverFamily.phantom: PackUnlock('phantom'),
+  ManeuverFamily.strafe: PackUnlock('striker'),
 };
 
 /// Credits that buy a maneuver before it is earned.
@@ -169,6 +185,10 @@ const _patterns = {
   ManeuverFamily.overdrive: [2, 3, 4, 5, 6],
   ManeuverFamily.loop: [1, 2, 5, 8, 7, 6, 3, 0],
   ManeuverFamily.spiral: [4, 1, 2, 5, 8, 7, 6, 3],
+  // A P: up the left side, round the top and back into the middle.
+  ManeuverFamily.phantom: [6, 3, 0, 1, 2, 5, 4],
+  // An N: two passes joined by the diagonal.
+  ManeuverFamily.strafe: [6, 3, 0, 4, 8, 5, 2],
 };
 
 const _signaturePatterns = {
@@ -198,6 +218,7 @@ Maneuver _make(
   bool ignoresShieldCooldown = false,
   bool keepsControl = false,
   double fireRateScale = 1,
+  bool cloaks = false,
 }) {
   final tier = _tiers[family]!;
   final duration = (durationMs * style.duration).round();
@@ -236,6 +257,7 @@ Maneuver _make(
     ignoresShieldCooldown: ignoresShieldCooldown,
     keepsControl: keepsControl,
     fireRateScale: fireRateScale,
+    cloaks: cloaks,
     unlock: _unlocks[family]!,
     price: _prices[tier],
     levels: [
@@ -598,6 +620,67 @@ Maneuver _spiral(PieceType ship, _Style style) => _make(
         Keyframe(1, ease: Ease.easeOut, attitude: Attitude(roll: 2, boost: 0.4)),
       ],
       fire: const [FireCue(0.5), FireCue(0.9)],
+    );
+
+/// Defensive: no shots, but the longest window of any maneuver, out of
+/// sight, ending a lane over and a little higher.
+Maneuver _phantom(PieceType ship, _Style style) => _make(
+      ship,
+      style,
+      family: ManeuverFamily.phantom,
+      name: 'Phantom',
+      description: 'Fades from sight, slips a lane over and comes back higher.',
+      durationMs: 1400,
+      energyCost: 45,
+      mirrorable: true,
+      cloaks: true,
+      untouchable: (0.1, 0.8),
+      path: const [
+        Keyframe(0.15, dx: 0.04, attitude: Attitude(boost: 0.3)),
+        Keyframe(0.6,
+            dx: 0.3,
+            dAltitude: 0.15,
+            attitude: Attitude(roll: 0.25, boost: 0.6)),
+        Keyframe(1, dx: 0.3, dAltitude: 0.1, ease: Ease.easeOut),
+      ],
+    );
+
+/// Offensive: two passes across the enemy at its altitude, a burst on each,
+/// and nothing to hide behind.
+Maneuver _strafe(PieceType ship, _Style style) => _make(
+      ship,
+      style,
+      family: ManeuverFamily.strafe,
+      name: 'Strafing Run',
+      description: 'Two passes across the enemy at its altitude, a burst on '
+          'each. No cover.',
+      durationMs: 1800,
+      energyCost: 55,
+      mirrorable: true,
+      path: const [
+        Keyframe(0.15,
+            xAnchor: Anchor.enemyLive,
+            dx: -0.25,
+            altitudeAnchor: Anchor.enemyLive,
+            attitude: Attitude(pitch: -0.4, boost: 0.8)),
+        Keyframe(0.45,
+            xAnchor: Anchor.enemyLive,
+            dx: 0.25,
+            altitudeAnchor: Anchor.enemyLive,
+            ease: Ease.linear,
+            attitude: Attitude(roll: 0.25, boost: 1)),
+        Keyframe(0.75,
+            xAnchor: Anchor.enemyLive,
+            dx: -0.25,
+            altitudeAnchor: Anchor.enemyLive,
+            ease: Ease.linear,
+            attitude: Attitude(roll: -0.25, boost: 1)),
+        Keyframe(1, ease: Ease.easeOut, attitude: Attitude(boost: 0.4)),
+      ],
+      fire: const [
+        FireCue(0.3, shots: 2, spread: 0.04, damage: 0.9),
+        FireCue(0.6, shots: 2, spread: 0.04, damage: 0.9),
+      ],
     );
 
 Maneuver _signature(PieceType ship, _Style style) => switch (ship) {

@@ -60,7 +60,7 @@ void main() {
     test('the commander edition unlocks everything', () {
       const commander = Entitlements(products: {StoreCatalog.commanderId});
       expect(StoreCatalog.items.every(commander.owns), isTrue);
-      expect(commander.ownedPacks, ['ace']);
+      expect(commander.ownedPacks, ['ace', 'phantom', 'striker']);
     });
 
     test('a legacy fleet stays owned', () {

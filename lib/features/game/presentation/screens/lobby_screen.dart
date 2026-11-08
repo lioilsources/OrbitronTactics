@@ -128,7 +128,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error joining game: $e')),
+          SnackBar(
+            content: Text(
+                e is GameNotOpen ? '$e' : 'Error joining game: $e'),
+          ),
         );
       }
     } finally {

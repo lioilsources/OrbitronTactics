@@ -28,16 +28,22 @@ lib/
 │   ├── constants/
 │   ├── game_logic/          # Board rules, piece movement, win condition
 │   ├── maneuvers/           # Maneuver catalog, gestures, flight paths (pure Dart)
+│   ├── telemetry/           # Telemetry interface (pure Dart)
 │   └── theme/
 ├── features/
 │   ├── battle/              # Game screen — board rendering, move handling
 │   ├── comcenter/           # Between-game lobby/settings screen
 │   ├── game/                # Game state management
-│   └── progress/            # Fleet progress (credits, upgrades, record) saved on device
+│   ├── onboarding/          # How to play, first-battle hint
+│   ├── progress/            # Fleet progress (credits, upgrades, record) saved on device
+│   ├── store/               # In-app purchases: catalog, entitlements, RevenueCat
+│   └── telemetry/           # Product events to Supabase, Sentry breadcrumbs
 
 assets/fleets/               # Battle ship sprites, one folder per fleet
 assets/audio/                # Battle music and effects (tools/battle_audio)
 supabase/                    # Supabase schema and migrations
+docs/                        # Privacy policy, store listing
+release.example.json         # --dart-define-from-file keys for release builds
 ```
 
 ## Dependencies
@@ -46,6 +52,9 @@ supabase/                    # Supabase schema and migrations
 - `freezed` / `json_serializable` — immutable game models
 - `supabase_flutter` — lobby and realtime multiplayer
 - `shared_preferences` — fleet progress, one JSON blob per fleet under `fleet_progress.<identity>`
+- `purchases_flutter` — RevenueCat in-app purchases (one-time products only)
+- `sentry_flutter` 9.x — crash reports (10.x needs Dart 3.12; 8.x breaks the Kotlin build)
+- `package_info_plus` — app version for telemetry
 - `flutter_soloud` 4.x — battle music and sound effects (SoLoud decodes OGG itself on every platform; 5.x needs a newer Flutter SDK)
 
 ## Single Player AI
@@ -77,13 +86,28 @@ supabase/                    # Supabase schema and migrations
 - `BattleArenaPainter` draws the sprites (decoded by `shipSpriteProvider`) sized as a fraction of the arena width and turns the top ship around; without a sprite it draws the vector hull.
 - The player's fleet is `FleetProgress.skin`, picked in the Comcenter; each difficulty's is `AiProfile.fleetSkin`. Only single player uses them (`AiOpponentController.skinFor`); other modes fly `FleetSkin.fallback` (Vanguard).
 
+## Store
+
+- Free game, no ads; the store sells looks and sidegrades. `FleetSkin.premium` marks six fleets; Vanguard and the AI fleets are free.
+- `StoreCatalog` lists the products (`bundle.commander`, `bundle.fleets`, `fleet.<slug>`, `pack.<id>`); the ids are the Google Play and App Store product ids. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
+- `PurchaseService`: `RevenueCatPurchaseService` when the build has `REVENUECAT_GOOGLE_KEY` / `REVENUECAT_APPLE_KEY`, `DebugPurchaseService` (free, saved on device) in debug builds, else `UnavailablePurchaseService`. No RevenueCat entitlements or offerings: the app maps product ids itself.
+- `EntitlementsNotifier` (`entitlementsProvider`) caches in `store.entitlements`, syncs at start, grants owned packs with `FleetProgressNotifier.grantPack`, and swaps an unowned premium skin for the fallback (refunds). The first launch with a store grandfathers the premium skin the player flies.
+- UI: Comcenter Store tab (`StoreTab`, Restore purchases), `showStoreItemSheet` from locked fleet cards and pack maneuvers.
+
+## Telemetry and onboarding
+
+- `Telemetry.event(name, props)` never throws. `SupabaseTelemetry` inserts into `app_events` (insert-only RLS) and adds a Sentry breadcrumb; tests use `NoTelemetry` / `RecordingTelemetry`. Events: `app_opened`, `game_started`, `game_finished`, `store_opened`, `store_item_viewed`, `purchase_started`, `purchase`, `restore`.
+- Sentry starts only with `SENTRY_DSN`; no PII, no tracing.
+- `OnboardingStore` (`onboardingStoreProvider`, everything seen by default): `HowToPlayScreen` on first launch, `_ControlsHint` over the arena until the first touch.
+
 ## Supabase Integration
 
 - **Realtime Broadcast** — move sync between players (~20-50ms)
 - **Presence** — detect opponent disconnect
 - **DB** — lobby/session management
+- **Auth** — every install signs in anonymously (`GameRepository.ensureSignedIn`). RLS: open games visible to signed-in players, a game otherwise only to its `white_uid`/`black_uid`; the black seat only through `join_game()`. `pg_cron` deletes stale games. `GameRepository.protocol` must be bumped when a `GameEvent` changes incompatibly.
 
-Configure in app: set Supabase URL and anon key (check `lib/core/` for config).
+Configure in app: set Supabase URL and anon key (check `lib/core/` for config). Release keys: `release.example.json`, built with `--dart-define-from-file=release.json`.
 
 ## Game Rules
 
@@ -94,4 +118,4 @@ Configure in app: set Supabase URL and anon key (check `lib/core/` for config).
 
 ## Platforms
 
-iOS, Android, Windows.
+iOS, Android. Release steps that need accounts: `Prompts/10-RELEASE-checklist.md`.

@@ -1,0 +1,7 @@
+{
+  "SUPABASE_URL": "https://YOUR-PROJECT.supabase.co",
+  "SUPABASE_ANON_KEY": "sb_publishable_...",
+  "SENTRY_DSN": "https://...@o0.ingest.sentry.io/0",
+  "REVENUECAT_GOOGLE_KEY": "goog_...",
+  "REVENUECAT_APPLE_KEY": "appl_..."
+}

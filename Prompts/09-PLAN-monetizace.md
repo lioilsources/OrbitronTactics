@@ -4,7 +4,17 @@
 > nesmí dávat výhodu v multiplayeru. Rozhodnutí v tabulkách jsou návrh — po schválení
 > platí jako uzavřená. Výchozí stav: `main` v0.8.0-alpha.1 (295 testů).
 
-## Stav dnes (z kódu)
+## Stav implementace (08/11/2026)
+
+Hotovo na větvi `claude/plan-monetizace`: B1 (podpis z `key.properties`), B3
+(anonymní přihlášení, RLS, `join_game`, cron, verze protokolu), B4 (Sentry +
+události do tabulky `app_events` místo samotného Sentry), A1–A8 (RevenueCat,
+`Entitlements`, záložka Store, Restore, zámky flotil, balíček Ace, grandfather),
+B8 (How to play + nápověda v první bitvě), B2/B7 texty v `docs/`, B10.
+Rozhodnutí: otevřené otázky 1–4 podle návrhu. Odznak supportera vypuštěn.
+Zbývá: B5, B6, B9 a vše s účty a klíči — viz `10-RELEASE-checklist.md`.
+
+## Stav před implementací (z kódu)
 
 | Oblast | Co je | Důsledek pro monetizaci |
 |---|---|---|

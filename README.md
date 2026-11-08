@@ -8,7 +8,6 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 |----------|--------|
 | iOS | Supported |
 | Android | Supported |
-| Windows | Supported |
 
 ## Features
 
@@ -21,9 +20,11 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 - Battle arena with altitude, banking ships and elemental explosions
 - Battle music per attacking unit type and sound effects per element
 - Maneuvers drawn as gestures: 11–13 per ship, armed four at a time
+- Free to play, no ads; a store for premium fleets and maneuver packs
+- How to play pages on first launch, control hints in the first battle
 - Threat indicators (red badge on endangered pieces)
 - Disconnect handling via Supabase Presence
-- 295 unit and widget tests
+- 322 unit and widget tests
 
 ## Single Player
 
@@ -53,13 +54,32 @@ New ones are earned by winning battles with that ship, bought with credits in th
 
 The attacker's unit type picks the battle music, and every element has its own shot and an explosion with a long echo. The speaker button in the battle header turns the sound off.
 
+## Store
+
+The whole game is free. The Comcenter's Store tab sells looks and sidegrades,
+all one-time purchases:
+
+| Product | Contents |
+|---------|----------|
+| Commander Edition | Everything below, and everything added later |
+| Fleet Collection | All six premium fleets, and fleets added later |
+| A premium fleet | Solar Crusade, Neon Runners, Crystal Choir, Ronin Blades, Atomic Age or Abyssal Tide |
+| Ace pack | The corkscrew for every ship |
+
+Vanguard and the three AI fleets (Star Nomads, Iron Armada, Void Hive) stay
+free. Purchases go through RevenueCat to Google Play and the App Store;
+Restore purchases is at the bottom of the Store tab. Debug builds sell
+everything for free.
+
 ## Tech Stack
 
 - Flutter / Dart 3.10.7
 - Riverpod 2.6.1 (StateNotifier pattern)
 - Supabase Flutter 2.8.0
 - Freezed 2.x (immutable models with JSON serialization)
-- shared_preferences (fleet progress)
+- shared_preferences (fleet progress, purchases cache, onboarding)
+- purchases_flutter (RevenueCat in-app purchases)
+- sentry_flutter (crash reports)
 - Pure Dart game logic and AI (no Flutter dependencies)
 
 ## Build
@@ -70,6 +90,9 @@ flutter run -d ios
 
 # Android
 flutter run -d android
+
+# Release, with the keys from release.example.json
+flutter build appbundle --release --dart-define-from-file=release.json
 
 # Tests (as CI runs them)
 flutter test --exclude-tags slow
@@ -82,3 +105,6 @@ flutter test --tags slow
 
 - [CHANGELOG.md](CHANGELOG.md) — development history
 - [GALLERY.md](GALLERY.md) — screenshots and videos
+- [docs/privacy-policy.md](docs/privacy-policy.md) — privacy policy
+- [docs/store-listing.md](docs/store-listing.md) — store texts, products, Data safety
+- [Prompts/10-RELEASE-checklist.md](Prompts/10-RELEASE-checklist.md) — release steps that need accounts and keys

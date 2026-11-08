@@ -1,5 +1,13 @@
 # Changelog
 
+## [08/11/2026]
+- Store in the Comcenter: Commander Edition, Fleet Collection, six premium fleets and the Ace pack, all one-time purchases through Google Play and the App Store; Restore purchases
+- Vanguard and the three AI fleets stay free; a premium fleet flown before the store is kept
+- How to play on first launch and from the lobby; the first battle spells out the controls
+- Online games belong to their two players: anonymous sign-in, row level security, stale games cleaned up, and the lobby lists only games of the same network protocol
+- Crash reports (Sentry) and anonymous product events
+- Release builds sign with the upload key from android/key.properties
+
 ## [13/09/2026]
 - Maneuvers: draw a gesture on the 3×3 pad and the ship flies it on its own — sidesteps, loops, barrel rolls, slaloms, dashes and a signature move for every unit type, firing from the maneuver's own plan
 - Every ship has twelve shared maneuver families in its own variant plus a signature of its own; the mirrored gesture flies the mirrored maneuver

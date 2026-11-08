@@ -8,16 +8,22 @@ import 'package:orbitron_tactics/features/battle/presentation/providers/battle_s
 import 'package:orbitron_tactics/features/battle/presentation/screens/battle_screen.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/maneuver_pad.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/shield_button.dart';
+import 'package:orbitron_tactics/features/onboarding/data/onboarding_store.dart';
+import 'package:orbitron_tactics/features/onboarding/presentation/onboarding_provider.dart';
 
 void main() {
   /// Pumps a hot-seat battle — both players get controls, the tightest
   /// layout there is — on a small phone.
-  Future<ProviderContainer> pumpBattle(WidgetTester tester, Size size) async {
+  Future<ProviderContainer> pumpBattle(WidgetTester tester, Size size,
+      {OnboardingStore? onboarding}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final container = ProviderContainer();
+    final container = ProviderContainer(overrides: [
+      if (onboarding != null)
+        onboardingStoreProvider.overrideWithValue(onboarding),
+    ]);
     addTearDown(container.dispose);
     container.read(battleStateProvider.notifier).startBattle(
           initial: BattleEngine.createBattle(
@@ -56,6 +62,34 @@ void main() {
     final container = await pumpBattle(tester, const Size(320, 568));
 
     expect(tester.takeException(), isNull);
+
+    container.read(battleStateProvider.notifier).stopBattle();
+    await tester.pump();
+  });
+
+  testWidgets('a first battle spells out the controls until the arena is '
+      'touched', (tester) async {
+    final onboarding = MemoryOnboardingStore(seen: false);
+    final container = await pumpBattle(tester, const Size(360, 640),
+        onboarding: onboarding);
+    final hint = find.textContaining('Drag across your half');
+
+    expect(hint, findsOneWidget);
+
+    await tester.tapAt(tester.getCenter(hint));
+    await tester.pump();
+
+    expect(hint, findsNothing);
+    expect(onboarding.battleHintSeen, isTrue);
+
+    container.read(battleStateProvider.notifier).stopBattle();
+    await tester.pump();
+  });
+
+  testWidgets('a seasoned player gets no hint', (tester) async {
+    final container = await pumpBattle(tester, const Size(360, 640));
+
+    expect(find.textContaining('Drag across your half'), findsNothing);
 
     container.read(battleStateProvider.notifier).stopBattle();
     await tester.pump();

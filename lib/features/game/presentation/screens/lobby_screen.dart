@@ -13,6 +13,8 @@ import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../onboarding/presentation/how_to_play_screen.dart';
+import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 
 // Last single-player setup picked in the lobby, kept for the app session.
@@ -31,6 +33,24 @@ class LobbyScreen extends ConsumerStatefulWidget {
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   final _nameController = TextEditingController(text: 'Player');
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // The rules are unusual: a new player sees them before the first game.
+    final onboarding = ref.read(onboardingStoreProvider);
+    if (!onboarding.howToPlaySeen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        onboarding.markHowToPlaySeen();
+        _showHowToPlay();
+      });
+    }
+  }
+
+  void _showHowToPlay() => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const HowToPlayScreen()),
+      );
 
   @override
   void dispose() {
@@ -251,6 +271,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: 'How to play',
+            onPressed: _showHowToPlay,
+          ),
           IconButton(
             icon: const Icon(Icons.military_tech),
             tooltip: 'Comcenter',

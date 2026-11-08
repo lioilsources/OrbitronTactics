@@ -20,6 +20,7 @@ import '../widgets/battle_arena_painter.dart';
 import '../widgets/maneuver_pad.dart';
 import '../widgets/pattern_glyph.dart';
 import '../widgets/shield_button.dart';
+import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
 
@@ -65,6 +66,16 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
   /// Plays the losing ship's explosion once the battle is over; the result
   /// shows when it has finished.
   late final AnimationController _destruction;
+
+  /// The controls spelled out over the arena, until the first battle's
+  /// first touch.
+  late bool _showHint = !ref.read(onboardingStoreProvider).battleHintSeen;
+
+  void _dismissHint() {
+    if (!_showHint) return;
+    setState(() => _showHint = false);
+    ref.read(onboardingStoreProvider).markBattleHintSeen();
+  }
 
   @override
   void initState() {
@@ -246,40 +257,47 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) => Listener(
-                          behavior: HitTestBehavior.opaque,
-                          onPointerDown: (e) => _onArenaPointerDown(
-                              e, constraints, isHotSeat, attackerAtBottom),
-                          onPointerMove: (e) => _onArenaPointerMove(
-                              e, constraints, attackerAtBottom),
-                          onPointerUp: (e) =>
-                              _pointerInTopHalf.remove(e.pointer),
-                          onPointerCancel: (e) =>
-                              _pointerInTopHalf.remove(e.pointer),
-                          child: AnimatedBuilder(
-                            animation: _destruction,
-                            builder: (context, child) => CustomPaint(
-                              painter: BattleArenaPainter(
-                                battleState,
-                                attackerAtBottom: attackerAtBottom,
-                                attackerSprite: attackerSprite,
-                                defenderSprite: defenderSprite,
-                                attackerBank: attackerBank,
-                                defenderBank: defenderBank,
-                                nowMs: battleState.elapsedMs +
-                                    (_destruction.value *
-                                            BattleArenaPainter.destructionMs)
-                                        .round(),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) => Listener(
+                                behavior: HitTestBehavior.opaque,
+                                onPointerDown: (e) => _onArenaPointerDown(
+                                    e, constraints, isHotSeat, attackerAtBottom),
+                                onPointerMove: (e) => _onArenaPointerMove(
+                                    e, constraints, attackerAtBottom),
+                                onPointerUp: (e) =>
+                                    _pointerInTopHalf.remove(e.pointer),
+                                onPointerCancel: (e) =>
+                                    _pointerInTopHalf.remove(e.pointer),
+                                child: AnimatedBuilder(
+                                  animation: _destruction,
+                                  builder: (context, child) => CustomPaint(
+                                    painter: BattleArenaPainter(
+                                      battleState,
+                                      attackerAtBottom: attackerAtBottom,
+                                      attackerSprite: attackerSprite,
+                                      defenderSprite: defenderSprite,
+                                      attackerBank: attackerBank,
+                                      defenderBank: defenderBank,
+                                      nowMs: battleState.elapsedMs +
+                                          (_destruction.value *
+                                                  BattleArenaPainter.destructionMs)
+                                              .round(),
+                                    ),
+                                    child: child,
+                                  ),
+                                  child: Container(),
+                                ),
                               ),
-                              child: child,
                             ),
-                            child: Container(),
                           ),
                         ),
-                      ),
+                        if (_showHint) const _ControlsHint(),
+                      ],
                     ),
                   ),
                 ),
@@ -331,6 +349,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
     bool isHotSeat,
     bool attackerAtBottom,
   ) {
+    _dismissHint();
     final inTopHalf = e.localPosition.dy < constraints.maxHeight / 2;
     // In network mode only the bottom (local) half is steerable —
     // the opponent's ship position arrives over the transport.
@@ -635,4 +654,33 @@ class _BattleResultOverlay extends StatelessWidget {
       ),
     );
   }
+}
+
+/// How to fly, over the lower half of the arena in a player's first battle.
+class _ControlsHint extends StatelessWidget {
+  const _ControlsHint();
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+        left: 12,
+        right: 12,
+        bottom: 12,
+        child: IgnorePointer(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.6)),
+            ),
+            child: const Text(
+              'Drag across your half to dodge, forward to climb, back to '
+              'dive. Hit the enemy at its own altitude. Draw a gesture on '
+              'the pad to fly a maneuver.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 13, height: 1.35),
+            ),
+          ),
+        ),
+      );
 }

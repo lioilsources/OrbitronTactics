@@ -9,6 +9,8 @@ import 'core/constants/release_constants.dart';
 import 'core/constants/supabase_constants.dart';
 import 'features/game/data/game_repository.dart';
 import 'features/game/presentation/screens/lobby_screen.dart';
+import 'features/onboarding/data/onboarding_store.dart';
+import 'features/onboarding/presentation/onboarding_provider.dart';
 import 'features/progress/data/fleet_progress_store.dart';
 import 'features/progress/presentation/providers/fleet_progress_provider.dart';
 import 'features/store/data/entitlements_store.dart';
@@ -41,6 +43,7 @@ Future<void> main() async {
       purchaseServiceProvider.overrideWithValue(_purchaseService(prefs)),
       entitlementsStoreProvider
           .overrideWithValue(PrefsEntitlementsStore(prefs)),
+      onboardingStoreProvider.overrideWithValue(PrefsOnboardingStore(prefs)),
     ],
   );
 

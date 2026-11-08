@@ -10,6 +10,9 @@ import 'package:orbitron_tactics/features/battle/presentation/widgets/maneuver_p
 import 'package:orbitron_tactics/features/battle/presentation/widgets/shield_button.dart';
 import 'package:orbitron_tactics/features/onboarding/data/onboarding_store.dart';
 import 'package:orbitron_tactics/features/onboarding/presentation/onboarding_provider.dart';
+import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
+import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   /// Pumps a hot-seat battle — both players get controls, the tightest
@@ -20,7 +23,10 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(overrides: [
+      fleetProgressStoreProvider.overrideWithValue(FleetProgressStore(prefs)),
       if (onboarding != null)
         onboardingStoreProvider.overrideWithValue(onboarding),
     ]);

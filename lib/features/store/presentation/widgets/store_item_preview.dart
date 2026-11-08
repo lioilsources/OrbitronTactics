@@ -36,6 +36,18 @@ class StoreItemPreview extends StatelessWidget {
           ],
           size: size,
         );
+      case StoreItemKind.music:
+        // One note per unit theme, in each unit's element colour.
+        return Row(
+          children: [
+            for (final type in PieceType.values)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Icon(Icons.music_note,
+                    size: size, color: BattleElement.of(type).color),
+              ),
+          ],
+        );
       case StoreItemKind.maneuverPack:
         final maneuvers = ManeuverCatalog.inPack(item.pack!.id);
         if (maneuvers.isEmpty) return SizedBox(height: size);

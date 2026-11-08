@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/telemetry/telemetry.dart';
+import '../../../battle/data/battle_music.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../data/entitlements.dart';
 import '../../data/entitlements_store.dart';
+import '../../data/music_choice_store.dart';
 import '../../data/purchase_service.dart';
 import '../../data/store_catalog.dart';
 
@@ -42,7 +44,9 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
     required String? Function() playerSkin,
     required void Function(String slug) setPlayerSkin,
     required void Function(String pack) grantPack,
+    void Function(BattleMusic music)? selectMusic,
   })  : _store = store,
+        _selectMusic = selectMusic,
         _service = service,
         _telemetry = telemetry,
         _playerSkin = playerSkin,
@@ -58,6 +62,7 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
   final String? Function() _playerSkin;
   final void Function(String slug) _setPlayerSkin;
   final void Function(String pack) _grantPack;
+  final void Function(BattleMusic music)? _selectMusic;
 
   static Entitlements _firstLaunch(String? skin) {
     final flown = FleetSkin.fromSlug(skin);
@@ -80,6 +85,9 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
       _apply(owned);
       if (item.fleet case final fleet? when state.ownsFleet(fleet)) {
         _setPlayerSkin(fleet.slug);
+      }
+      if (item.music case final music? when state.ownsMusic(music)) {
+        _selectMusic?.call(music);
       }
     }
     _telemetry.event('purchase', {'product': item.id, 'outcome': outcome.name});
@@ -127,5 +135,36 @@ final entitlementsProvider =
         ref.read(fleetProgressProvider(playerFleetIdentity)).skin,
     setPlayerSkin: (slug) => player().setSkin(slug),
     grantPack: (pack) => player().grantPack(pack),
+    selectMusic: (music) =>
+        ref.read(chosenBattleMusicProvider.notifier).choose(music),
   );
+});
+
+/// Where the battle music choice is kept. `main()` keeps it on the device.
+final musicChoiceStoreProvider =
+    Provider<MusicChoiceStore>((ref) => MemoryMusicChoiceStore());
+
+/// The battle music the player picked, owned or not.
+class BattleMusicChoice extends StateNotifier<BattleMusic> {
+  BattleMusicChoice(this._store) : super(BattleMusic.fromSlug(_store.load()));
+
+  final MusicChoiceStore _store;
+
+  void choose(BattleMusic music) {
+    state = music;
+    _store.save(music.slug);
+  }
+}
+
+final chosenBattleMusicProvider =
+    StateNotifierProvider<BattleMusicChoice, BattleMusic>(
+        (ref) => BattleMusicChoice(ref.watch(musicChoiceStoreProvider)));
+
+/// The music battles play: the player's pick while it is owned, else the
+/// standard themes.
+final battleMusicProvider = Provider<BattleMusic>((ref) {
+  final chosen = ref.watch(chosenBattleMusicProvider);
+  return ref.watch(entitlementsProvider).ownsMusic(chosen)
+      ? chosen
+      : BattleMusic.standard;
 });

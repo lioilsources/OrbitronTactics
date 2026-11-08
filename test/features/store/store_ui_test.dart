@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/comcenter/presentation/screens/comcenter_screen.dart';
 import 'package:orbitron_tactics/features/comcenter/presentation/widgets/maneuver_card.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
@@ -82,6 +83,26 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No earlier purchases on this account'), findsOneWidget);
+  });
+
+  testWidgets('locked music leads to its page, owned music is picked',
+      (tester) async {
+    await open(tester);
+    await tester.tap(find.text('STORE'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Retro Arcade'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StoreItemSheet), findsOneWidget);
+    expect(find.text('LISTEN'), findsOneWidget);
+
+    await tester.tap(find.text('BUY FREE (debug)'));
+    await tester.pumpAndSettle();
+    expect(container.read(battleMusicProvider), BattleMusic.retro);
+
+    await tester.tap(find.text('Standard'));
+    await tester.pumpAndSettle();
+    expect(container.read(battleMusicProvider), BattleMusic.standard);
   });
 
   testWidgets('without a store the page says so and sells nothing',

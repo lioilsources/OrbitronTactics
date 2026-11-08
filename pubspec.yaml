@@ -50,6 +50,7 @@ flutter:
     - assets/fleets/star_nomads/
     # Battle music and effects (see BattleSounds), built by tools/battle_audio
     - assets/audio/music/
+    - assets/audio/music_retro/
     - assets/audio/sfx/
 
 flutter_launcher_icons:

@@ -1,11 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
+import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
 import 'package:orbitron_tactics/features/store/data/entitlements.dart';
 import 'package:orbitron_tactics/features/store/data/store_catalog.dart';
 
 void main() {
   group('StoreCatalog', () {
+    test('sells every premium music set', () {
+      for (final music in BattleMusic.values.where((m) => m.premium)) {
+        expect(StoreCatalog.forMusic(music).music, music);
+      }
+    });
+
     test('sells every premium fleet and every maneuver pack', () {
       for (final skin in FleetSkin.values.where((skin) => skin.premium)) {
         expect(StoreCatalog.forFleet(skin).fleet, skin);
@@ -61,6 +68,24 @@ void main() {
       const commander = Entitlements(products: {StoreCatalog.commanderId});
       expect(StoreCatalog.items.every(commander.owns), isTrue);
       expect(commander.ownedPacks, ['ace', 'phantom', 'striker']);
+    });
+
+    test('the standard music is free, the retro pack is bought', () {
+      const none = Entitlements();
+      expect(none.ownsMusic(BattleMusic.standard), isTrue);
+      expect(none.ownsMusic(BattleMusic.retro), isFalse);
+      expect(
+          Entitlements(products: {StoreCatalog.musicId(BattleMusic.retro)})
+              .ownsMusic(BattleMusic.retro),
+          isTrue);
+      expect(
+          const Entitlements(products: {StoreCatalog.commanderId})
+              .ownsMusic(BattleMusic.retro),
+          isTrue);
+      expect(
+          const Entitlements(products: {StoreCatalog.fleetBundleId})
+              .ownsMusic(BattleMusic.retro),
+          isFalse);
     });
 
     test('a legacy fleet stays owned', () {

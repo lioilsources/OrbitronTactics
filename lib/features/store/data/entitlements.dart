@@ -1,4 +1,5 @@
 import '../../../core/maneuvers/maneuver_catalog.dart';
+import '../../battle/data/battle_music.dart';
 import '../../battle/data/fleet_skin.dart';
 import 'store_catalog.dart';
 
@@ -27,12 +28,18 @@ class Entitlements {
   bool ownsPack(String pack) =>
       commander || products.contains(StoreCatalog.packId(pack));
 
+  bool ownsMusic(BattleMusic music) =>
+      !music.premium ||
+      commander ||
+      products.contains(StoreCatalog.musicId(music));
+
   /// Whether everything [item] hands over is already here.
   bool owns(StoreItem item) => switch (item.kind) {
         StoreItemKind.commander => commander,
         StoreItemKind.fleetBundle => allFleets,
         StoreItemKind.fleet => ownsFleet(item.fleet!),
         StoreItemKind.maneuverPack => ownsPack(item.pack!.id),
+        StoreItemKind.music => ownsMusic(item.music!),
       };
 
   /// Ids of the maneuver packs owned, to grant to the player's fleet.

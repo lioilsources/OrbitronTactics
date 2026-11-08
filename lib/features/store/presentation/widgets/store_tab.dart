@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../battle/data/battle_music.dart';
+
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../data/store_catalog.dart';
 import '../providers/store_providers.dart';
@@ -62,6 +64,8 @@ class _StoreTabState extends ConsumerState<StoreTab> {
           ),
         ],
         const SizedBox(height: 12),
+        const _MusicChoice(),
+        const SizedBox(height: 12),
         for (final item in StoreCatalog.items)
           _StoreTile(
             item: item,
@@ -76,6 +80,50 @@ class _StoreTabState extends ConsumerState<StoreTab> {
             child: Text(_restoring ? 'RESTORING…' : 'RESTORE PURCHASES'),
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Which battle music plays: one chip per set, a locked one leading to
+/// its store page.
+class _MusicChoice extends ConsumerWidget {
+  const _MusicChoice();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playing = ref.watch(battleMusicProvider);
+    final entitlements = ref.watch(entitlementsProvider);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          'BATTLE MUSIC',
+          style: TextStyle(
+              color: Colors.grey.shade400, fontSize: 11, letterSpacing: 1.2),
+        ),
+        for (final music in BattleMusic.values)
+          ChoiceChip(
+              avatar: entitlements.ownsMusic(music)
+                  ? null
+                  : const Icon(Icons.lock, size: 14, color: Colors.amber),
+              label: Text(music.displayName),
+              selected: music == playing,
+              showCheckmark: false,
+              selectedColor: Colors.amber,
+              labelStyle: TextStyle(
+                fontSize: 12,
+                color: music == playing ? Colors.black : Colors.white70,
+              ),
+              backgroundColor: const Color(0xFF1A1A2E),
+              onSelected: (_) => entitlements.ownsMusic(music)
+                  ? ref.read(chosenBattleMusicProvider.notifier).choose(music)
+                  : showStoreItemSheet(
+                      context, ref, StoreCatalog.forMusic(music),
+                      from: 'music'),
+          ),
       ],
     );
   }

@@ -14,6 +14,7 @@ import 'features/onboarding/presentation/onboarding_provider.dart';
 import 'features/progress/data/fleet_progress_store.dart';
 import 'features/progress/presentation/providers/fleet_progress_provider.dart';
 import 'features/store/data/entitlements_store.dart';
+import 'features/store/data/music_choice_store.dart';
 import 'features/store/data/purchase_service.dart';
 import 'features/store/data/revenuecat_purchase_service.dart';
 import 'features/store/presentation/providers/store_providers.dart';
@@ -44,6 +45,7 @@ Future<void> main() async {
       entitlementsStoreProvider
           .overrideWithValue(PrefsEntitlementsStore(prefs)),
       onboardingStoreProvider.overrideWithValue(PrefsOnboardingStore(prefs)),
+      musicChoiceStoreProvider.overrideWithValue(PrefsMusicChoiceStore(prefs)),
     ],
   );
 

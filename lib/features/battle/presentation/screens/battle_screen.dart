@@ -21,6 +21,7 @@ import '../widgets/maneuver_pad.dart';
 import '../widgets/pattern_glyph.dart';
 import '../widgets/shield_button.dart';
 import '../../../onboarding/presentation/onboarding_provider.dart';
+import '../../../store/presentation/providers/store_providers.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
 
@@ -136,6 +137,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
 
   void _startAudio(BattleState battle) {
     final started = BattleAudio.instance.start(
+      music: ref.read(battleMusicProvider),
       attacker: battle.attacker.piece.type,
       elements: {
         BattleElement.of(battle.attacker.piece.type),

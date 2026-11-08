@@ -4,6 +4,7 @@ import 'package:orbitron_tactics/core/game_logic/models/fleet_progress.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/core/telemetry/telemetry.dart';
+import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
@@ -84,6 +85,22 @@ void main() {
     expect(telemetry.names, ['purchase_started', 'purchase']);
     expect(telemetry.events.last.props,
         {'product': item.id, 'outcome': 'purchased'});
+  });
+
+  test('bought music plays at once, and stops playing once refunded',
+      () async {
+    final c = container();
+    final notifier = c.read(entitlementsProvider.notifier);
+
+    expect(c.read(battleMusicProvider), BattleMusic.standard);
+    await notifier.buy(StoreCatalog.forMusic(BattleMusic.retro));
+    expect(c.read(battleMusicProvider), BattleMusic.retro);
+
+    await prefs.setStringList(DebugPurchaseService.key, []);
+    await notifier.sync();
+
+    expect(c.read(chosenBattleMusicProvider), BattleMusic.retro);
+    expect(c.read(battleMusicProvider), BattleMusic.standard);
   });
 
   test('buying the Ace pack teaches every ship its maneuvers', () async {

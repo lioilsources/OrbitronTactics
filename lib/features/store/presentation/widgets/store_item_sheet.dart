@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../battle/presentation/audio/battle_audio.dart';
+
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../data/purchase_service.dart';
 import '../../data/store_catalog.dart';
@@ -105,6 +107,14 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
             ),
             const SizedBox(height: 16),
             StoreItemPreview(item: item, size: 48),
+            if (item.music case final music?) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () => BattleAudio.instance.preview(music),
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('LISTEN'),
+              ),
+            ],
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,

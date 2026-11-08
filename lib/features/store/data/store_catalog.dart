@@ -1,9 +1,10 @@
 import '../../../core/maneuvers/maneuver.dart';
 import '../../../core/maneuvers/maneuver_catalog.dart';
+import '../../battle/data/battle_music.dart';
 import '../../battle/data/fleet_skin.dart';
 
 /// What a store item hands over.
-enum StoreItemKind { commander, fleetBundle, fleet, maneuverPack }
+enum StoreItemKind { commander, fleetBundle, fleet, maneuverPack, music }
 
 /// One product in the store. [id] is the product id in Google Play and App
 /// Store Connect, the same on both.
@@ -15,6 +16,7 @@ class StoreItem {
     required this.description,
     this.fleet,
     this.pack,
+    this.music,
   });
 
   final String id;
@@ -27,6 +29,9 @@ class StoreItem {
 
   /// The maneuver pack a [StoreItemKind.maneuverPack] item sells.
   final ManeuverPack? pack;
+
+  /// The battle music a [StoreItemKind.music] item sells.
+  final BattleMusic? music;
 }
 
 /// Every product the game sells: one-time purchases of extra content, none
@@ -39,6 +44,7 @@ class StoreCatalog {
 
   static String fleetId(FleetSkin skin) => 'fleet.${skin.slug}';
   static String packId(String pack) => 'pack.$pack';
+  static String musicId(BattleMusic music) => 'music.${music.slug}';
 
   static final premiumFleets = [
     for (final skin in FleetSkin.values)
@@ -51,8 +57,8 @@ class StoreCatalog {
       id: commanderId,
       kind: StoreItemKind.commander,
       title: 'Commander Edition',
-      description: 'Every premium fleet and maneuver pack, and everything '
-          'added to the store later.',
+      description: 'Every premium fleet, maneuver pack and music pack, and '
+          'everything added to the store later.',
     ),
     StoreItem._(
       id: fleetBundleId,
@@ -78,6 +84,16 @@ class StoreCatalog {
         description: pack.description,
         pack: pack,
       ),
+    for (final music in BattleMusic.values)
+      if (music.premium)
+        StoreItem._(
+          id: musicId(music),
+          kind: StoreItemKind.music,
+          title: '${music.displayName} music',
+          description: 'Every battle theme again as 8-bit chiptune, from the '
+              "pawn's quick synth line to the king's march.",
+          music: music,
+        ),
   ];
 
   static final Map<String, StoreItem> _byId = {
@@ -91,4 +107,6 @@ class StoreCatalog {
   static StoreItem forFleet(FleetSkin skin) => _byId[fleetId(skin)]!;
 
   static StoreItem forPack(String pack) => _byId[packId(pack)]!;
+
+  static StoreItem forMusic(BattleMusic music) => _byId[musicId(music)]!;
 }

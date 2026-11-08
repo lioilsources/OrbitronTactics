@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/maneuvers/maneuver.dart';
@@ -22,7 +21,7 @@ class ManeuverCard extends StatelessWidget {
     required this.onUnarm,
     required this.onBuy,
     required this.onTrain,
-    required this.onGrantPack,
+    required this.onGetPack,
   });
 
   final Maneuver maneuver;
@@ -37,7 +36,9 @@ class ManeuverCard extends StatelessWidget {
   final VoidCallback onUnarm;
   final VoidCallback onBuy;
   final VoidCallback onTrain;
-  final VoidCallback onGrantPack;
+
+  /// Opens the store page of the pack this maneuver comes in.
+  final void Function(String pack) onGetPack;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +130,11 @@ class ManeuverCard extends StatelessWidget {
     );
   }
 
+  static String _packName(String packId) => ManeuverCatalog.packs
+      .firstWhere((pack) => pack.id == packId,
+          orElse: () => ManeuverPack(id: packId, name: 'pack', description: ''))
+      .name;
+
   String get _tierName => switch (maneuver.tier) {
         ManeuverTier.starter => 'START',
         ManeuverTier.basic => 'BASIC',
@@ -154,7 +160,7 @@ class ManeuverCard extends StatelessWidget {
           child: Text(
             switch (maneuver.unlock) {
               WinsUnlock(:final wins) => 'Win $battleWins/$wins battles',
-              PackUnlock() => 'In the Ace pack',
+              PackUnlock(:final packId) => 'In the ${_packName(packId)}',
               StarterUnlock() => 'From the start',
             },
             style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
@@ -165,8 +171,11 @@ class ManeuverCard extends StatelessWidget {
             onPressed: credits >= price ? onBuy : null,
             child: Text('BUY $price'),
           )
-        else if (maneuver.unlock is PackUnlock && kDebugMode)
-          TextButton(onPressed: onGrantPack, child: const Text('UNLOCK PACK')),
+        else if (maneuver.unlock case PackUnlock(:final packId))
+          FilledButton.tonal(
+            onPressed: () => onGetPack(packId),
+            child: const Text('GET PACK'),
+          ),
       ],
     );
   }

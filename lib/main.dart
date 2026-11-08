@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,6 +11,10 @@ import 'features/game/data/game_repository.dart';
 import 'features/game/presentation/screens/lobby_screen.dart';
 import 'features/progress/data/fleet_progress_store.dart';
 import 'features/progress/presentation/providers/fleet_progress_provider.dart';
+import 'features/store/data/entitlements_store.dart';
+import 'features/store/data/purchase_service.dart';
+import 'features/store/data/revenuecat_purchase_service.dart';
+import 'features/store/presentation/providers/store_providers.dart';
 import 'features/telemetry/data/supabase_telemetry.dart';
 import 'features/telemetry/presentation/telemetry_provider.dart';
 
@@ -29,15 +34,24 @@ Future<void> main() async {
     ensureSignedIn: GameRepository(client).ensureSignedIn,
   );
 
+  final container = ProviderContainer(
+    overrides: [
+      fleetProgressStoreProvider.overrideWithValue(FleetProgressStore(prefs)),
+      telemetryProvider.overrideWithValue(telemetry),
+      purchaseServiceProvider.overrideWithValue(_purchaseService(prefs)),
+      entitlementsStoreProvider
+          .overrideWithValue(PrefsEntitlementsStore(prefs)),
+    ],
+  );
+
   void run() {
-    runApp(ProviderScope(
-      overrides: [
-        fleetProgressStoreProvider.overrideWithValue(FleetProgressStore(prefs)),
-        telemetryProvider.overrideWithValue(telemetry),
-      ],
+    runApp(UncontrolledProviderScope(
+      container: container,
       child: const OrbitronTacticsApp(),
     ));
     telemetry.event('app_opened');
+    // Purchases made on another device, refunds, payments that cleared.
+    container.read(entitlementsProvider.notifier).sync();
   }
 
   if (ReleaseConstants.sentryDsn.isEmpty) {
@@ -53,6 +67,19 @@ Future<void> main() async {
     },
     appRunner: run,
   );
+}
+
+/// RevenueCat when the build carries this platform's key, the free debug
+/// store in debug builds, otherwise none.
+PurchaseService _purchaseService(SharedPreferences prefs) {
+  final key = switch (defaultTargetPlatform) {
+    TargetPlatform.android => ReleaseConstants.revenueCatGoogleKey,
+    TargetPlatform.iOS => ReleaseConstants.revenueCatAppleKey,
+    _ => '',
+  };
+  if (key.isNotEmpty) return RevenueCatPurchaseService(key);
+  if (kDebugMode) return DebugPurchaseService(prefs);
+  return const UnavailablePurchaseService();
 }
 
 class OrbitronTacticsApp extends StatelessWidget {

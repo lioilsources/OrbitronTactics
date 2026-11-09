@@ -8,6 +8,7 @@ import '../../data/purchase_service.dart';
 import '../../data/store_catalog.dart';
 import '../providers/store_providers.dart';
 import 'store_item_preview.dart';
+import '../../../../l10n/l10n.dart';
 
 /// Opens [item]'s page from anywhere in the game; [from] says where, for
 /// telemetry.
@@ -52,10 +53,15 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
         await ref.read(entitlementsProvider.notifier).buy(widget.item);
     if (!mounted) return;
     setState(() => _busy = false);
+    final l10n = context.l10n;
+    final title = l10n.storeTitle(widget.item);
     final message = switch (outcome) {
-      Purchased() => '${widget.item.title} is yours',
-      PurchasePending() =>
-        'Waiting for the payment; ${widget.item.title} arrives once it clears',
+      Purchased() => l10n.purchaseDone(title),
+      PurchasePending() => l10n.purchasePending(title),
+      PurchaseFailed(failure: PurchaseFailure.storeUnavailable) =>
+        l10n.storeUnavailableShort,
+      PurchaseFailed(failure: PurchaseFailure.notInStore) =>
+        l10n.notInStoreYet,
       PurchaseFailed(:final message) => message,
       PurchaseCancelled() => null,
     };
@@ -93,7 +99,7 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              item.title,
+              context.l10n.storeTitle(item),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -102,7 +108,7 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
             ),
             const SizedBox(height: 6),
             Text(
-              item.description,
+              context.l10n.storeDescription(item),
               style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
             ),
             const SizedBox(height: 16),
@@ -112,7 +118,7 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
               TextButton.icon(
                 onPressed: () => BattleAudio.instance.preview(music),
                 icon: const Icon(Icons.play_arrow),
-                label: const Text('LISTEN'),
+                label: Text(context.l10n.listen),
               ),
             ],
             const SizedBox(height: 20),
@@ -127,12 +133,12 @@ class _StoreItemSheetState extends ConsumerState<StoreItemSheet> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(owned
-                        ? 'OWNED'
+                        ? context.l10n.owned
                         : !available
-                            ? 'STORE NOT AVAILABLE'
+                            ? context.l10n.storeNotAvailableButton
                             : price == null
-                                ? 'NOT IN THE STORE YET'
-                                : 'BUY $price'),
+                                ? context.l10n.notInStoreYet
+                                : context.l10n.buyPrice(price)),
               ),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
+import '../../../../l10n/l10n.dart';
 
 const Map<PieceType, String> _symbols = {
   PieceType.pawn: '♙',
@@ -9,15 +10,6 @@ const Map<PieceType, String> _symbols = {
   PieceType.bishop: '♗',
   PieceType.queen: '♕',
   PieceType.king: '♔',
-};
-
-const Map<PieceType, String> _names = {
-  PieceType.pawn: 'PAWN',
-  PieceType.rook: 'ROOK',
-  PieceType.knight: 'KNIGHT',
-  PieceType.bishop: 'BISHOP',
-  PieceType.queen: 'QUEEN',
-  PieceType.king: 'KING',
 };
 
 class UnitCombatPanel extends StatelessWidget {
@@ -53,7 +45,7 @@ class UnitCombatPanel extends StatelessWidget {
       children: [
         // Unit name
         Text(
-          _names[unit.piece.type] ?? '',
+          context.l10n.unit(unit.piece.type).toUpperCase(),
           style: TextStyle(
             color: isWhite ? Colors.white : Colors.grey.shade400,
             fontSize: 11,

@@ -19,6 +19,7 @@ import '../../../battle/data/fleet_skin.dart';
 import '../../../battle/presentation/providers/battle_state_provider.dart';
 import '../../../battle/presentation/screens/battle_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
+import '../../../../l10n/l10n.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -166,7 +167,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: const Text('OrbitronTactics'),
+        title: Text(context.l10n.appTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -174,21 +175,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             IconButton(
               icon: const Icon(Icons.exit_to_app),
               onPressed: () => _showLeaveDialog(context, ref),
-              tooltip: 'Leave Game',
+              tooltip: context.l10n.leaveGameTooltip,
             ),
           IconButton(
             icon: const Icon(Icons.military_tech),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ComcenterScreen()),
             ),
-            tooltip: 'Comcenter',
+            tooltip: context.l10n.comcenterTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
               ref.read(gameStateProvider.notifier).restartCurrentMode();
             },
-            tooltip: 'New Game',
+            tooltip: context.l10n.newGameTooltip,
           ),
         ],
       ),
@@ -200,7 +201,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               children: [
                 // Opponent info bar (top)
                 _PlayerInfoBar(
-                  name: topPlayer.displayName,
+                  name: _playerLabel(context, topPlayer.displayName),
                   color: topColor,
                   isCurrentTurn: gameState.currentTurn == topColor,
                   hasKing: topPlayer.hasKing,
@@ -250,7 +251,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
                 // Your info bar (bottom)
                 _PlayerInfoBar(
-                  name: bottomPlayer.displayName,
+                  name: _playerLabel(context, bottomPlayer.displayName),
                   color: bottomColor,
                   isCurrentTurn: gameState.currentTurn == bottomColor,
                   hasKing: bottomPlayer.hasKing,
@@ -281,7 +282,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 winner: gameState.winner!,
                 victoryCondition: gameState.victoryCondition!,
                 reward: aiController != null && localColor != null
-                    ? '+${aiController.creditsEarned(localColor)} cr'
+                    ? context.l10n
+                        .creditsReward(aiController.creditsEarned(localColor))
                     : null,
                 onNewGame: () {
                   ref.read(gameStateProvider.notifier).restartCurrentMode();
@@ -301,20 +303,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Leave Game?', style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'Your opponent will be able to claim victory.',
+        title: Text(context.l10n.leaveGameTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(
+          context.l10n.leaveGameBody,
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Leave'),
+            child: Text(context.l10n.leave),
           ),
         ],
       ),
@@ -493,7 +496,7 @@ class _TurnBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        thinking ? 'THINKING…' : 'TURN',
+        thinking ? context.l10n.turnThinking : context.l10n.turnLabel,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 11,
@@ -527,7 +530,7 @@ class _PowerFieldStatusBar extends StatelessWidget {
           const Icon(Icons.diamond_outlined, size: 16, color: Colors.cyan),
           const SizedBox(width: 4),
           Text(
-            'Power Fields: ',
+            context.l10n.powerFieldsLabel,
             style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
           ),
           Text(
@@ -543,7 +546,7 @@ class _PowerFieldStatusBar extends StatelessWidget {
             style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           Text(
-            '  (need $total)',
+            context.l10n.powerFieldsNeed(total),
             style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
           ),
         ],
@@ -591,8 +594,8 @@ class _DisconnectOverlay extends StatelessWidget {
                 color: Colors.orange,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Opponent Disconnected',
+              Text(
+                context.l10n.opponentDisconnected,
                 style: TextStyle(
                   color: Colors.orange,
                   fontSize: 22,
@@ -600,8 +603,8 @@ class _DisconnectOverlay extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Your opponent has left the game.',
+              Text(
+                context.l10n.opponentLeftBody,
                 style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(height: 24),
@@ -611,7 +614,7 @@ class _DisconnectOverlay extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: onClaimVictory,
                     icon: const Icon(Icons.emoji_events),
-                    label: const Text('Claim Victory'),
+                    label: Text(context.l10n.claimVictory),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange.shade700,
                     ),
@@ -620,7 +623,7 @@ class _DisconnectOverlay extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: onLeave,
                     icon: const Icon(Icons.arrow_back),
-                    label: const Text('Leave'),
+                    label: Text(context.l10n.leave),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white70,
                       side: const BorderSide(color: Colors.white30),
@@ -696,12 +699,12 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
     );
   }
 
-  String get _victoryText {
+  String _victoryText(AppLocalizations l10n) {
     return widget.victoryCondition.when(
-      powerFieldDomination: () => 'Power Field Domination!',
-      royalElimination: () => 'Royal Elimination!',
-      infiltration: (_) => 'Pawn Infiltration!',
-      abandonment: () => 'Opponent Abandoned!',
+      powerFieldDomination: () => l10n.victoryPowerFields,
+      royalElimination: () => l10n.victoryRoyal,
+      infiltration: (_) => l10n.victoryInfiltration,
+      abandonment: () => l10n.victoryAbandonment,
     );
   }
 
@@ -739,7 +742,9 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '${widget.winner == PlayerColor.white ? "White" : "Black"} Wins!',
+                    widget.winner == PlayerColor.white
+                        ? context.l10n.whiteWins
+                        : context.l10n.blackWins,
                     style: const TextStyle(
                       color: Colors.amber,
                       fontSize: 28,
@@ -748,7 +753,7 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _victoryText,
+                    _victoryText(context.l10n),
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   if (widget.reward != null) ...[
@@ -777,13 +782,13 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
                       ElevatedButton.icon(
                         onPressed: widget.onNewGame,
                         icon: const Icon(Icons.refresh),
-                        label: const Text('New Game'),
+                        label: Text(context.l10n.newGame),
                       ),
                       const SizedBox(width: 12),
                       OutlinedButton.icon(
                         onPressed: widget.onBackToLobby,
                         icon: const Icon(Icons.arrow_back),
-                        label: const Text('Back'),
+                        label: Text(context.l10n.back),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white70,
                           side: const BorderSide(color: Colors.white30),
@@ -800,3 +805,14 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
     );
   }
 }
+
+/// Names the game gives players itself, shown in the device's language.
+String _playerLabel(BuildContext context, String name) => switch (name) {
+      'White' => context.l10n.colorWhite,
+      'Black' => context.l10n.colorBlack,
+      'Orbitron AI · Easy' => 'Orbitron AI · ${context.l10n.difficultyEasy}',
+      'Orbitron AI · Medium' =>
+        'Orbitron AI · ${context.l10n.difficultyMedium}',
+      'Orbitron AI · Hard' => 'Orbitron AI · ${context.l10n.difficultyHard}',
+      _ => name,
+    };

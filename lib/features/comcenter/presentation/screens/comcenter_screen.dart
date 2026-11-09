@@ -14,6 +14,7 @@ import '../../../store/presentation/widgets/store_item_sheet.dart';
 import '../../../store/presentation/widgets/store_tab.dart';
 import '../widgets/maneuver_card.dart';
 import '../widgets/upgrade_card.dart';
+import '../../../../l10n/l10n.dart';
 
 class ComcenterScreen extends ConsumerWidget {
   const ComcenterScreen({super.key});
@@ -29,8 +30,8 @@ class ComcenterScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFF0D0D1A),
         appBar: AppBar(
-          title: const Text(
-            'COMCENTER',
+          title: Text(
+            context.l10n.comcenterTitle,
             style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.transparent,
@@ -44,7 +45,7 @@ class ComcenterScreen extends ConsumerWidget {
                       color: Colors.amber, size: 18),
                   const SizedBox(width: 4),
                   Text(
-                    '${fleet.credits} cr',
+                    context.l10n.credits(fleet.credits),
                     style: const TextStyle(
                       color: Colors.amber,
                       fontWeight: FontWeight.bold,
@@ -55,14 +56,14 @@ class ComcenterScreen extends ConsumerWidget {
               ),
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.amber,
             unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.amber,
             tabs: [
-              Tab(text: 'UNITS'),
-              Tab(text: 'MANEUVERS'),
-              Tab(text: 'STORE'),
+              Tab(text: context.l10n.tabUnits),
+              Tab(text: context.l10n.tabManeuvers),
+              Tab(text: context.l10n.tabStore),
             ],
           ),
         ),
@@ -97,7 +98,7 @@ class _UnitsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your fleet: ${skin.displayName}',
+            context.l10n.yourFleet(skin.displayName),
             style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -125,7 +126,7 @@ class _UnitsTab extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Upgrade your units to gain advantage in battle',
+            context.l10n.upgradeHint,
             style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
           ),
           const SizedBox(height: 16),
@@ -190,7 +191,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
               itemBuilder: (context, index) {
                 final ship = PieceType.values[index];
                 return ChoiceChip(
-                  label: Text(ship.name.toUpperCase()),
+                  label: Text(context.l10n.unit(ship).toUpperCase()),
                   labelStyle: TextStyle(
                     fontSize: 11,
                     color: ship == _ship ? Colors.black : Colors.white70,
@@ -208,7 +209,8 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
           Row(
             children: [
               Text(
-                'ARMED ${learned.active.length}/${ShipManeuvers.slots}',
+                context.l10n
+                    .armedCount(learned.active.length, ShipManeuvers.slots),
                 style: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 11,
@@ -216,7 +218,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
               ),
               const SizedBox(width: 10),
               Text(
-                '${fleet.battleWinsWith(_ship)} battles won',
+                context.l10n.battlesWon(fleet.battleWinsWith(_ship)),
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
               ),
             ],

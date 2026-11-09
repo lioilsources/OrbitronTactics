@@ -34,10 +34,15 @@ class PurchasePending extends PurchaseOutcome {
   String get name => 'pending';
 }
 
-class PurchaseFailed extends PurchaseOutcome {
-  const PurchaseFailed(this.message);
+/// Why a purchase failed, for the player to be told in their language.
+enum PurchaseFailure { storeUnavailable, notInStore, other }
 
+class PurchaseFailed extends PurchaseOutcome {
+  const PurchaseFailed(this.message, [this.failure = PurchaseFailure.other]);
+
+  /// The store's own words, when it gave any.
   final String message;
+  final PurchaseFailure failure;
 
   @override
   String get name => 'failed';
@@ -86,7 +91,8 @@ class UnavailablePurchaseService extends PurchaseService {
 
   @override
   Future<PurchaseOutcome> buy(String productId) async =>
-      const PurchaseFailed('The store is not available on this build');
+      const PurchaseFailed('The store is not available on this build',
+          PurchaseFailure.storeUnavailable);
 
   @override
   Future<Set<String>> restore() async => throw const StoreUnavailable();

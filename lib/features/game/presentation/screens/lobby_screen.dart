@@ -16,6 +16,7 @@ import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../../../onboarding/presentation/how_to_play_screen.dart';
 import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
+import '../../../../l10n/l10n.dart';
 
 // Last single-player setup picked in the lobby, kept for the app session.
 final _singlePlayerDifficultyProvider =
@@ -31,8 +32,16 @@ class LobbyScreen extends ConsumerStatefulWidget {
 }
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
-  final _nameController = TextEditingController(text: 'Player');
+  final _nameController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_nameController.text.isEmpty) {
+      _nameController.text = context.l10n.defaultPlayerName;
+    }
+  }
 
   @override
   void initState() {
@@ -76,7 +85,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     ref.read(gameStateProvider.notifier).startSinglePlayerGame(
           profile: AiProfile.of(setup.difficulty),
           humanColor: setup.color,
-          humanName: name.isEmpty ? 'Player' : name,
+          humanName: name.isEmpty ? context.l10n.defaultPlayerName : name,
         );
     _trackGameStarted(GameMode.singlePlayer, setup.difficulty);
     Navigator.of(context).push(
@@ -107,7 +116,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating game: $e')),
+          SnackBar(content: Text(context.l10n.errorCreatingGame('$e'))),
         );
       }
     } finally {
@@ -159,7 +168,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                e is GameNotOpen ? '$e' : 'Error joining game: $e'),
+                e is GameNotOpen
+                    ? context.l10n.gameNotOpen
+                    : context.l10n.errorJoiningGame('$e')),
           ),
         );
       }
@@ -180,7 +191,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     setState(() => _isLoading = true);
     try {
       final playerName = _nameController.text.trim().isEmpty
-          ? 'Host'
+          ? context.l10n.defaultHostName
           : _nameController.text.trim();
 
       final session = GameSession.createLocalWifiHostSession(
@@ -212,7 +223,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('WiFi host error: $e')),
+          SnackBar(content: Text(context.l10n.wifiHostError('$e'))),
         );
       }
     } finally {
@@ -225,12 +236,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       context: context,
       builder: (_) => const _WifiJoinDialog(),
     );
-    if (ip == null || ip.isEmpty) return;
+    if (ip == null || ip.isEmpty || !mounted) return;
 
     setState(() => _isLoading = true);
     try {
       final playerName = _nameController.text.trim().isEmpty
-          ? 'Guest'
+          ? context.l10n.defaultGuestName
           : _nameController.text.trim();
 
       final session = GameSession.createLocalWifiGuestSession(
@@ -252,7 +263,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('WiFi join error: $e')),
+          SnackBar(content: Text(context.l10n.wifiJoinError('$e'))),
         );
       }
     } finally {
@@ -267,18 +278,18 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: const Text('OrbitronTactics'),
+        title: Text(context.l10n.appTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: 'How to play',
+            tooltip: context.l10n.howToPlayTooltip,
             onPressed: _showHowToPlay,
           ),
           IconButton(
             icon: const Icon(Icons.military_tech),
-            tooltip: 'Comcenter',
+            tooltip: context.l10n.comcenterTooltip,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ComcenterScreen()),
             ),
@@ -296,7 +307,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: 'Your name',
+                  labelText: context.l10n.lobbyYourName,
                   labelStyle: TextStyle(color: Colors.grey.shade400),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade700),
@@ -314,7 +325,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ElevatedButton.icon(
                 onPressed: _isLoading ? null : _startSinglePlayer,
                 icon: const Icon(Icons.smart_toy),
-                label: const Text('Single Player'),
+                label: Text(context.l10n.lobbySinglePlayer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
@@ -330,7 +341,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _isLoading ? null : _createGame,
                       icon: const Icon(Icons.add),
-                      label: const Text('Create Game'),
+                      label: Text(context.l10n.lobbyCreateGame),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -342,7 +353,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _startLocalGame,
                       icon: const Icon(Icons.people),
-                      label: const Text('Local Game'),
+                      label: Text(context.l10n.lobbyLocalGame),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white70,
                         side: BorderSide(color: Colors.grey.shade700),
@@ -361,7 +372,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _hostLocalWifi,
                       icon: const Icon(Icons.wifi, size: 16),
-                      label: const Text('Host WiFi'),
+                      label: Text(context.l10n.lobbyHostWifi),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.greenAccent,
                         side: const BorderSide(color: Colors.green),
@@ -374,7 +385,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _joinLocalWifi,
                       icon: const Icon(Icons.wifi_find, size: 16),
-                      label: const Text('Join WiFi'),
+                      label: Text(context.l10n.lobbyJoinWifi),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.greenAccent,
                         side: const BorderSide(color: Colors.green),
@@ -386,7 +397,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'WiFi mode includes realtime battle arena',
+                context.l10n.lobbyWifiNote,
                 style: TextStyle(color: Colors.green.shade700, fontSize: 11),
                 textAlign: TextAlign.center,
               ),
@@ -394,7 +405,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
               // Waiting games list
               Text(
-                'Open Games',
+                context.l10n.lobbyOpenGames,
                 style: TextStyle(
                   color: Colors.grey.shade400,
                   fontSize: 14,
@@ -409,7 +420,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     if (games.isEmpty) {
                       return Center(
                         child: Text(
-                          'No open games.\nCreate one to start!',
+                          context.l10n.lobbyNoOpenGames,
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
@@ -421,8 +432,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                         final game = games[index];
                         final age = DateTime.now().difference(game.createdAt);
                         final ageText = age.inMinutes < 1
-                            ? 'just now'
-                            : '${age.inMinutes}m ago';
+                            ? context.l10n.lobbyJustNow
+                            : context.l10n.lobbyMinutesAgo(age.inMinutes);
 
                         return Card(
                           color: const Color(0xFF16213E),
@@ -447,7 +458,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green.shade700,
                               ),
-                              child: const Text('Join'),
+                              child: Text(context.l10n.join),
                             ),
                           ),
                         );
@@ -465,7 +476,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                             color: Colors.grey.shade600, size: 48),
                         const SizedBox(height: 8),
                         Text(
-                          'Cannot connect to server',
+                          context.l10n.lobbyCannotConnect,
                           style: TextStyle(color: Colors.grey.shade500),
                         ),
                         const SizedBox(height: 4),
@@ -506,23 +517,30 @@ class _SinglePlayerDialog extends ConsumerWidget {
 
     return AlertDialog(
       backgroundColor: const Color(0xFF1A1A2E),
-      title: const Row(
+      title: Row(
         children: [
           Icon(Icons.smart_toy, color: Colors.deepPurpleAccent),
           SizedBox(width: 8),
-          Text('Single Player', style: TextStyle(color: Colors.white)),
+          Text(context.l10n.lobbySinglePlayer,
+              style: const TextStyle(color: Colors.white)),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _DialogLabel('Difficulty'),
+          _DialogLabel(context.l10n.dialogDifficulty),
           SegmentedButton<AiDifficulty>(
-            segments: const [
-              ButtonSegment(value: AiDifficulty.easy, label: Text('Easy')),
-              ButtonSegment(value: AiDifficulty.medium, label: Text('Medium')),
-              ButtonSegment(value: AiDifficulty.hard, label: Text('Hard')),
+            segments: [
+              ButtonSegment(
+                  value: AiDifficulty.easy,
+                  label: Text(context.l10n.difficultyEasy)),
+              ButtonSegment(
+                  value: AiDifficulty.medium,
+                  label: Text(context.l10n.difficultyMedium)),
+              ButtonSegment(
+                  value: AiDifficulty.hard,
+                  label: Text(context.l10n.difficultyHard)),
             ],
             selected: {difficulty},
             showSelectedIcon: false,
@@ -531,15 +549,19 @@ class _SinglePlayerDialog extends ConsumerWidget {
                 .state = selection.first,
           ),
           const SizedBox(height: 12),
-          const _DialogLabel('AI fleets'),
+          _DialogLabel(context.l10n.dialogAiFleets),
           for (final option in AiDifficulty.values)
             _FleetRow(difficulty: option, selected: option == difficulty),
           const SizedBox(height: 16),
-          const _DialogLabel('Your color'),
+          _DialogLabel(context.l10n.dialogYourColor),
           SegmentedButton<PlayerColor>(
-            segments: const [
-              ButtonSegment(value: PlayerColor.white, label: Text('White')),
-              ButtonSegment(value: PlayerColor.black, label: Text('Black')),
+            segments: [
+              ButtonSegment(
+                  value: PlayerColor.white,
+                  label: Text(context.l10n.colorWhite)),
+              ButtonSegment(
+                  value: PlayerColor.black,
+                  label: Text(context.l10n.colorBlack)),
             ],
             selected: {color},
             showSelectedIcon: false,
@@ -550,8 +572,8 @@ class _SinglePlayerDialog extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             color == PlayerColor.white
-                ? 'You move first'
-                : 'The AI moves first',
+                ? context.l10n.youMoveFirst
+                : context.l10n.aiMovesFirst,
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
             textAlign: TextAlign.center,
           ),
@@ -560,13 +582,13 @@ class _SinglePlayerDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         ElevatedButton.icon(
           onPressed: () => Navigator.of(context)
               .pop((difficulty: difficulty, color: color)),
           icon: const Icon(Icons.play_arrow),
-          label: const Text('Start'),
+          label: Text(context.l10n.start),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -602,9 +624,9 @@ class _FleetRow extends ConsumerWidget {
             width: 64,
             child: Text(
               switch (difficulty) {
-                AiDifficulty.easy => 'Easy',
-                AiDifficulty.medium => 'Medium',
-                AiDifficulty.hard => 'Hard',
+                AiDifficulty.easy => context.l10n.difficultyEasy,
+                AiDifficulty.medium => context.l10n.difficultyMedium,
+                AiDifficulty.hard => context.l10n.difficultyHard,
               },
               style: style,
             ),
@@ -617,9 +639,10 @@ class _FleetRow extends ConsumerWidget {
           const SizedBox(width: 2),
           Text('${fleet.totalLevels}', style: style),
           const Spacer(),
-          Text('${fleet.credits} cr', style: style),
+          Text(context.l10n.credits(fleet.credits), style: style),
           const SizedBox(width: 12),
-          Text('${fleet.wins}W / ${fleet.losses}L', style: style),
+          Text(context.l10n.fleetRecord(fleet.wins, fleet.losses),
+              style: style),
         ],
       ),
     );
@@ -656,14 +679,15 @@ class _WifiHostDialog extends StatelessWidget {
         children: [
           const Icon(Icons.wifi, color: Colors.greenAccent),
           const SizedBox(width: 8),
-          const Text('WiFi Host', style: TextStyle(color: Colors.white)),
+          Text(context.l10n.wifiHostTitle,
+              style: const TextStyle(color: Colors.white)),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Share this address with your opponent:',
+          Text(
+            context.l10n.wifiShareAddress,
             style: TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
@@ -679,8 +703,8 @@ class _WifiHostDialog extends StatelessWidget {
           const SizedBox(height: 16),
           const CircularProgressIndicator(color: Colors.greenAccent),
           const SizedBox(height: 8),
-          const Text(
-            'Waiting for guest to connect...',
+          Text(
+            context.l10n.wifiWaitingGuest,
             style: TextStyle(color: Colors.white54, fontSize: 12),
           ),
         ],
@@ -713,14 +737,15 @@ class _WifiJoinDialogState extends State<_WifiJoinDialog> {
         children: [
           const Icon(Icons.wifi_find, color: Colors.greenAccent),
           const SizedBox(width: 8),
-          const Text('Join WiFi Game', style: TextStyle(color: Colors.white)),
+          Text(context.l10n.wifiJoinTitle,
+              style: const TextStyle(color: Colors.white)),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Enter the host\'s IP address:',
+          Text(
+            context.l10n.wifiEnterIp,
             style: TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
@@ -746,12 +771,12 @@ class _WifiJoinDialogState extends State<_WifiJoinDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
           style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-          child: const Text('Connect'),
+          child: Text(context.l10n.connect),
         ),
       ],
     );
@@ -788,7 +813,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
       gameId: widget.gameId,
       localColor: PlayerColor.white,
       localPlayerName: widget.playerName,
-      remotePlayerName: 'Opponent',
+      remotePlayerName: context.l10n.defaultOpponentName,
       client: Supabase.instance.client,
     );
 
@@ -826,7 +851,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: const Text('Waiting for opponent'),
+        title: Text(context.l10n.waitingForOpponent),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -837,7 +862,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
             const CircularProgressIndicator(),
             const SizedBox(height: 24),
             Text(
-              'Game ID:',
+              context.l10n.gameIdLabel,
               style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
             ),
             const SizedBox(height: 4),
@@ -851,7 +876,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Waiting for another player to join...',
+              context.l10n.waitingForPlayer,
               style: TextStyle(color: Colors.grey.shade400),
             ),
           ],

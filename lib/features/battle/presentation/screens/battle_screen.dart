@@ -24,6 +24,7 @@ import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../../../store/presentation/providers/store_providers.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
+import '../../../../l10n/l10n.dart';
 
 class BattleScreen extends ConsumerStatefulWidget {
   final PlayerColor? attackerColor;
@@ -127,7 +128,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
     _toast?.cancel();
     setState(() {
-      _maneuverName = slot.maneuver.name;
+      _maneuverName = context.l10n.maneuverName(slot.maneuver);
       _maneuverColor = accent;
     });
     _toast = Timer(const Duration(milliseconds: 1100), () {
@@ -322,7 +323,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                   ),
                   label: isHotSeat
                       ? _shieldLabel(bottomUnit.piece.color)
-                      : 'YOUR SHIELD',
+                      : context.l10n.yourShield,
                   onShield: () => ref
                       .read(battleStateProvider.notifier)
                       .activateLocalShield(isAttacker: attackerAtBottom),
@@ -394,8 +395,9 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
   }
 
-  String _shieldLabel(PlayerColor color) =>
-      color == PlayerColor.white ? 'WHITE SHIELD' : 'BLACK SHIELD';
+  String _shieldLabel(PlayerColor color) => color == PlayerColor.white
+      ? context.l10n.whiteShield
+      : context.l10n.blackShield;
 }
 
 /// One player's battle controls: unit panel and shield button side by side.
@@ -499,8 +501,8 @@ class _BattleHeader extends StatelessWidget {
         children: [
           const Icon(Icons.bolt, color: Colors.amber, size: 20),
           const SizedBox(width: 8),
-          const Text(
-            'BATTLE',
+          Text(
+            context.l10n.battleTitle,
             style: TextStyle(
               color: Colors.amber,
               fontSize: 18,
@@ -531,7 +533,7 @@ class _BattleHeader extends StatelessWidget {
             color: Colors.grey.shade500,
             iconSize: 20,
             visualDensity: VisualDensity.compact,
-            tooltip: muted ? 'Sound on' : 'Sound off',
+            tooltip: muted ? context.l10n.soundOn : context.l10n.soundOff,
             onPressed: onToggleMute,
           ),
         ],
@@ -592,7 +594,9 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isLocalWin ? 'VICTORY!' : 'DEFEATED',
+                  isLocalWin
+                      ? context.l10n.battleVictory
+                      : context.l10n.battleDefeated,
                   style: TextStyle(
                     color: isLocalWin ? Colors.amber : Colors.redAccent,
                     fontSize: 28,
@@ -608,7 +612,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 if (unlocked.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   Text(
-                    unlocked.length > 1 ? 'NEW MANEUVERS' : 'NEW MANEUVER',
+                    context.l10n.newManeuvers(unlocked.length),
                     style: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 10,
@@ -629,7 +633,7 @@ class _BattleResultOverlay extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            maneuver.name,
+                            context.l10n.maneuverName(maneuver),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -642,7 +646,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 Text(
-                  'Tap to continue',
+                  context.l10n.tapToContinue,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 11,
@@ -675,10 +679,8 @@ class _ControlsHint extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.amber.withValues(alpha: 0.6)),
             ),
-            child: const Text(
-              'Drag across your half to dodge, forward to climb, back to '
-              'dive. Hit the enemy at its own altitude. Draw a gesture on '
-              'the pad to fly a maneuver.',
+            child: Text(
+              context.l10n.controlsHint,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 13, height: 1.35),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/presentation/widgets/pattern_glyph.dart';
+import '../../../../l10n/l10n.dart';
 
 /// One maneuver in the Comcenter: its gesture, what it does, and the way in
 /// — arm it, buy it, train it, or go and win battles for it.
@@ -76,7 +77,7 @@ class ManeuverCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            maneuver.name,
+                            context.l10n.maneuverName(maneuver),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -87,7 +88,7 @@ class ManeuverCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        _Badge(text: _tierName, color: accent),
+                        _Badge(text: _tierName(context), color: accent),
                         if (owned && level > 1) ...[
                           const SizedBox(width: 4),
                           _Badge(text: 'L$level', color: Colors.amber),
@@ -96,15 +97,20 @@ class ManeuverCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      maneuver.description,
+                      context.l10n.maneuverDescription(maneuver),
                       style: TextStyle(
                           color: Colors.grey.shade400, fontSize: 11, height: 1.3),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${maneuver.costAt(level)} energy · '
-                      '${(maneuver.durationAt(level) / 1000).toStringAsFixed(1)} s'
-                      '${maneuver.mirrorable ? ' · mirrors' : ''}',
+                      context.l10n.maneuverStats(
+                            maneuver.costAt(level),
+                            (maneuver.durationAt(level) / 1000)
+                                .toStringAsFixed(1),
+                          ) +
+                          (maneuver.mirrorable
+                              ? context.l10n.maneuverMirrors
+                              : ''),
                       style: TextStyle(color: accent, fontSize: 11),
                     ),
                   ],
@@ -120,7 +126,7 @@ class ManeuverCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: credits >= trainPrice ? onTrain : null,
-                  child: Text('TRAIN $trainPrice'),
+                  child: Text(context.l10n.trainPrice(trainPrice)),
                 ),
               ],
             ],
@@ -130,27 +136,30 @@ class ManeuverCard extends StatelessWidget {
     );
   }
 
-  static String _packName(String packId) => ManeuverCatalog.packs
-      .firstWhere((pack) => pack.id == packId,
-          orElse: () => ManeuverPack(id: packId, name: 'pack', description: ''))
-      .name;
+  static String _packName(BuildContext context, String packId) =>
+      context.l10n.packName(ManeuverCatalog.packs.firstWhere(
+          (pack) => pack.id == packId,
+          orElse: () =>
+              ManeuverPack(id: packId, name: 'pack', description: '')));
 
-  String get _tierName => switch (maneuver.tier) {
-        ManeuverTier.starter => 'START',
-        ManeuverTier.basic => 'BASIC',
-        ManeuverTier.advanced => 'ADVANCED',
-        ManeuverTier.signature => 'SIGNATURE',
-        ManeuverTier.pack => 'PACK',
+  String _tierName(BuildContext context) => switch (maneuver.tier) {
+        ManeuverTier.starter => context.l10n.tierStarter,
+        ManeuverTier.basic => context.l10n.tierBasic,
+        ManeuverTier.advanced => context.l10n.tierAdvanced,
+        ManeuverTier.signature => context.l10n.tierSignature,
+        ManeuverTier.pack => context.l10n.tierPack,
       };
 
   Widget _wayIn(BuildContext context) {
     if (armed) {
-      return OutlinedButton(onPressed: onUnarm, child: const Text('ARMED'));
+      return OutlinedButton(onPressed: onUnarm, child: Text(context.l10n.maneuverArmed));
     }
     if (owned) {
       return FilledButton(
         onPressed: hasFreeSlot ? onArm : null,
-        child: Text(hasFreeSlot ? 'ARM' : 'PAD FULL'),
+        child: Text(hasFreeSlot
+            ? context.l10n.maneuverArm
+            : context.l10n.maneuverPadFull),
       );
     }
     final price = maneuver.price;
@@ -159,9 +168,11 @@ class ManeuverCard extends StatelessWidget {
         Expanded(
           child: Text(
             switch (maneuver.unlock) {
-              WinsUnlock(:final wins) => 'Win $battleWins/$wins battles',
-              PackUnlock(:final packId) => 'In the ${_packName(packId)}',
-              StarterUnlock() => 'From the start',
+              WinsUnlock(:final wins) =>
+                context.l10n.unlockWins(battleWins, wins),
+              PackUnlock(:final packId) =>
+                context.l10n.unlockPack(_packName(context, packId)),
+              StarterUnlock() => context.l10n.unlockStarter,
             },
             style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
           ),
@@ -169,12 +180,12 @@ class ManeuverCard extends StatelessWidget {
         if (price != null)
           FilledButton.tonal(
             onPressed: credits >= price ? onBuy : null,
-            child: Text('BUY $price'),
+            child: Text(context.l10n.buyCredits(price)),
           )
         else if (maneuver.unlock case PackUnlock(:final packId))
           FilledButton.tonal(
             onPressed: () => onGetPack(packId),
-            child: const Text('GET PACK'),
+            child: Text(context.l10n.getPack),
           ),
       ],
     );

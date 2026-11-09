@@ -8,6 +8,7 @@ import '../../data/store_catalog.dart';
 import '../providers/store_providers.dart';
 import 'store_item_preview.dart';
 import 'store_item_sheet.dart';
+import '../../../../l10n/l10n.dart';
 
 /// The Comcenter's store: every item with its price, and a way to get
 /// earlier purchases back.
@@ -30,15 +31,15 @@ class _StoreTabState extends ConsumerState<StoreTab> {
   Future<void> _restore() async {
     setState(() => _restoring = true);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final owned = await ref.read(entitlementsProvider.notifier).restore();
     if (!mounted) return;
     setState(() => _restoring = false);
     messenger.showSnackBar(SnackBar(
       content: Text(switch (owned) {
-        null => 'The store could not be reached',
-        0 => 'No earlier purchases on this account',
-        1 => 'Restored 1 purchase',
-        final count => 'Restored $count purchases',
+        null => l10n.restoreFailed,
+        0 => l10n.restoreNone,
+        final count => l10n.restoredCount(count),
       }),
     ));
   }
@@ -53,13 +54,13 @@ class _StoreTabState extends ConsumerState<StoreTab> {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'The whole game is free. These change how it looks, not who wins.',
+          context.l10n.storeIntro,
           style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
         ),
         if (!available) ...[
           const SizedBox(height: 8),
           Text(
-            'The store is not available on this build.',
+            context.l10n.storeUnavailable,
             style: TextStyle(color: Colors.orange.shade300, fontSize: 13),
           ),
         ],
@@ -69,7 +70,7 @@ class _StoreTabState extends ConsumerState<StoreTab> {
         for (final item in StoreCatalog.items)
           _StoreTile(
             item: item,
-            label: priceLabel(item, prices, entitlements.owns(item)),
+            label: priceLabel(context, item, prices, entitlements.owns(item)),
             owned: entitlements.owns(item),
             onTap: () => showStoreItemSheet(context, ref, item, from: 'store'),
           ),
@@ -77,7 +78,9 @@ class _StoreTabState extends ConsumerState<StoreTab> {
         Center(
           child: TextButton(
             onPressed: available && !_restoring ? _restore : null,
-            child: Text(_restoring ? 'RESTORING…' : 'RESTORE PURCHASES'),
+            child: Text(_restoring
+                ? context.l10n.restoring
+                : context.l10n.restorePurchases),
           ),
         ),
       ],
@@ -100,7 +103,7 @@ class _MusicChoice extends ConsumerWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          'BATTLE MUSIC',
+          context.l10n.battleMusic,
           style: TextStyle(
               color: Colors.grey.shade400, fontSize: 11, letterSpacing: 1.2),
         ),
@@ -109,7 +112,7 @@ class _MusicChoice extends ConsumerWidget {
               avatar: entitlements.ownsMusic(music)
                   ? null
                   : const Icon(Icons.lock, size: 14, color: Colors.amber),
-              label: Text(music.displayName),
+              label: Text(context.l10n.musicName(music)),
               selected: music == playing,
               showCheckmark: false,
               selectedColor: Colors.amber,
@@ -165,7 +168,7 @@ class _StoreTile extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    item.title,
+                    context.l10n.storeTitle(item),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -184,7 +187,7 @@ class _StoreTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              item.description,
+              context.l10n.storeDescription(item),
               style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
             ),
             const SizedBox(height: 8),

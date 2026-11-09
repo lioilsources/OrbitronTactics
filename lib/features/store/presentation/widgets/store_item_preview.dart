@@ -5,6 +5,7 @@ import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/data/battle_element.dart';
 import '../../../battle/presentation/widgets/pattern_glyph.dart';
 import '../../data/store_catalog.dart';
+import '../../../../l10n/l10n.dart';
 
 /// What a store item looks like: a fleet's ships, a pack's gesture, or a
 /// knight from each fleet a bundle holds.
@@ -87,5 +88,6 @@ class _Ships extends StatelessWidget {
 
 /// The badge a store item carries in a list: its price, OWNED, or a dash
 /// while the store is out of reach.
-String priceLabel(StoreItem item, Map<String, String> prices, bool owned) =>
-    owned ? 'OWNED' : prices[item.id] ?? '—';
+String priceLabel(BuildContext context, StoreItem item,
+        Map<String, String> prices, bool owned) =>
+    owned ? context.l10n.owned : prices[item.id] ?? '—';

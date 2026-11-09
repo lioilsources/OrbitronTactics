@@ -48,7 +48,8 @@ class RevenueCatPurchaseService extends PurchaseService {
       if (!_products.containsKey(productId)) await prices([productId]);
       final product = _products[productId];
       if (product == null) {
-        return const PurchaseFailed('This item is not in the store yet');
+        return const PurchaseFailed(
+            'This item is not in the store yet', PurchaseFailure.notInStore);
       }
       final result =
           await Purchases.purchase(PurchaseParams.storeProduct(product));

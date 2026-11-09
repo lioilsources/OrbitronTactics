@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -20,6 +21,7 @@ import 'features/store/data/revenuecat_purchase_service.dart';
 import 'features/store/presentation/providers/store_providers.dart';
 import 'features/telemetry/data/supabase_telemetry.dart';
 import 'features/telemetry/presentation/telemetry_provider.dart';
+import 'l10n/l10n.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,6 +97,15 @@ class OrbitronTacticsApp extends StatelessWidget {
     return MaterialApp(
       title: 'OrbitronTactics',
       debugShowCheckedModeBanner: false,
+      // The device's language when the app speaks it, else English.
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeListResolutionCallback: resolveAppLocale,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.indigo,

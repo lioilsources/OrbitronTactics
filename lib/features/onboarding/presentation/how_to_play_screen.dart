@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/l10n.dart';
 
 /// The rules on four pages: how to win, how pieces move, battles and
 /// maneuvers. Shown on the first launch and from the lobby's help button.
@@ -13,59 +14,54 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
   final _pages = PageController();
   int _page = 0;
 
-  static const _content = <({IconData icon, String title, List<String> lines})>[
-    (
-      icon: Icons.flag,
-      title: 'Three ways to win',
-      lines: [
-        'Hold all five power fields at the end of your turn.',
-        "Capture both the enemy's King and Queen.",
-        "Get a Pawn to the enemy's back rank.",
-        'Lose your King or Queen and the other becomes the Last Warrior: '
-            'it moves one square in any direction.',
-      ],
-    ),
-    (
-      icon: Icons.grid_on,
-      title: 'Pieces move their own way',
-      lines: [
-        'Pawn: sideways and back to move, diagonally forward to move or '
-            'capture. Never straight ahead.',
-        'Rook: up to 4 squares straight. Bishop: up to 3 diagonally, or '
-            'snipe 3 squares straight ahead over anything.',
-        'Knight: an L forward or sideways, only a low L back, blocked by a '
-            'Rook right in front.',
-        'Queen: 4 diagonally, 2 straight. King: 4 straight, 2 diagonally.',
-        'Tap a piece to see where it can go. A red ! means it can be taken.',
-      ],
-    ),
-    (
-      icon: Icons.rocket_launch,
-      title: 'Every capture is a battle',
-      lines: [
-        'The two pieces become ships and fight it out in the arena. The '
-            'winner keeps the square.',
-        'Drag across your half to dodge, forward to climb, back to dive.',
-        'A shot only hits a ship at about its own altitude, so to hit the '
-            'enemy you have to fly where it can hit you.',
-        'Raise the shield when fire is coming and you cannot get away.',
-      ],
-    ),
-    (
-      icon: Icons.gesture,
-      title: 'Maneuvers and your fleet',
-      lines: [
-        'Draw a gesture on the pad and the ship flies a maneuver on its own. '
-            'Each costs energy, which recharges during the battle.',
-        'Single player battles earn credits. Spend them in the Comcenter on '
-            'upgrades and new maneuvers.',
-        'The whole game is free. The store only sells new looks and '
-            'maneuver packs.',
-      ],
-    ),
-  ];
+  static List<({IconData icon, String title, List<String> lines})> _content(
+          AppLocalizations l10n) =>
+      [
+        (
+          icon: Icons.flag,
+          title: l10n.rulesWinTitle,
+          lines: [
+            l10n.rulesWin1,
+            l10n.rulesWin2,
+            l10n.rulesWin3,
+            l10n.rulesWin4,
+          ],
+        ),
+        (
+          icon: Icons.grid_on,
+          title: l10n.rulesPiecesTitle,
+          lines: [
+            l10n.rulesPieces1,
+            l10n.rulesPieces2,
+            l10n.rulesPieces3,
+            l10n.rulesPieces4,
+            l10n.rulesPieces5,
+          ],
+        ),
+        (
+          icon: Icons.rocket_launch,
+          title: l10n.rulesBattleTitle,
+          lines: [
+            l10n.rulesBattle1,
+            l10n.rulesBattle2,
+            l10n.rulesBattle3,
+            l10n.rulesBattle4,
+          ],
+        ),
+        (
+          icon: Icons.gesture,
+          title: l10n.rulesFleetTitle,
+          lines: [
+            l10n.rulesFleet1,
+            l10n.rulesFleet2,
+            l10n.rulesFleet3,
+          ],
+        ),
+      ];
 
-  bool get _last => _page == _content.length - 1;
+  static const _pageCount = 4;
+
+  bool get _last => _page == _pageCount - 1;
 
   void _next() {
     if (_last) {
@@ -87,15 +83,16 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       appBar: AppBar(
-        title: const Text('HOW TO PLAY',
-            style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold)),
+        title: Text(context.l10n.howToPlayTitle,
+            style: const TextStyle(
+                letterSpacing: 3, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           if (!_last)
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('SKIP'),
+              child: Text(context.l10n.skip),
             ),
         ],
       ),
@@ -107,7 +104,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
                 controller: _pages,
                 onPageChanged: (page) => setState(() => _page = page),
                 children: [
-                  for (final page in _content)
+                  for (final page in _content(context.l10n))
                     _Page(icon: page.icon, title: page.title, lines: page.lines),
                 ],
               ),
@@ -115,7 +112,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (var i = 0; i < _content.length; i++)
+                for (var i = 0; i < _pageCount; i++)
                   Container(
                     width: 8,
                     height: 8,
@@ -133,7 +130,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _next,
-                  child: Text(_last ? "LET'S PLAY" : 'NEXT'),
+                  child: Text(_last ? context.l10n.letsPlay : context.l10n.next),
                 ),
               ),
             ),

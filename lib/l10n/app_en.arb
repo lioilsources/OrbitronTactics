@@ -1,0 +1,353 @@
+{
+  "@@locale": "en",
+  "appTitle": "OrbitronTactics",
+  "defaultPlayerName": "Player",
+  "defaultHostName": "Host",
+  "defaultGuestName": "Guest",
+  "defaultOpponentName": "Opponent",
+  "cancel": "Cancel",
+  "leave": "Leave",
+  "back": "Back",
+  "newGame": "New Game",
+  "start": "Start",
+  "join": "Join",
+  "connect": "Connect",
+  "howToPlayTooltip": "How to play",
+  "comcenterTooltip": "Comcenter",
+  "credits": "{credits} cr",
+  "@credits": {
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsReward": "+{credits} cr",
+  "@creditsReward": {
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPawn": "Pawn",
+  "unitRook": "Rook",
+  "unitKnight": "Knight",
+  "unitBishop": "Bishop",
+  "unitQueen": "Queen",
+  "unitKing": "King",
+  "lobbyYourName": "Your name",
+  "lobbySinglePlayer": "Single Player",
+  "lobbyCreateGame": "Create Game",
+  "lobbyLocalGame": "Local Game",
+  "lobbyHostWifi": "Host WiFi",
+  "lobbyJoinWifi": "Join WiFi",
+  "lobbyWifiNote": "WiFi mode includes realtime battle arena",
+  "lobbyOpenGames": "Open Games",
+  "lobbyNoOpenGames": "No open games.\nCreate one to start!",
+  "lobbyJustNow": "just now",
+  "lobbyMinutesAgo": "{minutes}m ago",
+  "@lobbyMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lobbyCannotConnect": "Cannot connect to server",
+  "errorCreatingGame": "Error creating game: {error}",
+  "@errorCreatingGame": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorJoiningGame": "Error joining game: {error}",
+  "@errorJoiningGame": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "gameNotOpen": "That game is no longer open",
+  "wifiHostError": "WiFi host error: {error}",
+  "@wifiHostError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiJoinError": "WiFi join error: {error}",
+  "@wifiJoinError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dialogDifficulty": "Difficulty",
+  "dialogAiFleets": "AI fleets",
+  "dialogYourColor": "Your color",
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+  "colorWhite": "White",
+  "colorBlack": "Black",
+  "youMoveFirst": "You move first",
+  "aiMovesFirst": "The AI moves first",
+  "fleetRecord": "{wins}W / {losses}L",
+  "@fleetRecord": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      }
+    }
+  },
+  "wifiHostTitle": "WiFi Host",
+  "wifiShareAddress": "Share this address with your opponent:",
+  "wifiWaitingGuest": "Waiting for guest to connect...",
+  "wifiJoinTitle": "Join WiFi Game",
+  "wifiEnterIp": "Enter the host's IP address:",
+  "waitingForOpponent": "Waiting for opponent",
+  "gameIdLabel": "Game ID:",
+  "waitingForPlayer": "Waiting for another player to join...",
+  "leaveGameTooltip": "Leave Game",
+  "newGameTooltip": "New Game",
+  "leaveGameTitle": "Leave Game?",
+  "leaveGameBody": "Your opponent will be able to claim victory.",
+  "turnThinking": "THINKING…",
+  "turnLabel": "TURN",
+  "powerFieldsLabel": "Power Fields: ",
+  "powerFieldsNeed": "  (need {total})",
+  "@powerFieldsNeed": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "opponentDisconnected": "Opponent Disconnected",
+  "opponentLeftBody": "Your opponent has left the game.",
+  "claimVictory": "Claim Victory",
+  "victoryPowerFields": "Power Field Domination!",
+  "victoryRoyal": "Royal Elimination!",
+  "victoryInfiltration": "Pawn Infiltration!",
+  "victoryAbandonment": "Opponent Abandoned!",
+  "whiteWins": "White Wins!",
+  "blackWins": "Black Wins!",
+  "yourShield": "YOUR SHIELD",
+  "whiteShield": "WHITE SHIELD",
+  "blackShield": "BLACK SHIELD",
+  "battleTitle": "BATTLE",
+  "soundOn": "Sound on",
+  "soundOff": "Sound off",
+  "battleVictory": "VICTORY!",
+  "battleDefeated": "DEFEATED",
+  "newManeuvers": "{count, plural, =1{NEW MANEUVER} other{NEW MANEUVERS}}",
+  "@newManeuvers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToContinue": "Tap to continue",
+  "controlsHint": "Drag across your half to dodge, forward to climb, back to dive. Hit the enemy at its own altitude. Draw a gesture on the pad to fly a maneuver.",
+  "comcenterTitle": "COMCENTER",
+  "tabUnits": "UNITS",
+  "tabManeuvers": "MANEUVERS",
+  "tabStore": "STORE",
+  "yourFleet": "Your fleet: {name}",
+  "@yourFleet": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "upgradeHint": "Upgrade your units to gain advantage in battle",
+  "armedCount": "ARMED {armed}/{slots}",
+  "@armedCount": {
+    "placeholders": {
+      "armed": {
+        "type": "int"
+      },
+      "slots": {
+        "type": "int"
+      }
+    }
+  },
+  "battlesWon": "{count, plural, =1{1 battle won} other{{count} battles won}}",
+  "@battlesWon": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statHp": "HP",
+  "statDamage": "DMG",
+  "upgradeMax": "MAX",
+  "upgradeCost": "{cost}cr",
+  "@upgradeCost": {
+    "placeholders": {
+      "cost": {
+        "type": "int"
+      }
+    }
+  },
+  "maxLevel": "MAX LEVEL",
+  "maneuverStats": "{energy} energy · {seconds} s",
+  "@maneuverStats": {
+    "placeholders": {
+      "energy": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "maneuverMirrors": " · mirrors",
+  "trainPrice": "TRAIN {price}",
+  "@trainPrice": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "tierStarter": "START",
+  "tierBasic": "BASIC",
+  "tierAdvanced": "ADVANCED",
+  "tierSignature": "SIGNATURE",
+  "tierPack": "PACK",
+  "maneuverArmed": "ARMED",
+  "maneuverArm": "ARM",
+  "maneuverPadFull": "PAD FULL",
+  "unlockWins": "Win {won}/{needed} battles",
+  "@unlockWins": {
+    "placeholders": {
+      "won": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "unlockPack": "In the {pack}",
+  "@unlockPack": {
+    "placeholders": {
+      "pack": {
+        "type": "String"
+      }
+    }
+  },
+  "unlockStarter": "From the start",
+  "buyCredits": "BUY {price}",
+  "@buyCredits": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "getPack": "GET PACK",
+  "storeIntro": "The whole game is free. These change how it looks, not who wins.",
+  "storeUnavailable": "The store is not available on this build.",
+  "storeUnavailableShort": "The store is not available on this build",
+  "restorePurchases": "RESTORE PURCHASES",
+  "restoring": "RESTORING…",
+  "restoreFailed": "The store could not be reached",
+  "restoreNone": "No earlier purchases on this account",
+  "restoredCount": "{count, plural, =1{Restored 1 purchase} other{Restored {count} purchases}}",
+  "@restoredCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "battleMusic": "BATTLE MUSIC",
+  "musicStandard": "Standard",
+  "listen": "LISTEN",
+  "owned": "OWNED",
+  "storeNotAvailableButton": "STORE NOT AVAILABLE",
+  "notInStoreYet": "NOT IN THE STORE YET",
+  "buyPrice": "BUY {price}",
+  "@buyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseDone": "{item} is yours",
+  "@purchaseDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "purchasePending": "Waiting for the payment; {item} arrives once it clears",
+  "@purchasePending": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCommanderTitle": "Commander Edition",
+  "itemCommanderDescription": "Every premium fleet, maneuver pack and music pack, and everything added to the store later.",
+  "itemFleetsTitle": "Fleet Collection",
+  "itemFleetsDescription": "All {count} premium fleets, and every fleet added later.",
+  "@itemFleetsDescription": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "itemFleetDescription": "Ship art for all six units, white and black. Looks only: it flies like any other fleet.",
+  "itemMusicTitle": "{name} music",
+  "@itemMusicTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemMusicDescription": "Every battle theme again as 8-bit chiptune, from the pawn's quick synth line to the king's march.",
+  "howToPlayTitle": "HOW TO PLAY",
+  "skip": "SKIP",
+  "next": "NEXT",
+  "letsPlay": "LET'S PLAY",
+  "rulesWinTitle": "Three ways to win",
+  "rulesWin1": "Hold all five power fields at the end of your turn.",
+  "rulesWin2": "Capture both the enemy's King and Queen.",
+  "rulesWin3": "Get a Pawn to the enemy's back rank.",
+  "rulesWin4": "Lose your King or Queen and the other becomes the Last Warrior: it moves one square in any direction.",
+  "rulesPiecesTitle": "Pieces move their own way",
+  "rulesPieces1": "Pawn: sideways and back to move, diagonally forward to move or capture. Never straight ahead.",
+  "rulesPieces2": "Rook: up to 4 squares straight. Bishop: up to 3 diagonally, or snipe 3 squares straight ahead over anything.",
+  "rulesPieces3": "Knight: an L forward or sideways, only a low L back, blocked by a Rook right in front.",
+  "rulesPieces4": "Queen: 4 diagonally, 2 straight. King: 4 straight, 2 diagonally.",
+  "rulesPieces5": "Tap a piece to see where it can go. A red ! means it can be taken.",
+  "rulesBattleTitle": "Every capture is a battle",
+  "rulesBattle1": "The two pieces become ships and fight it out in the arena. The winner keeps the square.",
+  "rulesBattle2": "Drag across your half to dodge, forward to climb, back to dive.",
+  "rulesBattle3": "A shot only hits a ship at about its own altitude, so to hit the enemy you have to fly where it can hit you.",
+  "rulesBattle4": "Raise the shield when fire is coming and you cannot get away.",
+  "rulesFleetTitle": "Maneuvers and your fleet",
+  "rulesFleet1": "Draw a gesture on the pad and the ship flies a maneuver on its own. Each costs energy, which recharges during the battle.",
+  "rulesFleet2": "Single player battles earn credits. Spend them in the Comcenter on upgrades and new maneuvers.",
+  "rulesFleet3": "The whole game is free. The store only sells new looks and maneuver packs."
+}

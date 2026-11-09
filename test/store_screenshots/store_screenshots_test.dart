@@ -74,7 +74,7 @@ class _ShopWindow extends PurchaseService {
       StoreCatalog.commanderId => 249,
       StoreCatalog.fleetBundleId => 179,
       final id when id.startsWith('fleet.') => 49,
-      final id when id.startsWith('music.') => 25,
+      final id when id.startsWith('music.') => 29,
       _ => 79,
     };
     return czech ? '$crowns Kč' : '€${euro.toStringAsFixed(2)}';

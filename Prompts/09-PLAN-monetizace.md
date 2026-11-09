@@ -12,7 +12,9 @@ události do tabulky `app_events` místo samotného Sentry), A1–A8 (RevenueCat
 `Entitlements`, záložka Store, Restore, zámky flotil, balíček Ace, grandfather),
 B8 (How to play + nápověda v první bitvě), B2/B7 texty v `docs/`, B10.
 Rozhodnutí: otevřené otázky 1–4 podle návrhu. Odznak supportera vypuštěn.
-Zbývá: B5, B6, B9 a vše s účty a klíči — viz `10-RELEASE-checklist.md`.
+Doplněno 09/11/2026: balíčky Phantom a Striker, hudba Retro Arcade, čeština
+(B9), screenshoty a feature graphic. Zbývá: B5, B6 a vše s účty a klíči — viz
+`10-RELEASE-checklist.md`.
 
 ## Stav před implementací (z kódu)
 

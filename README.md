@@ -20,11 +20,12 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 - Battle arena with altitude, banking ships and elemental explosions
 - Battle music per attacking unit type and sound effects per element
 - Maneuvers drawn as gestures: 11–13 per ship, armed four at a time
-- Free to play, no ads; a store for premium fleets and maneuver packs
+- Free to play, no ads; a store for premium fleets, maneuver packs and music
+- English and Czech, following the device's language
 - How to play pages on first launch, control hints in the first battle
 - Threat indicators (red badge on endangered pieces)
 - Disconnect handling via Supabase Presence
-- 322 unit and widget tests
+- 344 unit and widget tests
 
 ## Single Player
 
@@ -64,10 +65,13 @@ all one-time purchases:
 | Commander Edition | Everything below, and everything added later |
 | Fleet Collection | All six premium fleets, and fleets added later |
 | A premium fleet | Solar Crusade, Neon Runners, Crystal Choir, Ronin Blades, Atomic Age or Abyssal Tide |
-| Ace pack | The corkscrew for every ship |
+| Ace, Phantom and Striker packs | The corkscrew, the cloaked Phantom and the two-pass Strafing Run for every ship |
+| Retro Arcade music | Every battle theme again as 8-bit chiptune |
 
 Vanguard and the three AI fleets (Star Nomads, Iron Armada, Void Hive) stay
-free. Purchases go through RevenueCat to Google Play and the App Store;
+free, and so do the standard themes. The packs are sidegrades: a slow
+balance test pits each pack maneuver against the closest earnable one in
+every ship, and neither wins more than 44 % of 900 battles. Purchases go through RevenueCat to Google Play and the App Store;
 Restore purchases is at the bottom of the Store tab. Debug builds sell
 everything for free.
 
@@ -93,6 +97,9 @@ flutter run -d android
 
 # Release, with the keys from release.example.json
 flutter build appbundle --release --dart-define-from-file=release.json
+
+# Store screenshots and feature graphics into docs/store
+STORE_SCREENSHOTS=1 flutter test test/store_screenshots
 
 # Tests (as CI runs them)
 flutter test --exclude-tags slow

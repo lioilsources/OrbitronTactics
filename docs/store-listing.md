@@ -1,5 +1,17 @@
 # Store listing — Orbitron Tactics
 
+## Graphics
+
+Rendered from the real screens by `STORE_SCREENSHOTS=1 flutter test
+test/store_screenshots`; regenerate after any UI change.
+
+| File | Use |
+|---|---|
+| `docs/store/screenshots/{en,cs}/01_lobby.png` … `07_how_to_play.png` | Phone screenshots, 1080 x 1920, in this order |
+| `docs/store/feature_graphic_{en,cs}.png` | Play feature graphic, 1024 x 500, per language |
+
+Tablet screenshots (7" and 10") are optional on Play and not made.
+
 ## Names and short descriptions
 
 | | English | Čeština |
@@ -36,8 +48,9 @@ PLAY YOUR WAY
 BUILD YOUR FLEET
 Win battles to earn credits, upgrade your units and learn new maneuvers.
 
-The whole game is free, with no ads. Optional purchases add premium fleets
-and maneuver packs; they change how the game looks, not who wins.
+The whole game is free, with no ads. Optional purchases add premium fleets,
+maneuver packs and a retro chiptune soundtrack; they change how the game
+looks and sounds, not who wins.
 
 ## Plný popis — čeština
 
@@ -68,7 +81,8 @@ VYBUDUJ SI FLOTILU
 Vyhrané bitvy přinášejí kredity na vylepšení jednotek a nové manévry.
 
 Celá hra je zdarma a bez reklam. Volitelné nákupy přidávají prémiové
-flotily a balíčky manévrů; mění vzhled hry, ne to, kdo vyhraje.
+flotily, balíčky manévrů a retro chiptune hudbu; mění vzhled a zvuk hry,
+ne to, kdo vyhraje.
 
 ## In-app products (one-time, non-consumable)
 
@@ -85,6 +99,9 @@ Product ids are the same on Google Play and in App Store Connect.
 | `fleet.atomic_age` | Atomic Age | 1.99 | 49 |
 | `fleet.abyssal_tide` | Abyssal Tide | 1.99 | 49 |
 | `pack.ace` | Ace pack | 2.99 | 79 |
+| `pack.phantom` | Phantom pack | 2.99 | 79 |
+| `pack.striker` | Striker pack | 2.99 | 79 |
+| `music.retro` | Retro Arcade music | 0.99 | 29 |
 
 The ids come from `StoreCatalog` in the app; a product the app does not
 know is ignored, and an item the store does not list shows "Not in the

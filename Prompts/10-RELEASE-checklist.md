@@ -3,12 +3,15 @@
 > Předávací checklist k plánu `09-PLAN-monetizace.md`. Kód je hotový na větvi
 > `claude/plan-monetizace` (Android podpis, Supabase RLS, telemetrie, obchod,
 > onboarding). Tady jsou kroky, které potřebují tvoje účty, klíče nebo Mac.
+> Od té doby přibyly: balíčky manévrů Phantom a Striker, hudba Retro Arcade,
+> čeština v aplikaci a screenshoty do storu. Produktů je teď **12**.
+>
 > Pro Claude v lokálním terminálu: postupuj po sekcích, nic z toho necommituj
 > kromě úprav označených **(commit)**. Klíče patří do `release.json` a
 > `android/key.properties`, oba jsou v `.gitignore`.
 
-Stav větve: `flutter analyze` čistý, `flutter test --exclude-tags slow` 322
-zelených, `flutter build apk --release` i `flutter build appbundle --release`
+Stav větve: `flutter analyze` čistý, `flutter test --exclude-tags slow` 344
+zelených (4 přeskočené jsou generátor screenshotů), `flutter build apk --release` i `flutter build appbundle --release`
 (s testovacím upload klíčem) prošly na Linuxu s Flutter 3.41.9. iOS build
 neověřený (chybí Mac).
 
@@ -57,7 +60,7 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
 3. **Closed testing hned teď**: osobní účet potřebuje 12 testerů
    přihlášených 14 dní v kuse, než povolí produkci. První build může jít
    bez IAP klíčů (obchod se ukáže jako nedostupný).
-4. Monetize → In-app products: založ 9 jednorázových produktů podle
+4. Monetize → In-app products: založ 12 jednorázových produktů podle
    tabulky v `docs/store-listing.md` (id musí sedět přesně), ceny ručně
    pro CZK a EUR, stav Active.
 5. Settings → License testing: přidej svůj Google účet a testery
@@ -75,7 +78,7 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
    credentials“; oprávnění se propisují až 36 h).
 2. **App Store app**: bundle id `com.ol1n.orbitronTactics`, In-App
    Purchase Key z App Store Connect.
-3. Products → Import: všech 9 produktů z obou storů. **Entitlements ani
+3. Products → Import: všech 12 produktů z obou storů. **Entitlements ani
    Offerings nejsou potřeba**, aplikace mapuje id produktů na obsah sama.
 4. API keys → public SDK keys `goog_...` a `appl_...` do `release.json`.
 
@@ -96,7 +99,7 @@ výchozí hodnoty v kódu míří na stávající projekt.
 2. Xcode → Runner → Signing & Capabilities → přidej **In-App Purchase**,
    vyber tým; v `ios/ExportOptions.plist` nahraď `REPLACE_WITH_YOUR_TEAM_ID`
    **(commit)**.
-3. App Store Connect: nová aplikace, 9 In-App Purchases (Non-Consumable,
+3. App Store Connect: nová aplikace, 12 In-App Purchases (Non-Consumable,
    stejná id), každý s review screenshotem; odeslat spolu s prvním buildem.
 4. `cd ios && pod install && cd ..`
    `flutter build ipa --release --dart-define-from-file=release.json`
@@ -115,7 +118,9 @@ výchozí hodnoty v kódu míří na stávající projekt.
 | License tester koupí Solar Crusade | Flotila odemčená a vybraná, `app_events` má `purchase` s `purchased` |
 | Refund v Play Console, restart aplikace | Flotila znovu zamčená, letí Vanguard |
 | Reinstalace, Restore purchases | Nákupy zpět |
-| Balíček Ace | Spirála u všech lodí v záložce Maneuvers |
+| Balíček Ace, Phantom, Striker | Spirála, Fantom a Nálet u všech lodí v záložce Maneuvers |
+| Hudba Retro Arcade | V Store tabu volba hudby; po koupi hraje v bitvě, po refundu zase standardní |
+| Telefon s češtinou / jiným jazykem | Čeština / angličtina |
 | Start offline | Hra jede, obchod bez cen, koupené věci zůstávají |
 | Alfa tester s prémiovou flotilou | Po aktualizaci ji má dál (legacy) |
 | Dvě zařízení, online hra | Lobby ukáže hru, druhý se připojí; třetí ji už nevidí |
@@ -123,15 +128,18 @@ výchozí hodnoty v kódu míří na stávající projekt.
 
 ## 9. Store assety
 
-6–8 screenshotů telefonu (lobby, deska, bitva, manévr, Comcenter, Store),
-feature graphic 1024×500, ikona 512×512 (`assets/icon/icon.png`), texty
-v `docs/store-listing.md`.
+Hotové v `docs/store/`: 7 screenshotů telefonu v EN a CS a feature graphic
+1024×500 v EN a CS (generuje je `STORE_SCREENSHOTS=1 flutter test
+test/store_screenshots`). Ikona 512×512 je `assets/icon/icon.png`, texty
+jsou v `docs/store-listing.md`. Chybí jen screenshoty tabletů (nepovinné).
+Lepší by byly screenshoty z reálného zařízení; tyhle jsou z testu.
 
 ## Co z plánu není hotové
 
-- **Čeština v aplikaci** (B9): UI je anglicky, store listing je dvojjazyčný.
 - **Odznak supportera v lobby** u Commander Edition: vypuštěn, šel by
   podvrhnout z klienta; Commander dává všechen současný i budoucí obsah.
-- **Vlna 2 a 3** obsahu (nové flotily, balíčky Phantom/Striker, hudba,
-  témata desky) podle plánu po vydání.
+- **Vlna 3** (témata desky, profil v lobby, booster kreditů) podle plánu
+  po vydání. Nové flotily potřebují sprity, nástroj na ně v repu není.
+- **Hudba Retro Arcade** je syntetizovaná skriptem, ne generovaná modelem;
+  poslechni ji před vydáním (`tools/battle_audio/chiptune.py`).
 - **Windows**: v repu není `windows/`, z README a CLAUDE.md jsem ho vyřadil.

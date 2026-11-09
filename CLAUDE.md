@@ -33,16 +33,17 @@ lib/
 ├── features/
 │   ├── battle/              # Game screen — board rendering, move handling
 │   ├── comcenter/           # Between-game lobby/settings screen
+│   ├── store/               # In-app purchases: catalog, entitlements, RevenueCat
 │   ├── game/                # Game state management
 │   ├── onboarding/          # How to play, first-battle hint
 │   ├── progress/            # Fleet progress (credits, upgrades, record) saved on device
-│   ├── store/               # In-app purchases: catalog, entitlements, RevenueCat
 │   └── telemetry/           # Product events to Supabase, Sentry breadcrumbs
 
 assets/fleets/               # Battle ship sprites, one folder per fleet
 assets/audio/                # Battle music and effects (tools/battle_audio)
+lib/l10n/                    # English and Czech (ARB, generated localizations, content_cs.dart)
 supabase/                    # Supabase schema and migrations
-docs/                        # Privacy policy, store listing
+docs/                        # Privacy policy, store listing, store/ screenshots and feature graphics
 release.example.json         # --dart-define-from-file keys for release builds
 ```
 
@@ -52,6 +53,7 @@ release.example.json         # --dart-define-from-file keys for release builds
 - `freezed` / `json_serializable` — immutable game models
 - `supabase_flutter` — lobby and realtime multiplayer
 - `shared_preferences` — fleet progress, one JSON blob per fleet under `fleet_progress.<identity>`
+- `flutter_localizations` / `intl` — gen-l10n, English and Czech
 - `purchases_flutter` — RevenueCat in-app purchases (one-time products only)
 - `sentry_flutter` 9.x — crash reports (10.x needs Dart 3.12; 8.x breaks the Kotlin build)
 - `package_info_plus` — app version for telemetry
@@ -78,6 +80,7 @@ release.example.json         # --dart-define-from-file keys for release builds
 - `BattleEngine.startManeuver` charges `BattleUnit.energy` (50 at the start, `maxEnergy` 100, `energyPerSecond` back) and stores a `ManeuverRun`; `tick` flies it, fires its bursts, lets shots pass through the untouchable window and refuses steering until it ends. `Overdrive` is the exception: the helm stays, only `fireRateScale` changes.
 - `ManeuverPad` recognises the gesture (`PatternRecognizer`) and `BattleStateNotifier.startLocalManeuver` runs it, sending `ManeuverStartedEvent` with the anchors so the opponent's engine flies the same path. An unknown maneuver id is ignored.
 - `BattleAi` reaches for one on its own 700 ms clock — cornered, or with the enemy in its hit zone. Tying it to the steering decision had the best pilots flying one almost without a break.
+- Pack families (`ManeuverTier.pack`, `PackUnlock`): `spiral` (Ace pack), `phantom` (Phantom pack: `Maneuver.cloaks`, no shots, longest untouchable window, the painter fades the ship) and `strafe` (Striker pack: two passes over the enemy). `maneuver_pack_balance_test` (slow) keeps a pack maneuver at or under 58 % against its closest earnable one; both land at 44 %. `BattleAi` takes a fixed `maneuvers` loadout for it.
 - Progress: `FleetProgress.maneuvers` (`ShipManeuvers`: owned, four armed, trained levels) and `battleWins` per ship. `FleetProgressNotifier.recordBattleWin` unlocks what the wins are worth, `buyManeuver`/`upgradeManeuver`/`armManeuvers`/`grantPack` do the rest. Single player only, like credits and skins.
 
 ## Fleet Ship Art
@@ -89,10 +92,22 @@ release.example.json         # --dart-define-from-file keys for release builds
 ## Store
 
 - Free game, no ads; the store sells looks and sidegrades. `FleetSkin.premium` marks six fleets; Vanguard and the AI fleets are free.
-- `StoreCatalog` lists the products (`bundle.commander`, `bundle.fleets`, `fleet.<slug>`, `pack.<id>`); the ids are the Google Play and App Store product ids. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
+- `StoreCatalog` lists the products (`bundle.commander`, `bundle.fleets`, `fleet.<slug>`, `pack.<id>`, `music.<slug>`); the ids are the Google Play and App Store product ids. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
 - `PurchaseService`: `RevenueCatPurchaseService` when the build has `REVENUECAT_GOOGLE_KEY` / `REVENUECAT_APPLE_KEY`, `DebugPurchaseService` (free, saved on device) in debug builds, else `UnavailablePurchaseService`. No RevenueCat entitlements or offerings: the app maps product ids itself.
 - `EntitlementsNotifier` (`entitlementsProvider`) caches in `store.entitlements`, syncs at start, grants owned packs with `FleetProgressNotifier.grantPack`, and swaps an unowned premium skin for the fallback (refunds). The first launch with a store grandfathers the premium skin the player flies.
+- Music: `BattleMusic` (`standard`, premium `retro` from `assets/audio/music_retro/`, built by `tools/battle_audio/chiptune.py`); `chosenBattleMusicProvider` keeps the pick in `battle_music`, `battleMusicProvider` falls back to standard when it is not owned; `BattleAudio.start(music:)` and `preview`.
 - UI: Comcenter Store tab (`StoreTab`, Restore purchases), `showStoreItemSheet` from locked fleet cards and pack maneuvers.
+
+## Localization
+
+- English (template) and Czech in `lib/l10n/app_{en,cs}.arb`; `flutter gen-l10n` writes the tracked `app_localizations*.dart` next to them. Use `context.l10n` (falls back to English without delegates, as in widget tests).
+- Catalog content stays English in pure Dart; `AppLocalizations.content()`, `maneuverName`, `storeTitle` and so on translate it from `content_cs.dart`. `l10n_test` fails when a key, placeholder or catalog text is missing in Czech or a Czech entry is stale.
+- `resolveAppLocale`: Czech for a Czech device, English for everything else (Flutter's own fallback would pick Czech, the first supported locale).
+- Fleet names stay proper nouns; the game's default player names (White, Black, Orbitron AI) are mapped for display in `game_screen.dart`.
+
+## Store screenshots
+
+`STORE_SCREENSHOTS=1 flutter test test/store_screenshots` renders `docs/store/` (skipped otherwise). It loads Roboto and Material Icons from the Flutter SDK and DejaVu Sans for chess symbols from this machine, fakes store prices, and picks a battle frame from simulated duels. `OrbitronTacticsApp` takes `home`, `locale` and `theme` for it.
 
 ## Telemetry and onboarding
 

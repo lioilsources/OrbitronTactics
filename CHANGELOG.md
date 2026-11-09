@@ -1,5 +1,11 @@
 # Changelog
 
+## [09/11/2026]
+- The app speaks Czech on a Czech device and English everywhere else; maneuver names and descriptions are translated too
+- Two more maneuver packs: Phantom (fades from sight and slips aside, no shots) and Strafing Run (two passes over the enemy, no cover); a balance test keeps them sidegrades
+- Retro Arcade music pack: every battle theme as 8-bit chiptune, picked in the Store tab, with a ten-second preview
+- Store screenshots and feature graphics in English and Czech, rendered from the real screens
+
 ## [08/11/2026]
 - Store in the Comcenter: Commander Edition, Fleet Collection, six premium fleets and the Ace pack, all one-time purchases through Google Play and the App Store; Restore purchases
 - Vanguard and the three AI fleets stay free; a premium fleet flown before the store is kept

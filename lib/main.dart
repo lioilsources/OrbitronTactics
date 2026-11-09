@@ -89,14 +89,34 @@ PurchaseService _purchaseService(SharedPreferences prefs) {
   return const UnavailablePurchaseService();
 }
 
+ThemeData orbitronTheme() => ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.indigo,
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+    );
+
 class OrbitronTacticsApp extends StatelessWidget {
-  const OrbitronTacticsApp({super.key});
+  /// [home], [locale] and [theme] are for the store screenshots; the app
+  /// starts in the lobby, in the device's language, in [orbitronTheme].
+  const OrbitronTacticsApp({
+    super.key,
+    this.home = const LobbyScreen(),
+    this.locale,
+    this.theme,
+  });
+
+  final Widget home;
+  final Locale? locale;
+  final ThemeData? theme;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'OrbitronTactics',
       debugShowCheckedModeBanner: false,
+      locale: locale,
       // The device's language when the app speaks it, else English.
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -106,14 +126,8 @@ class OrbitronTacticsApp extends StatelessWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       localeListResolutionCallback: resolveAppLocale,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      home: const LobbyScreen(),
+      theme: theme ?? orbitronTheme(),
+      home: home,
     );
   }
 }

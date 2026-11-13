@@ -6,6 +6,10 @@
 > Od té doby přibyly: balíčky manévrů Phantom a Striker, hudba Retro Arcade,
 > čeština v aplikaci a screenshoty do storu. Produktů je teď **12**.
 >
+> **Oprava 13/11/2026:** sekce 2, 6 a 7 neodpovídají existující release
+> pipeline (`.github/workflows/release-*.yml` už podepisuje a nahrává sám)
+> a iOS build v CI padá. Aktuální postup je v `11-PLAN-release-1.0.md`.
+>
 > Pro Claude v lokálním terminálu: postupuj po sekcích, nic z toho necommituj
 > kromě úprav označených **(commit)**. Klíče patří do `release.json` a
 > `android/key.properties`, oba jsou v `.gitignore`.

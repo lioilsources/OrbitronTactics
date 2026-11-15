@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import '../game_logic/engine/battle_engine.dart';
-import '../game_logic/engine/unit_base_stats.dart';
 import '../game_logic/engine/upgrade_engine.dart';
 import '../game_logic/models/piece.dart';
 import '../game_logic/models/unit_stats.dart';
 import '../game_logic/models/upgrade_profile.dart';
 import '../game_logic/models/weapon_type.dart';
+import '../worlds/world_balance.dart';
 
 /// Estimates battle outcomes from unit stats, without simulating the arena.
 class BattleOdds {
@@ -29,12 +29,13 @@ class BattleOdds {
     Piece attacker,
     Piece defender,
     UpgradeProfile attackerUpgrades,
-    UpgradeProfile defenderUpgrades,
-  ) {
+    UpgradeProfile defenderUpgrades, {
+    WorldBalance balance = WorldBalance.space,
+  }) {
     final attackerStats =
-        UpgradeEngine.statsFor(attacker.type, attackerUpgrades, unitBaseStats);
+        UpgradeEngine.statsFor(attacker.type, attackerUpgrades, balance.units);
     final defenderStats =
-        UpgradeEngine.statsFor(defender.type, defenderUpgrades, unitBaseStats);
+        UpgradeEngine.statsFor(defender.type, defenderUpgrades, balance.units);
     final attackerTtk = timeToKillMs(attackerStats, defenderStats);
     final defenderTtk = timeToKillMs(defenderStats, attackerStats);
 
@@ -46,31 +47,50 @@ class BattleOdds {
 
   /// Time for [shooter] to destroy [target] when neither ship moves: the
   /// killing shot leaves after `shots` attack intervals, then crosses the
-  /// arena.
+  /// arena. A melee unit strikes at range 1, each strike taking at least its
+  /// wind-up, lunge and recovery.
   static int timeToKillMs(UnitStats shooter, UnitStats target) {
     // Same rounding as the arena's hit resolution.
     final netDamage =
         shooter.damage - (shooter.damage * target.defenseRating).round();
     if (netDamage <= 0) return _never;
     final shots = (target.maxHp / netDamage).ceil();
+    final melee = shooter.melee;
+    if (melee != null) {
+      final reach = melee.windupMs + melee.dashMsAt(1);
+      final cycle = max(shooter.attackIntervalMs, reach + melee.recoverMs);
+      // The first strike waits one interval, like the first shot.
+      return shooter.attackIntervalMs + (shots - 1) * cycle + reach;
+    }
     return shots * shooter.attackIntervalMs + travelMs(shooter.weaponType);
+  }
+
+  /// Time from an attack leaving [stats]' unit to it landing: the shot's
+  /// flight, or a strike's wind-up and lunge at range 1.
+  static int leadMs(UnitStats stats) {
+    final melee = stats.melee;
+    if (melee == null) return travelMs(stats.weaponType);
+    return melee.windupMs + melee.dashMsAt(1);
   }
 
   /// Time a [weapon]'s projectile takes to cross the arena.
   static int travelMs(WeaponType weapon) =>
       (1 / BattleEngine.projectileSpeed(weapon)).round();
 
-  static final Map<int, OddsTable> _tables = {};
+  static final Map<(String, int), OddsTable> _tables = {};
 
   /// [attackerWinProbability] for every type pairing of a fleet with
   /// [attackerUpgrades] attacking a fleet with [defenderUpgrades]. Cached
-  /// per pair of upgrade levels — the search asks millions of times.
+  /// per world and pair of upgrade levels — the search asks millions of times.
   static OddsTable table(
     UpgradeProfile attackerUpgrades,
-    UpgradeProfile defenderUpgrades,
-  ) {
-    final key =
-        _levelsKey(attackerUpgrades) * 4096 + _levelsKey(defenderUpgrades);
+    UpgradeProfile defenderUpgrades, {
+    WorldBalance balance = WorldBalance.space,
+  }) {
+    final key = (
+      balance.id,
+      _levelsKey(attackerUpgrades) * 4096 + _levelsKey(defenderUpgrades),
+    );
     return _tables[key] ??= OddsTable._([
       for (final attacker in PieceType.values)
         for (final defender in PieceType.values)
@@ -79,6 +99,7 @@ class BattleOdds {
             Piece(type: defender, color: PlayerColor.black),
             attackerUpgrades,
             defenderUpgrades,
+            balance: balance,
           ),
     ]);
   }

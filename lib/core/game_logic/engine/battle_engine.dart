@@ -11,9 +11,10 @@ import '../models/piece.dart';
 import '../models/projectile.dart';
 import '../models/shield_state.dart';
 import '../models/spot.dart';
+import '../models/strike_run.dart';
 import '../models/upgrade_profile.dart';
 import '../models/weapon_type.dart';
-import 'unit_base_stats.dart';
+import '../../worlds/world_balance.dart';
 import 'upgrade_engine.dart';
 
 const _uuid = Uuid();
@@ -49,8 +50,13 @@ class BattleEngine {
   static double projectileSpeed(WeaponType weapon) =>
       _projectileSpeed[weapon]!;
 
-  static BattleUnit _makeUnit(Piece piece, UpgradeProfile profile) {
-    final stats = UpgradeEngine.statsFor(piece.type, profile, unitBaseStats);
+  /// Steering a melee unit can't start a new strike before this long after
+  /// it lost its aim in the wind-up.
+  static const int feintCooldownMs = 300;
+
+  static BattleUnit _makeUnit(
+      Piece piece, UpgradeProfile profile, WorldBalance balance) {
+    final stats = UpgradeEngine.statsFor(piece.type, profile, balance.units);
     return BattleUnit(
       piece: piece,
       stats: stats,
@@ -65,10 +71,11 @@ class BattleEngine {
     required Piece defender,
     required UpgradeProfile attackerUpgrades,
     required UpgradeProfile defenderUpgrades,
+    WorldBalance balance = WorldBalance.space,
   }) {
     return BattleState(
-      attacker: _makeUnit(attacker, attackerUpgrades),
-      defender: _makeUnit(defender, defenderUpgrades),
+      attacker: _makeUnit(attacker, attackerUpgrades, balance),
+      defender: _makeUnit(defender, defenderUpgrades, balance),
     );
   }
 
@@ -96,6 +103,10 @@ class BattleEngine {
     // Tick attack timers and fire
     attacker = _tickAttack(attacker, deltaMs, true, projectiles);
     defender = _tickAttack(defender, deltaMs, false, projectiles);
+    (attacker, defender) =
+        _tickStrike(attacker, defender, deltaMs, elapsedMs, true, impacts);
+    (defender, attacker) =
+        _tickStrike(defender, attacker, deltaMs, elapsedMs, false, impacts);
 
     // Tick shield cooldowns and win energy back
     attacker = _tickShield(_tickEnergy(attacker, deltaMs), deltaMs);
@@ -129,9 +140,9 @@ class BattleEngine {
       ));
       if (shielded) continue;
       if (moved.fromAttacker) {
-        defender = _applyHit(defender, moved);
+        defender = _applyDamage(defender, moved.damage);
       } else {
-        attacker = _applyHit(attacker, moved);
+        attacker = _applyDamage(attacker, moved.damage);
       }
     }
 
@@ -181,6 +192,7 @@ class BattleEngine {
     final unit = isAttacker ? state.attacker : state.defender;
     final enemy = isAttacker ? state.defender : state.attacker;
     if (unit.maneuver != null) return state;
+    if (!force && unit.strike != null) return state;
     final cost = maneuver.costAt(level);
     if (!force && unit.energy < cost) return state;
 
@@ -280,6 +292,8 @@ class BattleEngine {
     bool isAttacker,
     List<Projectile> projectiles,
   ) {
+    // Melee units strike instead; see [_tickStrike].
+    if (unit.stats.isMelee) return unit;
     final run = unit.maneuver;
     // A maneuver fires from its plan instead — unless it leaves the helm.
     if (run != null && !run.maneuver.keepsControl) return unit;
@@ -301,8 +315,112 @@ class BattleEngine {
     return unit.copyWith(nextAttackMs: next);
   }
 
+  /// Melee range between two units: 0 with both at the divider, 2 with both
+  /// at their own edges.
+  static double rangeBetween(BattleUnit a, BattleUnit b) =>
+      (1 - a.altitude) + (1 - b.altitude);
+
+  /// Whether [target] stands where [striker]'s strike lands.
+  static bool inReach(BattleUnit striker, BattleUnit target) {
+    final melee = striker.stats.melee;
+    if (melee == null) return false;
+    return (striker.xFraction - target.xFraction).abs() <= melee.arcHalfWidth &&
+        (striker.altitude - target.altitude).abs() <= hitHalfAltitude;
+  }
+
+  static bool _untouchable(BattleUnit unit, int elapsedMs) =>
+      (unit.maneuver?.untouchableAt(elapsedMs) ?? false) ||
+      (unit.strike?.untouchableAt(elapsedMs) ?? false);
+
+  /// Runs [me]'s melee attack: starts a strike when the enemy is in reach,
+  /// cancels it when the enemy leaves reach during the wind-up (a feint),
+  /// resolves contact after the lunge and ends the strike after recovery.
+  /// Returns [me] and [enemy] as they are afterwards.
+  static (BattleUnit, BattleUnit) _tickStrike(
+    BattleUnit me,
+    BattleUnit enemy,
+    int deltaMs,
+    int elapsedMs,
+    bool isAttacker,
+    List<Impact> impacts,
+  ) {
+    final melee = me.stats.melee;
+    // A unit destroyed this tick still lands a strike due now: both sides'
+    // contacts of one tick count as simultaneous.
+    if (melee == null) return (me, enemy);
+    final run = me.maneuver;
+    // A maneuver fights from its plan — unless it leaves the helm.
+    if (run != null && !run.maneuver.keepsControl) return (me, enemy);
+    final rate = run == null ? 1.0 : run.maneuver.fireRateScale;
+
+    // The interval runs from one strike's start to the next, alongside the
+    // strike itself.
+    final next = math.max(0, me.nextAttackMs - deltaMs);
+    var strike = me.strike;
+
+    if (strike == null) {
+      if (next > 0 || !inReach(me, enemy)) {
+        return (me.copyWith(nextAttackMs: next), enemy);
+      }
+      strike = StrikeRun(
+        startedMs: elapsedMs,
+        windupMs: melee.windupMs,
+        dashMs: melee.dashMsAt(rangeBetween(me, enemy)),
+        recoverMs: melee.recoverMs,
+        target: spotOf(enemy),
+      );
+      // Like a gun, keep what this tick overshot the timer by, so the
+      // rhythm doesn't drift with the tick length.
+      final overshoot = me.nextAttackMs > 0 ? me.nextAttackMs - deltaMs : 0;
+      return (
+        me.copyWith(
+          nextAttackMs: (me.stats.attackIntervalMs * rate).round() + overshoot,
+          strike: strike,
+        ),
+        enemy,
+      );
+    }
+
+    if (strike.phaseAt(elapsedMs) == StrikePhase.windup) {
+      if (inReach(me, enemy)) return (me.copyWith(nextAttackMs: next), enemy);
+      return (
+        me.copyWith(
+          nextAttackMs: math.max(next, feintCooldownMs),
+          clearStrike: true,
+        ),
+        enemy,
+      );
+    }
+
+    if (!strike.resolved && elapsedMs >= strike.contactMs) {
+      if (inReach(me, enemy) && !_untouchable(enemy, elapsedMs)) {
+        final shielded = enemy.shieldState.isActive;
+        impacts.add(Impact(
+          id: _uuid.v4(),
+          onAttacker: !isAttacker,
+          xFraction: enemy.xFraction,
+          altitude: enemy.altitude,
+          damage: me.stats.damage,
+          shielded: shielded,
+          atMs: elapsedMs,
+        ));
+        if (shielded) {
+          strike = strike.copyWith(recoverMs: strike.recoverMs + melee.staggerMs);
+        } else {
+          enemy = _applyDamage(enemy, me.stats.damage);
+        }
+      }
+      strike = strike.copyWith(resolved: true);
+    }
+
+    if (strike.phaseAt(elapsedMs) == StrikePhase.done) {
+      return (me.copyWith(nextAttackMs: next, clearStrike: true), enemy);
+    }
+    return (me.copyWith(nextAttackMs: next, strike: strike), enemy);
+  }
+
   static bool _isHit(BattleUnit target, Projectile p, int elapsedMs) =>
-      !(target.maneuver?.untouchableAt(elapsedMs) ?? false) &&
+      !_untouchable(target, elapsedMs) &&
       (target.xFraction - p.xFraction).abs() <= hitHalfWidth &&
       (target.altitude - p.altitude).abs() <= hitHalfAltitude;
 
@@ -320,6 +438,7 @@ class BattleEngine {
     final unit = isAttacker ? state.attacker : state.defender;
     final run = unit.maneuver;
     if (run != null && !run.maneuver.keepsControl) return state;
+    if (unit.strike?.locksHelmAt(state.elapsedMs) ?? false) return state;
     final moved = unit.copyWith(
       xFraction:
           xFraction.clamp(shipEdgeMargin, 1.0 - shipEdgeMargin).toDouble(),
@@ -352,9 +471,9 @@ class BattleEngine {
     return unit.copyWith(shieldState: shield);
   }
 
-  static BattleUnit _applyHit(BattleUnit unit, Projectile p) {
-    final absorbed = (p.damage * unit.stats.defenseRating).round();
-    final net = (p.damage - absorbed).clamp(0, p.damage);
+  static BattleUnit _applyDamage(BattleUnit unit, int damage) {
+    final absorbed = (damage * unit.stats.defenseRating).round();
+    final net = (damage - absorbed).clamp(0, damage);
     final newHp = (unit.currentHp - net).clamp(0, unit.stats.maxHp);
     return unit.copyWith(currentHp: newHp);
   }

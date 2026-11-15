@@ -11,6 +11,7 @@ import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/shield_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 
 void main() {
   const tickMs = 16;
@@ -213,6 +214,34 @@ void main() {
         expect(fight(type, null, pilot(AiProfile.hard, 2)).winner, black,
             reason: 'Hard defending with ${type.name}');
       }
+    });
+
+    test('Hard steps out of a melee strike it sees coming', () {
+      final groundKnight = WorldBalance.ground.statsOf(PieceType.knight);
+      BattleUnit knightUnit(PlayerColor color, {int nextAttackMs = 0}) =>
+          BattleUnit(
+            piece: Piece(type: PieceType.knight, color: color),
+            stats: groundKnight,
+            currentHp: groundKnight.maxHp,
+            shieldState: const ShieldState(),
+            nextAttackMs: nextAttackMs,
+          );
+      var state = BattleState(
+        attacker: knightUnit(white),
+        defender: knightUnit(black, nextAttackMs: 1 << 30),
+      );
+      // A Hard pilot without a shield to fall back on.
+      final hard = pilot(AiProfile.hard.copyWith(shieldSkill: 0), 1);
+
+      state = BattleEngine.tick(state, tickMs);
+      final strike = state.attacker.strike!;
+      while (state.elapsedMs <= strike.contactMs) {
+        state = apply(state, hard.decide(state, isAttacker: false, deltaMs: tickMs),
+            isAttacker: false);
+        state = BattleEngine.tick(state, tickMs);
+      }
+
+      expect(state.defender.currentHp, groundKnight.maxHp);
     });
 
     test('Hard reaches for a maneuver in a duel', () {

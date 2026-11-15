@@ -1,6 +1,7 @@
 import 'maneuver_run.dart';
 import 'piece.dart';
 import 'shield_state.dart';
+import 'strike_run.dart';
 import 'unit_stats.dart';
 
 class BattleUnit {
@@ -24,6 +25,9 @@ class BattleUnit {
   /// ignores steering and its guns follow the maneuver's plan.
   final ManeuverRun? maneuver;
 
+  /// The melee strike in progress, if any.
+  final StrikeRun? strike;
+
   /// Energy a ship holds at most, and what it starts a battle with.
   static const double maxEnergy = 100;
   static const double startingEnergy = 50;
@@ -38,13 +42,15 @@ class BattleUnit {
     this.altitude = 0.5,
     this.energy = startingEnergy,
     this.maneuver,
+    this.strike,
   });
 
   double get hpFraction => currentHp / stats.maxHp;
   bool get isAlive => currentHp > 0;
 
   /// Whether the ship can start a maneuver costing [energyCost].
-  bool canAfford(int energyCost) => maneuver == null && energy >= energyCost;
+  bool canAfford(int energyCost) =>
+      maneuver == null && strike == null && energy >= energyCost;
 
   BattleUnit copyWith({
     Piece? piece,
@@ -57,6 +63,8 @@ class BattleUnit {
     double? energy,
     ManeuverRun? maneuver,
     bool clearManeuver = false,
+    StrikeRun? strike,
+    bool clearStrike = false,
   }) {
     return BattleUnit(
       piece: piece ?? this.piece,
@@ -68,6 +76,7 @@ class BattleUnit {
       altitude: altitude ?? this.altitude,
       energy: energy ?? this.energy,
       maneuver: clearManeuver ? null : (maneuver ?? this.maneuver),
+      strike: clearStrike ? null : (strike ?? this.strike),
     );
   }
 }

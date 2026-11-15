@@ -62,6 +62,7 @@ supabase/                    # Supabase schema and migrations
 - `BattleArenaPainter` shows altitude as size and shadow, banks ships by their sideways speed (`ShipBank`), and draws shots and `ExplosionFx` in the shooter's `BattleElement` (pawn kinetic, knight water, bishop fire, rook ice, queen and king electric). The loser's explosion plays before the result overlay.
 - `BattleAudio` (SoLoud) loops the attacker's theme and plays what `BattleSoundCues` finds between two battle states: each element's shot, the head of its explosion for an impact, the whole echoing explosion for the destroyed ship. Assets in `assets/audio/{music,sfx}/` (`BattleSounds`) come from `tools/battle_audio/`; the mute setting is saved as `battle_audio_muted`. Any audio failure only logs.
 - `ArenaLayout` maps altitude to where a ship sits in its half — own edge at 0, just short of the divider at 1 — and its `travelFraction` is shared by the painter and the arena's input, so steering moves the ship exactly as far as the finger.
+- Melee (plan 12, step 1B): `WorldBalance` (`lib/core/worlds/`) holds a world's unit stats; space is today's `unitBaseStats`. A unit with `AttackStyle.melee` strikes instead of firing: wind-up (cancelled when the enemy leaves reach), untouchable lunge timed by range, recovery; a shield blocks and staggers. `tools/duel_lab.dart` measures balance, `space_duel_regression_test` pins space.
 
 ## Maneuvers
 

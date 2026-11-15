@@ -1,0 +1,108 @@
+# Faction packs from Prompts/13-PLAN-frakce.md, chapter 2 (schema of
+# chapter 6). The first side plays white, the second black. `dna`, `base`,
+# `rim` and `subject` go into the prompt verbatim.
+
+- id: heaven_hell
+  name_cs: "Nebe × Peklo"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E8DCC4", dark: "#7C8FA8" }
+  sides:
+    - id: heaven
+      name_cs: "Nebe"
+      dna: "Ivory, warm gold and sky blue; polished marble, white feathers, cloud wisps, halos"
+      base: "sky blue"
+      rim: "warm gold"
+      outline: dark
+      seed: 1001
+      pieces:
+        king: { name_cs: "Archanděl s plamenným mečem", subject: "An archangel commander in golden plate armor with huge folded white wings and a radiant halo crown, holding a flaming sword upright" }
+        queen: { name_cs: "Šestikřídlý seraf", subject: "A graceful seraph queen with six white wings spread wide like a fan and a crown of light" }
+        rook: { name_cs: "Nebeská brána na oblaku", subject: "A lone heavenly gate tower built of white marble on a puffy cloud, with closed golden doors and battlements, an empty building with nobody around it" }
+        bishop: { name_cs: "Anděl-zvěstovatel s trubkou", subject: "A slender herald angel in a long pointed hood, holding only a long golden trumpet diagonally to its lips" }
+        knight: { name_cs: "Pegas", subject: "A white pegasus with a curved neck, small folded wings and a golden bridle" }
+        pawn: { name_cs: "Cherubín se štítkem", subject: "A small chubby cherub with tiny wings holding a little round golden shield" }
+    - id: hell
+      name_cs: "Peklo"
+      dna: "Deep crimson and charcoal with glowing orange lava cracks; horns, obsidian, embers"
+      base: "lava orange"
+      rim: "fiery orange"
+      outline: light
+      seed: 2001
+      pieces:
+        king: { name_cs: "Pán pekel s trojzubcem", subject: "A towering devil lord with large curved horns, a crown of fire and a cape of smoke, holding a huge iron trident upright" }
+        queen: { name_cs: "Ďáblice s netopýřími křídly", subject: "A she-devil queen with bat wings spread wide like a fan, a horned tiara and a long crimson gown" }
+        rook: { name_cs: "Sopečná bašta s lávou", subject: "A lone volcanic rock bastion with glowing lava cracks, battlements and a small burning gate, an empty building with nobody around it" }
+        bishop: { name_cs: "Pokušitel v kápi", subject: "A thin hooded tempter with a pointed cowl, holding only a long crooked staff topped with a glowing ember" }
+        knight: { name_cs: "Ohnivý hřebec", subject: "An infernal stallion with a mane and tail of fire and glowing hooves" }
+        pawn: { name_cs: "Čertík s vidlemi", subject: "A small round imp with stubby horns and a cheeky grin holding a tiny pitchfork" }
+
+- id: rome_carthage
+  name_cs: "Řím × Kartágo"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E6D5B8", dark: "#8C7A6B" }
+  sides:
+    - id: rome
+      name_cs: "Řím"
+      dna: "Legion red and gold on polished iron; eagles, laurel, rectangular shields, crested helmets"
+      base: "red"
+      rim: "gold"
+      outline: dark
+      seed: 1101
+      pieces:
+        king: { name_cs: "Vojevůdce s vavřínem", subject: "A Roman general in a muscle cuirass and red cloak wearing a golden laurel wreath, holding an eagle-topped scepter upright" }
+        queen: { name_cs: "Bohyně Roma s kopím", subject: "The goddess Roma as a tall armored woman with a crested helmet, a wide flowing red cloak, a spear and a large round shield" }
+        rook: { name_cs: "Testudo, želva ze štítů", subject: "A testudo formation shown as one solid block of interlocked red rectangular shields, with small sandaled feet below" }
+        bishop: { name_cs: "Aquilifer, nosič orla", subject: "A slender standard bearer wearing a wolf pelt, holding a tall golden eagle standard diagonally" }
+        knight: { name_cs: "Jezdec equites", subject: "A Roman cavalryman with a crested helmet and oval shield riding a horse" }
+        pawn: { name_cs: "Legionář se scutem", subject: "A small stout legionary with a big rectangular red shield and a short javelin" }
+    - id: carthage
+      name_cs: "Kartágo"
+      dna: "Tyrian purple, sand and bronze; crescent-and-disc emblems, palm leaves, elephant tusks, round shields"
+      base: "purple"
+      rim: "bronze"
+      outline: light
+      seed: 2101
+      pieces:
+        king: { name_cs: "Hannibal", subject: "A bearded Carthaginian general in a bronze cuirass, purple cloak and crested helmet, holding a curved sword upright" }
+        queen: { name_cs: "Královna Dídó", subject: "Queen Dido of Carthage in a wide layered purple gown with a tall golden diadem and a fan of palm leaves behind her" }
+        rook: { name_cs: "Válečný slon s věžičkou", subject: "A heavy war elephant standing square, carrying a wooden battlement tower on its back, with bronze tusk caps" }
+        bishop: { name_cs: "Baleárský prakovník", subject: "A slender slinger with a pointed cap, swinging a long sling diagonally above his head" }
+        knight: { name_cs: "Numidský jezdec", subject: "A light horseman riding bareback, holding javelins and a small round shield" }
+        pawn: { name_cs: "Libyjský kopiník", subject: "A small spearman with a conical helmet and a round shield painted with a crescent and disc" }
+
+- id: fairytale_devils
+  name_cs: "Pohádkové království × Čerti"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#F2E6D0", dark: "#9DB4C0" }
+  sides:
+    - id: kingdom
+      name_cs: "Království"
+      dna: "Sky blue, white and gold with red hearts; fairy-tale costumes, embroidered folk patterns"
+      base: "sky blue"
+      rim: "gold"
+      outline: dark
+      seed: 1201
+      pieces:
+        king: { name_cs: "Dobrotivý král se zlatým jablkem", subject: "A kind old fairy-tale king with a white beard, a big golden crown and a red ermine cloak, holding a golden apple and a scepter upright" }
+        queen: { name_cs: "Princezna se zlatou hvězdou na čele", subject: "A princess with a small golden star on her forehead, a wide bell-shaped blue gown and a radiant star crown" }
+        rook: { name_cs: "Zámecká věž s praporkem", subject: "A round castle tower with battlements, a small arched door and a little flag" }
+        bishop: { name_cs: "Kouzelný dědeček", subject: "A tall thin wise old grandfather with a long white beard, a pointed hat and a long walking staff" }
+        knight: { name_cs: "Bílý kůň se zlatou hřívou", subject: "A white horse with a flowing golden mane and a red saddle" }
+        pawn: { name_cs: "Honza s uzlíčkem buchet", subject: "A small round village boy with a straw hat, carrying a bundle on a stick over his shoulder" }
+    - id: devils
+      name_cs: "Čerti"
+      dna: "Sooty brown fur with red tongues and orange fire; little horns, hooves, chains, pitchforks"
+      base: "orange"
+      rim: "fire yellow"
+      outline: light
+      seed: 2201
+      pieces:
+        king: { name_cs: "Lucifer s knihou hříchů", subject: "A big furry comical devil king with tall horns, a tiny crown and a huge book under his arm, holding a pitchfork upright" }
+        queen: { name_cs: "Čertova babička", subject: "A devil grandmother with a wide layered skirt, a big headscarf with horns poking through and a wooden spoon" }
+        rook: { name_cs: "Pekelný kotel", subject: "A big iron cauldron on a stone hearth with orange fire beneath and puffs of steam" }
+        bishop: { name_cs: "Čert-písař s brkem a pytlem", subject: "A tall thin devil scribe with one long pointed horn, holding a long quill diagonally and a sack over his shoulder" }
+        knight: { name_cs: "Kozel", subject: "A mischievous billy goat with curved horns and a little bell" }
+        pawn: { name_cs: "Čertík s vidlemi", subject: "A small round furry devil kid with tiny horns and a red tongue sticking out, holding a tiny pitchfork" }

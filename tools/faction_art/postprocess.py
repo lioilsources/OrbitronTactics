@@ -5,7 +5,9 @@ For every piece: the RMBG cutout is cropped to its alpha, scaled to the
 target height of its type (styles.yaml `heights`, the king fills the
 canvas), aligned to the bottom edge, given a 2-3 px outline (dark on the
 light side, light on the dark side) and exported at 512, 256 and 128 px.
-Writes out/<pack>/<model>/final/<size>/<piece>_<white|black>.png and manifest.json.
+Writes out/<pack>/<model>/final/<size>/<piece>_<white|black>.png (board, with
+the plinth the model draws), final/battle/<size>/ (plinth cut off for the
+realtime battle) and manifest.json.
 
 Picks live in picks.yaml (pack -> model -> side -> piece -> candidate); a
 missing entry takes candidate 0.
@@ -88,6 +90,45 @@ def cutout_of(pack_id, model, side_id, piece, candidate):
     return image.crop(alpha.getbbox())
 
 
+# A plinth is a flat band at the bottom: at most this share of the piece's
+# height, and the piece above it narrower than this share of its width.
+PLINTH_MAX = 0.16
+PLINTH_STEP = 0.75
+
+
+def row_widths(alpha):
+    px = alpha.load()
+    w, h = alpha.size
+    widths = []
+    for y in range(h):
+        xs = [x for x in range(w) if px[x, y] > 96]
+        widths.append(xs[-1] - xs[0] + 1 if xs else 0)
+    return widths
+
+
+def strip_plinth(cutout):
+    """The cutout without the thin display base Qwen likes to put under a
+    miniature, for the battle arena; unchanged when it finds none."""
+    work = cutout.resize((max(1, cutout.width // 4), max(1, cutout.height // 4)), Image.NEAREST)
+    widths = row_widths(work.getchannel("A"))
+    h = len(widths)
+    bottom = next((y for y in range(h - 1, -1, -1) if widths[y]), None)
+    if bottom is None:
+        return cutout
+    band = range(bottom, max(-1, bottom - int(PLINTH_MAX * h)), -1)
+    base = max(widths[y] for y in band)
+    inside = False
+    for y in band:
+        if not inside:
+            # The rounded lower rim of the plinth: wait for its full width.
+            inside = widths[y] >= 0.9 * base
+            continue
+        if widths[y] < PLINTH_STEP * base:
+            # What stands on the plinth is clearly narrower: cut here.
+            return cutout.crop((0, 0, cutout.width, (y + 1) * 4))
+    return cutout
+
+
 def place(cutout, ratio, canvas):
     """The cutout scaled to [ratio] of the king's height, centered and
     standing on the bottom edge of a square [canvas]."""
@@ -129,12 +170,15 @@ def main():
         for piece in side["pieces"]:
             candidate = picks.get(side["id"], {}).get(piece, 0)
             cutout = cutout_of(pack["id"], args.model, side["id"], piece, candidate)
-            big = place(cutout, styles["heights"][piece], 1024)
-            for size in SIZES:
-                small = big.resize((size, size), Image.LANCZOS)
-                folder = final / str(size)
-                folder.mkdir(parents=True, exist_ok=True)
-                with_outline(small, side["outline"]).save(folder / f"{piece}_{color}.png")
+            # Board pieces keep their plinth; battle sprites lose it.
+            for variant, source in (("board", cutout), ("battle", strip_plinth(cutout))):
+                stripped = source.crop(source.getchannel("A").getbbox())
+                big = place(stripped, styles["heights"][piece], 1024)
+                for size in SIZES:
+                    small = big.resize((size, size), Image.LANCZOS)
+                    folder = final / str(size) if variant == "board" else final / "battle" / str(size)
+                    folder.mkdir(parents=True, exist_ok=True)
+                    with_outline(small, side["outline"]).save(folder / f"{piece}_{color}.png")
     (final / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
     print(f"wrote {final}")
 

@@ -170,7 +170,11 @@ def run(graph, timeout=3600):
     if pid:
         log(f"  adopting queued job {pid[:8]}")
     else:
-        pid = api("/prompt", {"prompt": graph, "client_id": "orbitron-fleets"})["prompt_id"]
+        payload = {"prompt": graph, "client_id": "orbitron-fleets"}
+        if os.environ.get("COMFY_FRONT"):
+            # Jump the server's queue (shared ComfyUI, only on request).
+            payload["front"] = True
+        pid = api("/prompt", payload)["prompt_id"]
     t0 = time.time()
     retries = 2
     while time.time() - t0 < timeout:

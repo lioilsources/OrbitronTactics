@@ -1,0 +1,8 @@
+# Renders, rejects and review sheets stay local
+out/
+out_bad/
+sheets/
+__pycache__/
+*.log
+out_worlds/
+out_worlds_bad/

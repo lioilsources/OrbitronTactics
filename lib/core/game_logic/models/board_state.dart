@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../board/board_geometry.dart';
+import '../board/board_spec.dart';
 import 'piece.dart';
 import 'position.dart';
 import 'power_field.dart';
@@ -11,18 +13,31 @@ class BoardState with _$BoardState {
   const BoardState._();
 
   const factory BoardState({
-    /// 8x8 grid indexed as grid[row][col]. Null = empty square.
+    /// rows × cols grid indexed as grid[row][col]. Null = empty square.
     required List<List<Piece?>> grid,
     required List<PowerField> powerFields,
+
+    /// The board variant. Missing in JSON from before variants: classic8.
+    @BoardSpecConverter()
+    @Default(BoardSpec.classic8)
+    BoardSpec spec,
   }) = _BoardState;
 
   factory BoardState.fromJson(Map<String, dynamic> json) =>
       _$BoardStateFromJson(json);
 
-  factory BoardState.empty(List<PowerField> powerFields) => BoardState(
-        grid: List.generate(8, (_) => List.generate(8, (_) => null)),
+  factory BoardState.empty(
+    List<PowerField> powerFields, {
+    BoardSpec spec = BoardSpec.classic8,
+  }) =>
+      BoardState(
+        grid: List.generate(
+            spec.rows, (_) => List.generate(spec.cols, (_) => null)),
         powerFields: powerFields,
+        spec: spec,
       );
+
+  BoardGeometry get geometry => spec.geometry;
 
   Piece? pieceAt(Position pos) => grid[pos.row][pos.col];
 
@@ -41,7 +56,7 @@ class BoardState with _$BoardState {
   /// Returns a new BoardState with a piece moved from [from] to [to].
   BoardState movePiece(Position from, Position to) {
     final newGrid = [
-      for (int r = 0; r < 8; r++) [...grid[r]],
+      for (final row in grid) [...row],
     ];
     final piece = newGrid[from.row][from.col];
     newGrid[from.row][from.col] = null;
@@ -52,7 +67,7 @@ class BoardState with _$BoardState {
   /// Returns a new BoardState with the piece at [pos] replaced.
   BoardState setPiece(Position pos, Piece? piece) {
     final newGrid = [
-      for (int r = 0; r < 8; r++) [...grid[r]],
+      for (final row in grid) [...row],
     ];
     newGrid[pos.row][pos.col] = piece;
     return copyWith(grid: newGrid);
@@ -65,8 +80,8 @@ class BoardState with _$BoardState {
     bool? isLastWarrior,
   }) {
     final results = <Position>[];
-    for (int r = 0; r < 8; r++) {
-      for (int c = 0; c < 8; c++) {
+    for (int r = 0; r < grid.length; r++) {
+      for (int c = 0; c < grid[r].length; c++) {
         final piece = grid[r][c];
         if (piece == null) continue;
         if (type != null && piece.type != type) continue;

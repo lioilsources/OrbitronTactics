@@ -1,13 +1,15 @@
 import '../models/board_state.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import 'path_checker.dart';
 import 'piece_validator.dart';
 
 /// Last Warrior movement rules:
-/// - +1 square in all 8 directions (like a standard chess king)
+/// - One step to an adjacent square: all 8 directions on a square board
+///   (like a standard chess king), the 6 edges on hex
 /// - Applied when the piece's isLastWarrior flag is true
 ///   (which happens when the other royal piece was captured)
-class LastWarriorValidator implements PieceValidator {
+class LastWarriorValidator extends PieceValidator {
   const LastWarriorValidator();
 
   @override
@@ -15,19 +17,6 @@ class LastWarriorValidator implements PieceValidator {
     BoardState board,
     Position position,
     PlayerColor color,
-  ) {
-    final moves = <Position>[];
-
-    for (int dRow = -1; dRow <= 1; dRow++) {
-      for (int dCol = -1; dCol <= 1; dCol++) {
-        if (dRow == 0 && dCol == 0) continue;
-        final target = position.offset(dRow, dCol);
-        if (target.isOnBoard && !board.isFriendly(target, color)) {
-          moves.add(target);
-        }
-      }
-    }
-
-    return moves;
-  }
+  ) =>
+      PathChecker.slide(board, position, board.geometry.adjacent, 1, color);
 }

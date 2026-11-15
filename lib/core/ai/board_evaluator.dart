@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../game_logic/board/board_geometry.dart';
 import '../game_logic/engine/unit_base_stats.dart';
 import '../game_logic/engine/upgrade_engine.dart';
 import '../game_logic/models/game_state.dart';
@@ -8,6 +9,7 @@ import '../game_logic/models/piece.dart';
 import '../game_logic/models/position.dart';
 import '../game_logic/models/upgrade_profile.dart';
 import 'battle_odds.dart';
+import 'cell_set.dart';
 import 'move_generator.dart';
 
 /// Weights of the terms of [BoardEvaluator.evaluate].
@@ -122,17 +124,21 @@ class BoardEvaluator {
     List<Move> enemyMoves,
   ) {
     final board = s.board;
+    final geometry = board.geometry;
     final values = _valuesFor(upgrades);
-    final targets = _targetMask(moves);
-    final enemyTargets = _targetMask(enemyMoves);
+    final targets = _targetSet(moves, geometry);
+    final enemyTargets = _targetSet(enemyMoves, geometry);
+    final infiltrationRank = geometry.infiltrationRank(color);
+    // (7 − distance)² on the classic board, the same range on any other
+    final rowScale = 7 / (geometry.rows - 1);
 
     // Material, royals, infiltration
     var material = 0.0;
     var infiltration = 0.0;
     var hasKing = false;
     var hasQueen = false;
-    for (var row = 0; row < 8; row++) {
-      for (var col = 0; col < 8; col++) {
+    for (var row = 0; row < board.grid.length; row++) {
+      for (var col = 0; col < board.grid[row].length; col++) {
         final piece = board.grid[row][col];
         if (piece == null || piece.color != color) continue;
         material += values[_valueIndex(piece)];
@@ -142,9 +148,12 @@ class BoardEvaluator {
           case PieceType.queen:
             hasQueen = true;
           case PieceType.pawn:
-            final distance = (color.infiltrationRank - row).abs();
-            infiltration += ((7 - distance) * (7 - distance)).toDouble();
-            if (distance == 1 && enemyTargets & _bit(row, col) == 0) {
+            final distance = (infiltrationRank - row).abs();
+            final progress = (geometry.rows - 1 - distance) * rowScale;
+            infiltration += progress * progress;
+            if (distance == 1 &&
+                !enemyTargets.contains(
+                    geometry.indexOf(Position(row: row, col: col)))) {
               infiltration += _unstoppablePawnBonus;
             }
           default:
@@ -164,7 +173,7 @@ class BoardEvaluator {
       final position = field.position;
       if (board.pieceAt(position)?.color == color) {
         held++;
-      } else if (targets & _bit(position.row, position.col) != 0) {
+      } else if (targets.contains(geometry.indexOf(position))) {
         inReach++;
       }
     }
@@ -200,14 +209,12 @@ class BoardEvaluator {
   static int _valueIndex(Piece p) =>
       p.type.index * 2 + (p.isLastWarrior ? 1 : 0);
 
-  static int _bit(int row, int col) => 1 << (row * 8 + col);
-
-  static int _targetMask(List<Move> moves) {
-    var mask = 0;
+  static CellSet _targetSet(List<Move> moves, BoardGeometry geometry) {
+    final set = CellSet();
     for (final move in moves) {
-      mask |= _bit(move.to.row, move.to.col);
+      set.add(geometry.indexOf(move.to));
     }
-    return mask;
+    return set;
   }
 
   static List<double> _valuesFor(UpgradeProfile up) {

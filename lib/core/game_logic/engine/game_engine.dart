@@ -1,3 +1,4 @@
+import '../board/board_spec.dart';
 import '../models/board_state.dart';
 import '../models/game_phase.dart';
 import '../models/game_state.dart';
@@ -18,18 +19,20 @@ import 'victory_checker.dart';
 class GameEngine {
   const GameEngine._();
 
-  /// Create a new game with the given players and power field variant.
+  /// Create a new game with the given players and power field variant,
+  /// on [spec]'s board.
   static GameState createGame({
     required String gameId,
     required Player playerWhite,
     required Player playerBlack,
     List<PowerField>? powerFields,
+    BoardSpec spec = BoardSpec.classic8,
   }) {
-    final pf = powerFields ?? PowerFieldGenerator.generate(gameId);
+    final pf = powerFields ?? PowerFieldGenerator.generate(gameId, spec: spec);
     return GameState(
       gameId: gameId,
       phase: GamePhase.formation,
-      board: BoardState.empty(pf),
+      board: BoardState.empty(pf, spec: spec),
       currentTurn: PlayerColor.white,
       playerWhite: playerWhite,
       playerBlack: playerBlack,
@@ -202,38 +205,27 @@ class GameEngine {
     return (resolved, reward);
   }
 
-  /// Create a default "chess-like" formation for quick start / testing.
-  static Formation defaultFormation(PlayerColor color) {
-    final backRow = color == PlayerColor.white ? 0 : 7;
-    final pawnRow = color == PlayerColor.white ? 1 : 6;
-
+  /// Create a default "chess-like" formation for quick start / testing:
+  /// [spec]'s layout on [color]'s rows.
+  static Formation defaultFormation(
+    PlayerColor color, {
+    BoardSpec spec = BoardSpec.classic8,
+  }) {
     final placements = <FormationPlacement>[];
 
-    // Back row: Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook
-    const backRowPieces = [
-      PieceType.rook,
-      PieceType.knight,
-      PieceType.bishop,
-      PieceType.queen,
-      PieceType.king,
-      PieceType.bishop,
-      PieceType.knight,
-      PieceType.rook,
-    ];
-
-    for (int col = 0; col < 8; col++) {
-      placements.add(FormationPlacement(
-        position: Position(row: backRow, col: col),
-        piece: Piece(type: backRowPieces[col], color: color),
-      ));
-    }
-
-    // Pawn row
-    for (int col = 0; col < 8; col++) {
-      placements.add(FormationPlacement(
-        position: Position(row: pawnRow, col: col),
-        piece: Piece(type: PieceType.pawn, color: color),
-      ));
+    // Classic: back row Rook, Knight, Bishop, Queen, King, Bishop, Knight,
+    // Rook, then the pawn row
+    for (var i = 0; i < spec.layout.length; i++) {
+      final row = color == PlayerColor.white ? i : spec.rows - 1 - i;
+      final types = spec.layout[i];
+      for (int col = 0; col < types.length; col++) {
+        final type = types[col];
+        if (type == null) continue;
+        placements.add(FormationPlacement(
+          position: Position(row: row, col: col),
+          piece: Piece(type: type, color: color),
+        ));
+      }
     }
 
     return Formation(placements: placements);

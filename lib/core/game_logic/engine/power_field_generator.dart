@@ -1,10 +1,15 @@
 import 'dart:math';
+import '../board/board_geometry.dart';
+import '../board/board_spec.dart';
 import '../models/position.dart';
 import '../models/power_field.dart';
 
-/// Generates 5 power field positions from 8 predefined symmetric variants.
-/// Each variant is point-symmetric about the board center (3.5, 3.5),
-/// ensuring neither player has a positional advantage.
+/// Generates the power fields of a game.
+///
+/// The classic board picks one of 8 predefined variants (kept as they are,
+/// although not all of them are exactly symmetric). Other boards without
+/// fixed variants get [symmetric] fields: half picked at random, the other
+/// half their point mirror, plus one central field for an odd count.
 class PowerFieldGenerator {
   const PowerFieldGenerator._();
 
@@ -79,13 +84,83 @@ class PowerFieldGenerator {
     ],
   ];
 
-  /// Generate power fields using a random variant.
+  /// Generate power fields for a game on [spec].
   /// Uses [gameId] as seed for reproducibility.
-  static List<PowerField> generate(String gameId) {
+  static List<PowerField> generate(
+    String gameId, {
+    BoardSpec spec = BoardSpec.classic8,
+  }) {
     final seed = gameId.hashCode;
     final random = Random(seed);
-    final variantIndex = random.nextInt(variants.length);
-    return generateFromVariant(variantIndex);
+    return generateFor(spec, random);
+  }
+
+  /// Power fields for a game on [spec], drawn from [random].
+  static List<PowerField> generateFor(BoardSpec spec, Random random) {
+    final fixed = spec.powerFieldVariants;
+    if (fixed != null) {
+      return [
+        for (final pos in fixed[random.nextInt(fixed.length)])
+          PowerField(position: pos),
+      ];
+    }
+    return [
+      for (final pos in symmetric(spec.geometry, spec.powerFieldCount, random,
+          marginRows: spec.formationRows))
+        PowerField(position: pos),
+    ];
+  }
+
+  /// [count] point-symmetric fields on [geometry], outside the first
+  /// [marginRows] rows of either side. For an odd count one field is a
+  /// cell closest to the board's centre; when the board has no cell on the
+  /// centre itself, that one field is the only asymmetry.
+  static List<Position> symmetric(
+    BoardGeometry geometry,
+    int count,
+    Random random, {
+    int marginRows = 2,
+  }) {
+    final band = [
+      for (final cell in geometry.cells)
+        if (cell.row >= marginRows && cell.row < geometry.rows - marginRows)
+          cell,
+    ];
+
+    final fields = <Position>[];
+    Position? centre;
+    if (count.isOdd) {
+      final nearest = band
+          .map(geometry.distanceFromCentre)
+          .reduce(min);
+      final candidates = [
+        for (final cell in band)
+          if (geometry.distanceFromCentre(cell) - nearest < 1e-9) cell,
+      ];
+      centre = candidates[random.nextInt(candidates.length)];
+    }
+
+    // One representative per mirror pair.
+    final pool = [
+      for (final cell in band)
+        if (geometry.indexOf(cell) < geometry.indexOf(geometry.mirror(cell)) &&
+            geometry.contains(geometry.mirror(cell)) &&
+            cell != centre &&
+            geometry.mirror(cell) != centre)
+          cell,
+    ];
+    final pairs = count ~/ 2;
+    if (pool.length < pairs) {
+      throw ArgumentError('Board too small for $count power fields');
+    }
+    for (var i = 0; i < pairs; i++) {
+      final cell = pool.removeAt(random.nextInt(pool.length));
+      fields
+        ..add(cell)
+        ..add(geometry.mirror(cell));
+    }
+    if (centre != null) fields.add(centre);
+    return fields;
   }
 
   /// Generate power fields from a specific variant index.

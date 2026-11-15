@@ -1,7 +1,6 @@
 import '../models/board_state.dart';
 import '../models/game_state.dart';
 import '../models/move.dart';
-import '../models/piece.dart';
 import '../models/position.dart';
 import '../models/game_phase.dart';
 import 'validator_registry.dart';
@@ -35,7 +34,7 @@ class MoveValidator {
     if (piece == null) return 'No piece at source position';
     if (piece.color != state.currentTurn) return 'Not your turn';
 
-    if (!to.isOnBoard) return 'Target position is off the board';
+    if (!state.board.geometry.contains(to)) return 'Target position is off the board';
 
     if (state.board.isFriendly(to, piece.color)) {
       return 'Cannot capture your own piece';
@@ -62,11 +61,8 @@ class MoveValidator {
   static Move buildMove(BoardState board, Position from, Position to) {
     final piece = board.pieceAt(from)!;
 
-    // Determine if this is a bishop snipe
-    final isSnipe = piece.type == PieceType.bishop &&
-        !piece.isLastWarrior &&
-        from.col == to.col &&
-        (to.row - from.row).abs() == 3;
+    // The piece's validator knows whether the move was a snipe
+    final isSnipe = validatorFor(piece).isSnipe(board, from, to, piece.color);
 
     return Move(
       from: from,

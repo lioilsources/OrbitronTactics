@@ -1,3 +1,4 @@
+import '../board/board_geometry.dart';
 import '../models/board_state.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
@@ -6,39 +7,26 @@ import '../models/position.dart';
 class PathChecker {
   const PathChecker._();
 
-  /// Returns true if all squares between [from] and [to] (exclusive) are empty.
-  /// Works for straight lines and diagonals.
-  static bool isPathClear(BoardState board, Position from, Position to) {
-    final dRow = (to.row - from.row).sign;
-    final dCol = (to.col - from.col).sign;
-
-    var current = from.offset(dRow, dCol);
-    while (current != to) {
-      if (!board.isEmpty(current)) return false;
-      current = current.offset(dRow, dCol);
-    }
-    return true;
-  }
-
-  /// Returns all reachable positions along a direction from [start],
-  /// up to [maxDistance] squares.
-  /// Stops at the first occupied square:
+  /// Returns all reachable positions along [direction] from [start],
+  /// up to [maxDistance] steps.
+  /// Stops at the edge of the board or a blocked square, and at the first
+  /// occupied square:
   /// - includes it if enemy (can capture)
   /// - excludes it if friendly
   static List<Position> getReachableSquares(
     BoardState board,
     Position start,
-    int dRow,
-    int dCol,
+    Direction direction,
     int maxDistance,
     PlayerColor color,
   ) {
+    final geometry = board.geometry;
     final results = <Position>[];
     var current = start;
 
     for (int i = 0; i < maxDistance; i++) {
-      current = current.offset(dRow, dCol);
-      if (!current.isOnBoard) break;
+      current = geometry.step(current, direction);
+      if (!geometry.contains(current)) break;
 
       if (board.isEmpty(current)) {
         results.add(current);
@@ -50,5 +38,21 @@ class PathChecker {
       }
     }
     return results;
+  }
+
+  /// Every square reachable sliding up to [maxDistance] steps in each of
+  /// [directions], in that order.
+  static List<Position> slide(
+    BoardState board,
+    Position start,
+    List<Direction> directions,
+    int maxDistance,
+    PlayerColor color,
+  ) {
+    if (maxDistance <= 0) return <Position>[];
+    return [
+      for (final direction in directions)
+        ...getReachableSquares(board, start, direction, maxDistance, color),
+    ];
   }
 }

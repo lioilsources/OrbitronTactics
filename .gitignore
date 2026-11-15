@@ -48,3 +48,4 @@ app.*.map.json
 .env
 .env.*
 out_compare/
+tools/faction_art/out/

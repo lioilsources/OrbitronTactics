@@ -8,7 +8,9 @@ import '../../../battle/data/battle_element.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../battle/presentation/widgets/pattern_glyph.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../../l10n/l10n.dart';
 import '../widgets/maneuver_card.dart';
+import '../widgets/piece_skin_picker.dart';
 import '../widgets/upgrade_card.dart';
 
 class ComcenterScreen extends ConsumerWidget {
@@ -21,7 +23,7 @@ class ComcenterScreen extends ConsumerWidget {
     final fleet = ref.watch(fleetProgressProvider(playerFleetIdentity));
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFF0D0D1A),
         appBar: AppBar(
@@ -51,17 +53,22 @@ class ComcenterScreen extends ConsumerWidget {
               ),
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.amber,
             unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.amber,
-            tabs: [Tab(text: 'UNITS'), Tab(text: 'MANEUVERS')],
+            tabs: [
+              const Tab(text: 'UNITS'),
+              const Tab(text: 'MANEUVERS'),
+              Tab(text: context.l10n.boardTab),
+            ],
           ),
         ),
         body: TabBarView(
           children: [
             _UnitsTab(fleet: fleet),
             _ManeuversTab(fleet: fleet),
+            const PieceSkinPicker(),
           ],
         ),
       ),

@@ -1,0 +1,14 @@
+{
+  "@@locale": "cs",
+  "boardTab": "DESKA",
+  "pieceSkinTitle": "Figurky na desce",
+  "pieceSkinHint": "Vyber armády, které se kreslí na desku ve všech režimech hry.",
+  "classicMarks": "Klasické značky",
+  "classicMarksHint": "Na každé figurce ukáže malý šachový symbol.",
+  "pieceSkinClassic": "Klasické",
+  "pieceSkinClassicWhite": "Bílí",
+  "pieceSkinClassicBlack": "Černí",
+  "pieceSkinHeavenHell": "Nebe × Peklo",
+  "pieceSkinHeavenHellWhite": "Nebe",
+  "pieceSkinHeavenHellBlack": "Peklo"
+}

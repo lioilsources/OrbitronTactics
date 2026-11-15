@@ -19,6 +19,9 @@ dependencies:
   supabase_flutter: ^2.8.0
   shared_preferences: ^2.3.0
   flutter_soloud: ^4.1.7
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +36,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     # Battle ship sprites, one folder per fleet (see FleetSkin)
     - assets/fleets/vanguard/
@@ -48,6 +52,8 @@ flutter:
     # Battle music and effects (see BattleSounds), built by tools/battle_audio
     - assets/audio/music/
     - assets/audio/sfx/
+    # Board piece skin packs, one folder per pack (see PieceSkin)
+    - assets/pieces/heaven_hell/
 
 flutter_launcher_icons:
   android: "ic_launcher"

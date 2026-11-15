@@ -41,7 +41,8 @@ def load():
 
 
 def piece_prompt(styles, pack, side, piece):
-    frame = styles["frame"].format(base=side["base"], rim=side["rim"])
+    kind = styles["kinds"].get(piece, styles["kinds"]["default"])
+    frame = styles["frame"].format(kind=kind, rim=side["rim"])
     return styles["piece"].format(
         style=styles["styles"][pack["style"]],
         subject=side["pieces"][piece]["subject"],
@@ -55,7 +56,7 @@ def lineup_prompt(styles, pack, side):
     subjects = {p: _lower_first(side["pieces"][p]["subject"]) for p in PIECES}
     return styles["lineup"].format(
         style=styles["styles"][pack["style"]], faction=side["name_en"] if "name_en" in side
-        else side["id"].replace("_", " ").title(), base=side["base"],
+        else side["id"].replace("_", " ").title(),
         dna=_lower_first(side["dna"]), **subjects)
 
 
@@ -161,7 +162,7 @@ def render(model, prompt, seed, guidance, stem, size=(1024, 1024)):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("pack")
-    parser.add_argument("--model", choices=MODELS, default="dev")
+    parser.add_argument("--model", choices=MODELS, default="qwen")
     parser.add_argument("--side", help="one side id; default both")
     parser.add_argument("--pieces", default=",".join(PIECES))
     parser.add_argument("--candidates", type=int, default=4)

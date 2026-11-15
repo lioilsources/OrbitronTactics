@@ -163,6 +163,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hell'**
   String get pieceSkinHeavenHellBlack;
+
+  /// Name of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Rome × Carthage'**
+  String get pieceSkinRomeCarthage;
+
+  /// White side of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Rome'**
+  String get pieceSkinRomeCarthageWhite;
+
+  /// Black side of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Carthage'**
+  String get pieceSkinRomeCarthageBlack;
+
+  /// Name of the Fairy-tale Kingdom × Devils piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Fairy-tale Kingdom × Devils'**
+  String get pieceSkinFairytaleDevils;
+
+  /// White side of the Fairy-tale Kingdom × Devils piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Kingdom'**
+  String get pieceSkinFairytaleDevilsWhite;
+
+  /// Black side of the Fairy-tale Kingdom × Devils piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Devils'**
+  String get pieceSkinFairytaleDevilsBlack;
 }
 
 class _AppLocalizationsDelegate

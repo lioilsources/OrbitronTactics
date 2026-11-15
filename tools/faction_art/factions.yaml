@@ -88,7 +88,7 @@
       pieces:
         king: { name_cs: "Dobrotivý král se zlatým jablkem", subject: "A kind old fairy-tale king with a white beard, a big golden crown and a red ermine cloak, holding a golden apple and a scepter upright" }
         queen: { name_cs: "Princezna se zlatou hvězdou na čele", subject: "A princess with a small golden star on her forehead, a wide bell-shaped blue gown and a radiant star crown" }
-        rook: { name_cs: "Zámecká věž s praporkem", subject: "A lone round castle tower with battlements, a small arched door and a little flag, an empty building with nobody around it" }
+        rook: { name_cs: "Zámecká věž s praporkem", subject: "A living round castle tower toy with a friendly face on its wall, battlements, a small arched door and a little flag, alone" }
         bishop: { name_cs: "Kouzelný dědeček", subject: "A tall thin wise old grandfather with a long white beard, a pointed hat and a long walking staff" }
         knight: { name_cs: "Bílý kůň se zlatou hřívou", subject: "A white horse with a flowing golden mane and a red saddle" }
         pawn: { name_cs: "Honza s uzlíčkem buchet", subject: "A small round village boy with a straw hat, carrying a bundle on a stick over his shoulder" }
@@ -102,7 +102,7 @@
       pieces:
         king: { name_cs: "Lucifer s knihou hříchů", subject: "A big furry comical devil king with tall horns, a tiny crown and a huge book under his arm, holding a pitchfork upright" }
         queen: { name_cs: "Čertova babička", subject: "A devil grandmother with a wide layered skirt, a big headscarf with horns poking through and a wooden spoon" }
-        rook: { name_cs: "Pekelný kotel", subject: "A lone big iron cauldron on a stone hearth with orange fire beneath and puffs of steam, with nobody around it" }
+        rook: { name_cs: "Pekelný kotel", subject: "A living big iron cauldron toy with a cheeky face, stubby legs, orange fire beneath and puffs of steam, alone" }
         bishop: { name_cs: "Čert-písař s brkem a pytlem", subject: "A tall thin devil scribe with one long pointed horn, holding a long quill diagonally and a sack over his shoulder" }
         knight: { name_cs: "Kozel", subject: "A mischievous billy goat with curved horns and a little bell" }
         pawn: { name_cs: "Čertík s vidlemi", subject: "A small round furry devil kid with tiny horns and a red tongue sticking out, holding a tiny pitchfork" }
@@ -126,7 +126,7 @@
       pieces:
         king: { name_cs: "Král skřítků", subject: "A jolly elf king with pointed ears, a crown of golden leaves and a mint cloak, holding a flower scepter upright" }
         queen: { name_cs: "Královna víl", subject: "A fairy queen with large dragonfly wings spread wide like a fan, a petal gown and a tiny star wand" }
-        rook: { name_cs: "Muchomůrkový domeček", subject: "A lone toadstool cottage with a big spotted cap roof, a round door and tiny windows, an empty building with nobody around it" }
+        rook: { name_cs: "Muchomůrkový domeček", subject: "A living toadstool cottage toy with a big spotted cap roof, a friendly face in its round door and tiny windows, alone" }
         bishop: { name_cs: "Světluška s lucerničkou", subject: "A slender firefly sprite with a glowing tail and a pointed hat, holding a long stick with a tiny lantern diagonally" }
         knight: { name_cs: "Jednorožec", subject: "A pastel unicorn with a curly mint mane and a golden spiral horn" }
         pawn: { name_cs: "Skřítek se žaludovou čepičkou", subject: "A small round pixie wearing an acorn cap, holding a little leaf shield" }
@@ -140,7 +140,7 @@
       pieces:
         king: { name_cs: "Zlý čaroděj s havranem", subject: "A grumpy old warlock with a crooked crown on his pointed hat and a raven on his shoulder, holding a gnarled staff upright" }
         queen: { name_cs: "Královna čarodějnic na koštěti", subject: "A witch queen in a wide patched cloak spread like a fan, sitting sideways on a broomstick, with a tall pointed hat" }
-        rook: { name_cs: "Perníková chaloupka", subject: "A lone gingerbread cottage decorated with candies and icing, a crooked chimney, an empty building with nobody around it" }
+        rook: { name_cs: "Perníková chaloupka", subject: "A living gingerbread cottage toy with a sly face, candies and icing and a crooked chimney, alone" }
         bishop: { name_cs: "Vědma s kotlíkem", subject: "A tall thin fortune teller witch with a long pointed hat, holding a long ladle diagonally over a tiny bubbling pot" }
         knight: { name_cs: "Obří černý kocour", subject: "A big purple-black cat with glowing green eyes and an arched back" }
         pawn: { name_cs: "Ropucha v kloboučku", subject: "A small round toad wearing a tiny pointed witch hat" }
@@ -161,7 +161,7 @@
       pieces:
         king: { name_cs: "Včelí král s korunkou", subject: "A fuzzy round bee king with a golden crown and a honey dipper scepter held upright" }
         queen: { name_cs: "Včelí královna", subject: "A bee queen with four wide translucent wings spread like a fan and a honeycomb crown" }
-        rook: { name_cs: "Úl s plástvemi", subject: "A lone round beehive made of honeycomb with a small door, an empty building with nobody around it" }
+        rook: { name_cs: "Úl s plástvemi", subject: "A living round beehive toy made of honeycomb with a friendly face and a small door, alone" }
         bishop: { name_cs: "Strážkyně s žihadlem jako kopím", subject: "A slender guard bee with a pointed helmet, holding a long stinger spear diagonally" }
         knight: { name_cs: "Čmelák", subject: "A plump fluffy bumblebee rearing up with a curved body, seen in side profile" }
         pawn: { name_cs: "Dělnice s kyblíčkem medu", subject: "A small round worker bee carrying a tiny bucket of honey" }
@@ -175,7 +175,7 @@
       pieces:
         king: { name_cs: "Sršní král", subject: "A sharp angular hornet king with a spiky crown and long jaws, holding a thorn scepter upright" }
         queen: { name_cs: "Vosí královna", subject: "A slender wasp queen with turquoise wings spread wide like a fan and a pointed crown" }
-        rook: { name_cs: "Papírové hnízdo", subject: "A lone grey paper wasp nest shaped like a squat lantern, an empty building with nobody around it" }
+        rook: { name_cs: "Papírové hnízdo", subject: "A living grey paper wasp nest toy shaped like a squat lantern with a grumpy face, alone" }
         bishop: { name_cs: "Vosa-lučištnice", subject: "A thin wasp archer with a pointed cap, holding a long staff tipped with a stinger diagonally" }
         knight: { name_cs: "Vážka", subject: "A turquoise dragonfly with a long curved body and wings raised, seen in side profile" }
         pawn: { name_cs: "Vosí voják", subject: "A small round wasp soldier with a tiny pointed helmet and a short pin sword" }
@@ -231,7 +231,7 @@
       pieces:
         king: { name_cs: "Hřivnatý kocour-král", subject: "A fluffy maned cat king with a golden crown and a red cape, holding a scepter with a bell upright" }
         queen: { name_cs: "Siamská královna", subject: "An elegant siamese cat queen with a long tail curled like a fan and a jeweled tiara" }
-        rook: { name_cs: "Škrabadlo-věž", subject: "A lone cat scratching tower with a flat top and rope-wrapped posts, with nobody around it" }
+        rook: { name_cs: "Škrabadlo-věž", subject: "A living cat scratching tower toy with a friendly face, a flat top and rope-wrapped posts, alone" }
         bishop: { name_cs: "Sphynx-mudrc", subject: "A tall thin hairless sphynx cat sage in a pointed hat, holding a long yarn-wrapped staff diagonally" }
         knight: { name_cs: "Kočka na robotickém vysavači", subject: "A cat riding a round robot vacuum, rearing up with its paws raised, seen in side profile" }
         pawn: { name_cs: "Kotě s klubíčkem", subject: "A small round kitten holding a ball of yarn" }
@@ -245,7 +245,7 @@
       pieces:
         king: { name_cs: "Bernardýn se soudkem", subject: "A big saint bernard dog king with a barrel collar and a crown, holding a bone scepter upright" }
         queen: { name_cs: "Afghánská chrtice", subject: "An afghan hound queen with long silky ears and fur flowing wide like a fan and a tiara" }
-        rook: { name_cs: "Psí bouda", subject: "A lone wooden doghouse with a flat roof and a bone sign, an empty building with nobody around it" }
+        rook: { name_cs: "Psí bouda", subject: "A living wooden doghouse toy with a happy face, a flat roof and a bone sign, alone" }
         bishop: { name_cs: "Chrt-posel", subject: "A tall thin greyhound messenger in a pointed cap, holding a long stick diagonally" }
         knight: { name_cs: "Jack Russell ve skoku", subject: "A jack russell terrier leaping in side profile with a curved body" }
         pawn: { name_cs: "Štěně s kostí", subject: "A small round puppy holding a bone in its mouth" }
@@ -266,7 +266,7 @@
       pieces:
         king: { name_cs: "Ananas", subject: "A pineapple king with a tall leaf crown and a friendly face, holding a banana scepter upright" }
         queen: { name_cs: "Granátové jablko s korunkou", subject: "A pomegranate queen with a small crown and a skirt of leaves spread like a fan" }
-        rook: { name_cs: "Meloun", subject: "A lone squat watermelon cut flat on top like a fortress, with nobody around it" }
+        rook: { name_cs: "Meloun", subject: "A living squat watermelon toy with a friendly face, cut flat on top like a fortress, alone" }
         bishop: { name_cs: "Banán", subject: "A tall slender banana sage with a pointed peel hat, holding a long stick diagonally" }
         knight: { name_cs: "Pták kiwi", subject: "A round kiwi bird with a long curved beak, seen in side profile" }
         pawn: { name_cs: "Borůvka", subject: "A small round blueberry with a tiny leaf on top and a happy face" }
@@ -280,7 +280,7 @@
       pieces:
         king: { name_cs: "Brokolice", subject: "A broccoli king with a bushy green crown head and a leaf cape, holding a celery scepter upright" }
         queen: { name_cs: "Kukuřice se zlatými vlasy", subject: "A corn cob queen with golden silk hair and husk leaves spread like a fan" }
-        rook: { name_cs: "Dýně", subject: "A lone big squat pumpkin with a flat top cut like battlements, with nobody around it" }
+        rook: { name_cs: "Dýně", subject: "A living big squat pumpkin toy with a cheeky face and a flat top cut like battlements, alone" }
         bishop: { name_cs: "Mrkev", subject: "A tall slender carrot with leafy green top, holding a long twig diagonally" }
         knight: { name_cs: "Chilli paprička", subject: "A red chili pepper shaped like a curved horse head, seen in side profile" }
         pawn: { name_cs: "Hrášek", subject: "A small round green pea with a tiny leaf and a cheeky face" }

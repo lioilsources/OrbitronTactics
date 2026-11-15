@@ -54,6 +54,8 @@ flutter:
     - assets/audio/sfx/
     # Board piece skin packs, one folder per pack (see PieceSkin)
     - assets/pieces/heaven_hell/
+    - assets/pieces/fairytale_devils/
+    - assets/pieces/rome_carthage/
 
 flutter_launcher_icons:
   android: "ic_launcher"

@@ -1,38 +1,44 @@
 #!/usr/bin/env python3
 """Render the world art pilot of plan 12, step 1A (see worlds.py).
 
-Same ComfyUI pipeline as gen_fleets.py: FLUX.1-dev txt2img for the light
-side, FLUX Kontext repaint for the dark side, RMBG-2.0 cutout. Renders land
-in out_worlds/<world>/<faction>/<unit>_<white|black>.png.
+Both sides are txt2img renders of their own designs, light side as white and
+hell side as black, cut out with RMBG-2.0. Two models:
 
-  python3 gen_worlds.py --first                  # the one piece drawn first
-  python3 gen_worlds.py --worlds golems,actium   # pilot set: pawn and king
-  python3 gen_worlds.py --worlds all --dark      # plus one dark repaint each
-  python3 gen_worlds.py --audit
+  dev   FLUX.1-dev, the fleet pipeline (gen_fleets.py); non-commercial licence
+  qwen  Qwen-Image fp8, Apache 2.0
+
+Renders land in out_worlds/<model>/<world>/<unit>_<white|black>.png, with a
+contact sheet per model in out_worlds/<model>/sheet.png.
+
+  python3 gen_worlds.py --model qwen                     # pilot: pawn and king
+  python3 gen_worlds.py --model dev --worlds golems,actium
+  python3 gen_worlds.py --model qwen --worlds fable --units all   # whole army
+  python3 gen_worlds.py --model qwen --audit
 """
 import argparse
-import hashlib
 import shutil
 import sys
 import time
 from collections import deque
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 import gen_fleets as fleet_tools
-from worlds import FIRST_PIECE, PILOT_UNITS, WORLDS, black_prompt, seed_for, white_prompt
+from worlds import ALL_UNITS, PILOT_UNITS, WORLDS, prompt_for, seed_for
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "out_worlds"
 BAD = HERE / "out_worlds_bad"
+MODELS = ("dev", "qwen")
+COLORS = ("white", "black")
 
-# Side figures: the largest connected blob must hold this share of the
-# opaque pixels (one figure, no debris), and the figure keeps this margin to
-# every edge (nothing cut off).
+# Every figure: the largest connected blob holds this share of the opaque
+# pixels (one subject, no debris) and keeps this margin to every edge
+# (nothing cut off). Symmetric worlds (ships) also keep the fleet mirror gate.
 SINGLE_MIN = 0.97
 MARGIN_MIN = 0.03
-ATTEMPTS = {"white": 4, "black": 3}
+ATTEMPTS = 4
 log = fleet_tools.log
 
 
@@ -78,54 +84,80 @@ def margin(path):
     return min(box[0] / w, box[1] / h, (w - box[2]) / w, (h - box[3]) / h)
 
 
-def gate(folder, unit, color, view):
-    cutout = folder / f"{unit}_{color}.png"
-    if color == "black":
-        ratio = fleet_tools.mean_luma(cutout) / fleet_tools.mean_luma(folder / f"{unit}_white.png")
-        return -ratio, None if ratio <= fleet_tools.DARKNESS_MAX else (
-            f"darkness {ratio:.2f} > {fleet_tools.DARKNESS_MAX}")
-    if view == "top":
-        iou = fleet_tools.mirror_iou(cutout)
-        return iou, None if iou >= fleet_tools.SYMMETRY_MIN else (
-            f"mirror IoU {iou:.2f} < {fleet_tools.SYMMETRY_MIN}")
+def gate(cutout, world_id):
     single, edge = single_share(cutout), margin(cutout)
     failures = []
     if single < SINGLE_MIN:
-        failures.append(f"one figure {single:.2f} < {SINGLE_MIN}")
+        failures.append(f"one subject {single:.2f} < {SINGLE_MIN}")
     if edge < MARGIN_MIN:
         failures.append(f"margin {edge:.3f} < {MARGIN_MIN}")
-    return single + edge, "; ".join(failures) or None
+    score = single + edge
+    if WORLDS[world_id]["mirror"]:
+        iou = fleet_tools.mirror_iou(cutout)
+        score += iou
+        if iou < fleet_tools.SYMMETRY_MIN:
+            failures.append(f"mirror IoU {iou:.2f} < {fleet_tools.SYMMETRY_MIN}")
+    return score, "; ".join(failures) or None
 
 
-def render(world_id, faction_id, unit, color):
-    view = WORLDS[world_id]["view"]
-    folder = OUT / world_id / faction_id
+def qwen_graph(prompt, seed, prefix):
+    """Qwen-Image txt2img with the same RMBG cutout as ship_graph: raw render
+    at node 14, cutout with alpha at node 31."""
+    return {
+        "1": {"class_type": "UNETLoader",
+              "inputs": {"unet_name": "qwen_image_fp8_e4m3fn.safetensors",
+                         "weight_dtype": "default"}},
+        "2": {"class_type": "CLIPLoader",
+              "inputs": {"clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+                         "type": "qwen_image"}},
+        "3": {"class_type": "VAELoader", "inputs": {"vae_name": "qwen_image_vae.safetensors"}},
+        "4": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["2", 0], "text": prompt}},
+        "5": {"class_type": "CLIPTextEncode",
+              "inputs": {"clip": ["2", 0], "text": fleet_tools.NEGATIVE}},
+        "15": {"class_type": "ModelSamplingAuraFlow",
+               "inputs": {"model": ["1", 0], "shift": 3.1}},
+        "7": {"class_type": "EmptySD3LatentImage",
+              "inputs": {"width": 1024, "height": 1024, "batch_size": 1}},
+        "8": {"class_type": "KSampler",
+              "inputs": {"model": ["15", 0], "positive": ["4", 0], "negative": ["5", 0],
+                         "latent_image": ["7", 0], "seed": seed, "steps": 20, "cfg": 2.5,
+                         "sampler_name": "euler", "scheduler": "simple", "denoise": 1.0}},
+        "9": {"class_type": "VAEDecode", "inputs": {"samples": ["8", 0], "vae": ["3", 0]}},
+        "14": {"class_type": "SaveImage",
+               "inputs": {"images": ["9", 0], "filename_prefix": prefix + "_rgb"}},
+        "30": {"class_type": "RMBG",
+               "inputs": {"image": ["9", 0], "model": "RMBG-2.0", "sensitivity": 1.0,
+                          "process_res": 1024, "mask_blur": 0, "mask_offset": 0,
+                          "invert_output": False, "refine_foreground": True,
+                          "background": "Alpha", "background_color": "#808080"}},
+        "31": {"class_type": "SaveImage",
+               "inputs": {"images": ["30", 0], "filename_prefix": prefix + "_rgba"}},
+    }
+
+
+def render(model, world_id, unit, color):
+    folder = OUT / model / world_id
     folder.mkdir(parents=True, exist_ok=True)
     cutout, raw = folder / f"{unit}_{color}.png", folder / f"{unit}_{color}_rgb.png"
-    if cutout.exists() and raw.exists() and gate(folder, unit, color, view)[1] is None:
+    if cutout.exists() and raw.exists() and gate(cutout, world_id)[1] is None:
         return "skip"
+    prompt = prompt_for(world_id, color, unit)
     stamp = time.strftime("%H%M%S")
     tries = []
     t0 = time.time()
-    for attempt in range(ATTEMPTS[color]):
-        seed = (seed_for(world_id, faction_id, unit) + attempt * 7919) % (1 << 32)
-        prefix = f"orbitron_worlds/{world_id}_{faction_id}_{unit}_{color}"
-        if color == "white":
-            graph = fleet_tools.ship_graph(white_prompt(world_id, faction_id, unit), seed, prefix)
-        else:
-            white_raw = folder / f"{unit}_white_rgb.png"
-            digest = hashlib.sha1(white_raw.read_bytes()).hexdigest()[:12]
-            ref = fleet_tools.upload(white_raw, f"orbitron_{world_id}_{faction_id}_{unit}_{digest}.png")
-            graph = fleet_tools.ship_graph(
-                black_prompt(world_id, faction_id, unit, attempt), seed, prefix, ref=ref)
+    for attempt in range(ATTEMPTS):
+        seed = (seed_for(world_id, color, unit) + attempt * 7919) % (1 << 32)
+        prefix = f"orbitron_worlds/{model}_{world_id}_{unit}_{color}"
+        graph = (fleet_tools.ship_graph(prompt, seed, prefix) if model == "dev"
+                 else qwen_graph(prompt, seed, prefix))
         outputs = fleet_tools.run(graph)
         raw.write_bytes(fleet_tools.fetch(outputs, "14"))
         cutout.write_bytes(fleet_tools.fetch(outputs, "31"))
-        score, failure = gate(folder, unit, color, view)
+        score, failure = gate(cutout, world_id)
         if failure is None:
             return f"{time.time() - t0:.0f}s" + (f", attempt {attempt + 1}" if attempt else "")
         log(f"  attempt {attempt + 1} fails the gate ({failure})")
-        dest = BAD / world_id / faction_id
+        dest = BAD / model / world_id
         dest.mkdir(parents=True, exist_ok=True)
         kept = []
         for path in (cutout, raw):
@@ -139,51 +171,65 @@ def render(world_id, faction_id, unit, color):
     return f"{time.time() - t0:.0f}s, no attempt passed — kept the best, REVIEW"
 
 
-def jobs(args):
-    if args.first:
-        world_id, faction_id, unit = FIRST_PIECE
-        return [(world_id, faction_id, unit, "white")]
-    names = list(WORLDS) if args.worlds == "all" else args.worlds.split(",")
-    out = []
-    for world_id in names:
-        if world_id not in WORLDS:
-            sys.exit(f"unknown world {world_id}")
-        factions = list(WORLDS[world_id]["factions"])[:2]
-        for faction_id in factions:
-            for unit in PILOT_UNITS:
-                out.append((world_id, faction_id, unit, "white"))
-        if args.dark:
-            # One dark repaint per world: the first faction's king.
-            out.append((world_id, factions[0], PILOT_UNITS[-1], "black"))
-    return out
+def sheet(model, names, units, review, file_name="sheet"):
+    """One row per world and side, one column per role."""
+    cell, label = 256, 18
+    rows = [(w, c) for w in names for c in COLORS]
+    img = Image.new("RGB", (cell * len(units), (cell + label) * len(rows)), (110, 110, 110))
+    draw = ImageDraw.Draw(img)
+    for r, (world_id, color) in enumerate(rows):
+        y = r * (cell + label)
+        for c, unit in enumerate(units):
+            path = OUT / model / world_id / f"{unit}_{color}.png"
+            if not path.exists():
+                continue
+            sprite = Image.open(path).convert("RGBA").resize((cell, cell))
+            img.paste(sprite, (c * cell, y + label), sprite)
+            name = f"{world_id}/{unit}_{color}"
+            flagged = name in review
+            draw.text((c * cell + 4, y + 3), name + (" REVIEW" if flagged else ""),
+                      fill=(255, 80, 80) if flagged else (255, 255, 255))
+    img.save(OUT / model / f"{file_name}.png")
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--model", choices=MODELS, default="qwen")
     parser.add_argument("--worlds", default="all")
-    parser.add_argument("--first", action="store_true", help="only the piece drawn first")
-    parser.add_argument("--dark", action="store_true", help="add one dark repaint per world")
+    parser.add_argument("--units", default="pilot", help="pilot, all, or a list")
+    parser.add_argument("--sheet", default="sheet", help="contact sheet file name")
     parser.add_argument("--audit", action="store_true")
     args = parser.parse_args()
+    names = list(WORLDS) if args.worlds == "all" else args.worlds.split(",")
+    units = {"pilot": PILOT_UNITS, "all": ALL_UNITS}.get(args.units) or tuple(args.units.split(","))
+    for world_id in names:
+        if world_id not in WORLDS:
+            sys.exit(f"unknown world {world_id}")
+        for side in WORLDS[world_id]["sides"].values():
+            missing = set(units) - set(side["units"])
+            if missing:
+                sys.exit(f"{world_id}/{side['name']} has no {sorted(missing)}")
 
     if args.audit:
-        for path in sorted(OUT.glob("*/*/*_*.png")):
-            if path.stem.endswith("_rgb"):
-                continue
-            world_id, faction_id = path.parent.parent.name, path.parent.name
-            unit, color = path.stem.rsplit("_", 1)
-            _, failure = gate(path.parent, unit, color, WORLDS[world_id]["view"])
-            print(f"{world_id}/{faction_id}/{path.stem}: {failure or 'ok'}")
+        for path in sorted((OUT / args.model).glob("*/*_*.png")):
+            if not path.stem.endswith("_rgb"):
+                print(f"{path.parent.name}/{path.stem}: {gate(path, path.parent.name)[1] or 'ok'}")
         return
 
-    failures = []
-    for world_id, faction_id, unit, color in jobs(args):
-        name = f"{world_id}/{faction_id}/{unit}_{color}"
-        try:
-            log(f"{name}: {render(world_id, faction_id, unit, color)}")
-        except Exception as e:  # noqa: BLE001 - keep the batch going
-            log(f"{name}: FAILED {e}")
-            failures.append(name)
+    failures, review = [], set()
+    for world_id in names:
+        for color in COLORS:
+            for unit in units:
+                name = f"{world_id}/{unit}_{color}"
+                try:
+                    result = render(args.model, world_id, unit, color)
+                    if "REVIEW" in result:
+                        review.add(name)
+                    log(f"{args.model} {name}: {result}")
+                except Exception as e:  # noqa: BLE001 - keep the batch going
+                    log(f"{args.model} {name}: FAILED {e}")
+                    failures.append(name)
+    sheet(args.model, names, units, review, args.sheet)
     log(f"done, {len(failures)} failed: {failures}")
     sys.exit(1 if failures else 0)
 

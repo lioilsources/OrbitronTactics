@@ -41,4 +41,22 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get pieceSkinHeavenHellBlack => 'Peklo';
+
+  @override
+  String get pieceSkinRomeCarthage => 'Řím × Kartágo';
+
+  @override
+  String get pieceSkinRomeCarthageWhite => 'Řím';
+
+  @override
+  String get pieceSkinRomeCarthageBlack => 'Kartágo';
+
+  @override
+  String get pieceSkinFairytaleDevils => 'Pohádkové království × Čerti';
+
+  @override
+  String get pieceSkinFairytaleDevilsWhite => 'Království';
+
+  @override
+  String get pieceSkinFairytaleDevilsBlack => 'Čerti';
 }

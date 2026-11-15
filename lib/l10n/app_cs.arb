@@ -10,5 +10,11 @@
   "pieceSkinClassicBlack": "Černí",
   "pieceSkinHeavenHell": "Nebe × Peklo",
   "pieceSkinHeavenHellWhite": "Nebe",
-  "pieceSkinHeavenHellBlack": "Peklo"
+  "pieceSkinHeavenHellBlack": "Peklo",
+  "pieceSkinRomeCarthage": "Řím × Kartágo",
+  "pieceSkinRomeCarthageWhite": "Řím",
+  "pieceSkinRomeCarthageBlack": "Kartágo",
+  "pieceSkinFairytaleDevils": "Pohádkové království × Čerti",
+  "pieceSkinFairytaleDevilsWhite": "Království",
+  "pieceSkinFairytaleDevilsBlack": "Čerti"
 }

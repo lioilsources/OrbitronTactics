@@ -1,25 +1,71 @@
 {
   "@@locale": "en",
   "boardTab": "BOARD",
-  "@boardTab": {"description": "Comcenter tab with the board piece skin picker"},
+  "@boardTab": {
+    "description": "Comcenter tab with the board piece skin picker"
+  },
   "pieceSkinTitle": "Board pieces",
-  "@pieceSkinTitle": {"description": "Heading above the piece skin packs"},
+  "@pieceSkinTitle": {
+    "description": "Heading above the piece skin packs"
+  },
   "pieceSkinHint": "Pick the armies drawn on the board in every game mode.",
-  "@pieceSkinHint": {"description": "Explains what the piece skin picker changes"},
+  "@pieceSkinHint": {
+    "description": "Explains what the piece skin picker changes"
+  },
   "classicMarks": "Classic marks",
-  "@classicMarks": {"description": "Toggle that draws a small chess glyph on every image piece"},
+  "@classicMarks": {
+    "description": "Toggle that draws a small chess glyph on every image piece"
+  },
   "classicMarksHint": "Show a small chess symbol on each figure.",
-  "@classicMarksHint": {"description": "Subtitle of the classic marks toggle"},
+  "@classicMarksHint": {
+    "description": "Subtitle of the classic marks toggle"
+  },
   "pieceSkinClassic": "Classic",
-  "@pieceSkinClassic": {"description": "Name of the default symbol pieces"},
+  "@pieceSkinClassic": {
+    "description": "Name of the default symbol pieces"
+  },
   "pieceSkinClassicWhite": "White",
-  "@pieceSkinClassicWhite": {"description": "White side of the classic pieces"},
+  "@pieceSkinClassicWhite": {
+    "description": "White side of the classic pieces"
+  },
   "pieceSkinClassicBlack": "Black",
-  "@pieceSkinClassicBlack": {"description": "Black side of the classic pieces"},
+  "@pieceSkinClassicBlack": {
+    "description": "Black side of the classic pieces"
+  },
   "pieceSkinHeavenHell": "Heaven × Hell",
-  "@pieceSkinHeavenHell": {"description": "Name of the Heaven against Hell piece pack"},
+  "@pieceSkinHeavenHell": {
+    "description": "Name of the Heaven against Hell piece pack"
+  },
   "pieceSkinHeavenHellWhite": "Heaven",
-  "@pieceSkinHeavenHellWhite": {"description": "White side of the Heaven against Hell pack"},
+  "@pieceSkinHeavenHellWhite": {
+    "description": "White side of the Heaven against Hell pack"
+  },
   "pieceSkinHeavenHellBlack": "Hell",
-  "@pieceSkinHeavenHellBlack": {"description": "Black side of the Heaven against Hell pack"}
+  "@pieceSkinHeavenHellBlack": {
+    "description": "Black side of the Heaven against Hell pack"
+  },
+  "pieceSkinRomeCarthage": "Rome × Carthage",
+  "@pieceSkinRomeCarthage": {
+    "description": "Name of the Rome × Carthage piece pack"
+  },
+  "pieceSkinRomeCarthageWhite": "Rome",
+  "@pieceSkinRomeCarthageWhite": {
+    "description": "White side of the Rome × Carthage piece pack"
+  },
+  "pieceSkinRomeCarthageBlack": "Carthage",
+  "@pieceSkinRomeCarthageBlack": {
+    "description": "Black side of the Rome × Carthage piece pack"
+  },
+  "pieceSkinFairytaleDevils": "Fairy-tale Kingdom × Devils",
+  "@pieceSkinFairytaleDevils": {
+    "description": "Name of the Fairy-tale Kingdom × Devils piece pack"
+  },
+  "pieceSkinFairytaleDevilsWhite": "Kingdom",
+  "@pieceSkinFairytaleDevilsWhite": {
+    "description": "White side of the Fairy-tale Kingdom × Devils piece pack"
+  },
+  "pieceSkinFairytaleDevilsBlack": "Devils",
+  "@pieceSkinFairytaleDevilsBlack": {
+    "description": "Black side of the Fairy-tale Kingdom × Devils piece pack"
+  }
 }

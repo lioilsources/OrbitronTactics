@@ -1,0 +1,75 @@
+{
+ "id": "fairytale_devils",
+ "name_cs": "Pohádkové království × Čerti",
+ "style": "KIDS",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#F2E6D0",
+  "dark": "#9DB4C0"
+ },
+ "sides": [
+  {
+   "id": "kingdom",
+   "color": "white",
+   "name_cs": "Království",
+   "pieces": {
+    "king": {
+     "name_cs": "Dobrotivý král se zlatým jablkem",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Princezna se zlatou hvězdou na čele",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Zámecká věž s praporkem",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Kouzelný dědeček",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Bílý kůň se zlatou hřívou",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Honza s uzlíčkem buchet",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "devils",
+   "color": "black",
+   "name_cs": "Čerti",
+   "pieces": {
+    "king": {
+     "name_cs": "Lucifer s knihou hříchů",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Čertova babička",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Pekelný kotel",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Čert-písař s brkem a pytlem",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Kozel",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Čertík s vidlemi",
+     "candidate": 0
+    }
+   }
+  }
+ ]
+}

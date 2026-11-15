@@ -15,6 +15,16 @@ enum PieceSkin {
     'heaven_hell',
     lightSquare: Color(0xFFE8DCC4),
     darkSquare: Color(0xFF7C8FA8),
+  ),
+  romeCarthage(
+    'rome_carthage',
+    lightSquare: Color(0xFFE6D5B8),
+    darkSquare: Color(0xFF8C7A6B),
+  ),
+  fairytaleDevils(
+    'fairytale_devils',
+    lightSquare: Color(0xFFF2E6D0),
+    darkSquare: Color(0xFF9DB4C0),
   );
 
   const PieceSkin(this.slug, {Color? lightSquare, Color? darkSquare})
@@ -53,6 +63,8 @@ enum PieceSkin {
   String displayName(AppLocalizations l10n) => switch (this) {
         classic => l10n.pieceSkinClassic,
         heavenHell => l10n.pieceSkinHeavenHell,
+        fairytaleDevils => l10n.pieceSkinFairytaleDevils,
+        romeCarthage => l10n.pieceSkinRomeCarthage,
       };
 
   /// The name of [color]'s army in this skin.
@@ -62,6 +74,10 @@ enum PieceSkin {
       classic => white ? l10n.pieceSkinClassicWhite : l10n.pieceSkinClassicBlack,
       heavenHell =>
         white ? l10n.pieceSkinHeavenHellWhite : l10n.pieceSkinHeavenHellBlack,
+      fairytaleDevils =>
+        white ? l10n.pieceSkinFairytaleDevilsWhite : l10n.pieceSkinFairytaleDevilsBlack,
+      romeCarthage =>
+        white ? l10n.pieceSkinRomeCarthageWhite : l10n.pieceSkinRomeCarthageBlack,
     };
   }
 }

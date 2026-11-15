@@ -4,3 +4,11 @@ heaven_hell:
   qwen:
     heaven: { king: 1, queen: 1, rook: 0, bishop: 1, knight: 3, pawn: 0 }
     hell: { king: 2, queen: 2, rook: 2, bishop: 1, knight: 3, pawn: 1 }
+rome_carthage:
+  qwen:
+    rome: { king: 3, queen: 2, rook: 0, bishop: 3, knight: 2, pawn: 1 }
+    carthage: { king: 1, queen: 2, rook: 1, bishop: 1, knight: 0, pawn: 2 }
+fairytale_devils:
+  qwen:
+    kingdom: { king: 3, queen: 2, rook: 3, bishop: 1, knight: 1, pawn: 1 }
+    devils: { king: 1, queen: 1, rook: 1, bishop: 2, knight: 1, pawn: 0 }

@@ -33,7 +33,8 @@ void main() {
 
     // Both armies of every pack: six white and six black pieces each.
     expect(find.byType(PieceSkinCard), findsNWidgets(PieceSkin.values.length));
-    expect(find.byType(Image), findsNWidgets(12));
+    final imagePacks = PieceSkin.values.where((skin) => skin.isImagePack).length;
+    expect(find.byType(Image), findsNWidgets(12 * imagePacks));
 
     await tester.tap(find.text('Heaven × Hell'));
     await tester.tap(find.text('Classic marks'));

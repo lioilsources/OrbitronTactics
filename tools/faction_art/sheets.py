@@ -8,6 +8,7 @@
 Writes into out/<pack>/sheets/ (model sheets get the model in the name):
   compare_<side>.png     rows = pieces, columns = candidates of each model
   candidates_<side>.png  rows = pieces, columns = candidates (picked one framed)
+  plinths_<model>.png    board piece above its battle sprite (plinth cut)
   silhouettes.png        test 1: alpha filled with one color, 64 px
   board.png              test 2-4: starting position on 64 px squares, in
                          color, grayscale, deuteranopia and protanopia
@@ -113,6 +114,19 @@ def final_piece(pack, piece, color, size=128):
     return image if source == size else image.resize((size, size), Image.LANCZOS)
 
 
+def plinths(pack, dest):
+    """Board piece above its battle sprite, to check the plinth cut."""
+    cell = 128
+    img = Image.new("RGB", (cell * len(PIECES), cell * 4), GREY)
+    for r, color in enumerate(COLORS):
+        for c, piece in enumerate(PIECES):
+            for k, sub in enumerate(("", "battle")):
+                path = OUT / pack["id"] / MODEL / "final" / sub / "128" / f"{piece}_{color}.png"
+                sprite = Image.open(path).convert("RGBA")
+                img.paste(sprite, (c * cell, (2 * r + k) * cell), sprite)
+    img.save(dest / f"plinths_{MODEL}.png")
+
+
 def silhouettes(pack, dest):
     cell = 64
     img = Image.new("RGB", (cell * len(PIECES), cell * 2), (235, 235, 235))
@@ -206,6 +220,7 @@ def main():
         candidates_sheet(pack, args.model, picks, dest)
     else:
         silhouettes(pack, dest)
+        plinths(pack, dest)
         board_tests(pack, dest)
         metrics = luma_bands(pack)
         (dest / f"metrics_{args.model}.json").write_text(json.dumps(metrics, indent=1))

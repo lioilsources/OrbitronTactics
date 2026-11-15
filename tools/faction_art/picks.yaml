@@ -2,5 +2,5 @@
 # sheets: pack -> model -> side -> piece.
 heaven_hell:
   qwen:
-    heaven: { king: 1, queen: 0, rook: 3, bishop: 1, knight: 1, pawn: 0 }
-    hell: { king: 0, queen: 1, rook: 1, bishop: 1, knight: 0, pawn: 1 }
+    heaven: { king: 1, queen: 1, rook: 0, bishop: 1, knight: 3, pawn: 0 }
+    hell: { king: 2, queen: 2, rook: 2, bishop: 1, knight: 3, pawn: 1 }

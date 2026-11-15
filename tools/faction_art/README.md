@@ -8,8 +8,8 @@ Stranu poznáš podle barvy a motivu, typ figurky podle siluety.
 | `styles.yaml` | stylové presety, siluetové věty, rám, šablona promptu, cílové výšky |
 | `factions.yaml` | packy: strany, DNA, podstavec, lem, seed, SUBJECT věty |
 | `picks.yaml` | vybraný kandidát pro každou figurku |
-| `gen_pieces.py` | skládá prompty a generuje přes ComfyUI (FLUX.1-dev, výřez RMBG-2.0) |
-| `postprocess.py` | ořez, výška podle typu, zarovnání dolů, obrys, export 512/256/128 a `manifest.json` |
+| `gen_pieces.py` | skládá prompty a generuje přes ComfyUI: Qwen-Image, pro srovnání `--model dev` (FLUX.1-dev); výřez RMBG-2.0 |
+| `postprocess.py` | ořez, odstranění postav navíc, výška podle typu, zarovnání dolů, obrys, export 512/256/128 a `manifest.json` |
 | `sheets.py` | archy kandidátů, siluetový test, deska v barvě, šedotónu a pro barvoslepé, `metrics.json` |
 
 Postup jednoho packu:
@@ -23,8 +23,9 @@ python3 gen_pieces.py heaven_hell                   # 2 strany × 6 figurek × 4
 python3 sheets.py heaven_hell --candidates          # archy k výběru, pak picks.yaml
 python3 postprocess.py heaven_hell
 python3 sheets.py heaven_hell                       # akceptační testy
+# FLUX-dev pro srovnání: --model dev u gen_pieces, postprocess i sheets
 ```
 
 Výstupy jdou do `out/<pack>/`, ta složka je v `.gitignore`. Do appky se kopírují jen hotové figurky z `out/<pack>/final/`.
 
-Licence: FLUX.1-dev je nekomerční model. Před vydáním je potřeba ověřit podmínky pro výstupy, nebo finální figurky vygenerovat jiným modelem.
+Model: Qwen-Image (Apache 2.0) podle rozhodnutí Olina. FLUX.1-dev je nekomerční a slouží jen ke srovnání (`python3 sheets.py <pack> --compare`).

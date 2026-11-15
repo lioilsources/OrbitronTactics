@@ -6,6 +6,12 @@
 
 Stav implementace: fáze 0 (PoC Nebe × Peklo) v `tools/faction_art/`. Data z kap. 1.1, 2 a 5 jsou v `styles.yaml` a `factions.yaml`; zatím jsou v nich páry s hotovými SUBJECT větami (1, 9, 26).
 
+Rozhodnutí Olina po PoC (15. 11. 2026):
+1. **Model: Qwen-Image** (Apache 2.0), ne flux-dev. FLUX-dev kreslil v Pekle černé podstavce a má nekomerční licenci. Nastavení: 20 kroků, cfg 2.5, shift 3.1, prázdný negativní prompt. Pravidla psaní z kap. 4 platí dál.
+2. **Úprava pevných bloků:** rám u věže říká „Single building“ místo „Single figure“, protože Qwen jinak přidává k věži postavičku. Siluetová věta střelce drží jen hůl, bez „or bow“.
+3. **Větší figury:** král zabírá celou výšku pole, ostatní figury podle poměrů z kap. 1.1.
+4. **Bez podstavce:** rám podstavec nezmiňuje a programově se nedomalovává. Strany se rozlišují barvou, motivem a obrysem.
+
 ## 0. Zadání v kostce
 
 - **Problém:** černé figurky jsou na desce nerozpoznatelné. Žádná frakce proto nesmí být definovaná tmou.

@@ -24,10 +24,11 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE / "out"
 SIZES = (512, 256, 128)
 COLORS = ("white", "black")
-# Share of the canvas the king takes, and the floor gap under every piece.
-KING_HEIGHT = 0.94
-BOTTOM_GAP = 0.02
-MAX_WIDTH = 0.96
+# Share of the canvas the king takes (Olin: the king fills almost the whole
+# square; the outline keeps it off the edge), and the floor gap.
+KING_HEIGHT = 1.0
+BOTTOM_GAP = 0.0
+MAX_WIDTH = 1.0
 OUTLINE_RGB = {"dark": (34, 26, 38), "light": (246, 240, 228)}
 ALPHA_FLOOR = 10
 

@@ -16,6 +16,7 @@ flutter build ios
 flutter analyze
 flutter test --exclude-tags slow   # what CI runs
 flutter test --tags slow           # AI self-play: Hard vs Medium, ~1 min
+dart run tools/variant_lab.dart [games] [ids]  # Medium vs Medium per board variant
 ```
 
 ## Architecture
@@ -26,7 +27,7 @@ lib/
 ├── core/                    # App-wide utilities, theme, router
 │   ├── ai/                  # Single-player AI: board search, battle pilot, fleet spending (pure Dart)
 │   ├── constants/
-│   ├── game_logic/          # Board rules, piece movement, win condition
+│   ├── game_logic/          # Board rules, piece movement, win condition; board/ = BoardGeometry, BoardSpec
 │   ├── maneuvers/           # Maneuver catalog, gestures, flight paths (pure Dart)
 │   └── theme/
 ├── features/
@@ -87,7 +88,7 @@ Configure in app: set Supabase URL and anon key (check `lib/core/` for config).
 
 ## Game Rules
 
-- 8×8 board, custom piece types and movement
+- 8×8 board (`BoardSpec.classic8`, the default; other variants incl. hex exist only in the core and `variant_lab`, no UI), custom piece types and movement
 - 5 power fields — control majority to win
 - Threat indicators: red badge on pieces in danger
 - Local hot-seat mode: two players, one device

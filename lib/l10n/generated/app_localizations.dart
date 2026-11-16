@@ -235,6 +235,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Witches'**
   String get pieceSkinFairiesWitchesBlack;
+
+  /// Name of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Olympus × Titans'**
+  String get pieceSkinOlympusTitans;
+
+  /// White side of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Olympus'**
+  String get pieceSkinOlympusTitansWhite;
+
+  /// Black side of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Titans'**
+  String get pieceSkinOlympusTitansBlack;
+
+  /// Name of the Bees × Hornets piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Bees × Hornets'**
+  String get pieceSkinBeesHornets;
+
+  /// White side of the Bees × Hornets piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Bees'**
+  String get pieceSkinBeesHornetsWhite;
+
+  /// Black side of the Bees × Hornets piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hornets'**
+  String get pieceSkinBeesHornetsBlack;
+
+  /// Name of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Samurai × Yōkai'**
+  String get pieceSkinSamuraiYokai;
+
+  /// White side of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Samurai'**
+  String get pieceSkinSamuraiYokaiWhite;
+
+  /// Black side of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Yōkai'**
+  String get pieceSkinSamuraiYokaiBlack;
+
+  /// Name of the Dinosaurs × Ice Age piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dinosaurs × Ice Age'**
+  String get pieceSkinDinosIceAge;
+
+  /// White side of the Dinosaurs × Ice Age piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dinosaurs'**
+  String get pieceSkinDinosIceAgeWhite;
+
+  /// Black side of the Dinosaurs × Ice Age piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Ice Age'**
+  String get pieceSkinDinosIceAgeBlack;
+
+  /// Name of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hussites × Crusaders'**
+  String get pieceSkinHussitesCrusaders;
+
+  /// White side of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hussites'**
+  String get pieceSkinHussitesCrusadersWhite;
+
+  /// Black side of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Crusaders'**
+  String get pieceSkinHussitesCrusadersBlack;
+
+  /// Name of the Cats × Dogs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Cats × Dogs'**
+  String get pieceSkinCatsDogs;
+
+  /// White side of the Cats × Dogs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Cats'**
+  String get pieceSkinCatsDogsWhite;
+
+  /// Black side of the Cats × Dogs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dogs'**
+  String get pieceSkinCatsDogsBlack;
+
+  /// Name of the Fruit × Vegetables piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit × Vegetables'**
+  String get pieceSkinFruitVeggies;
+
+  /// White side of the Fruit × Vegetables piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit'**
+  String get pieceSkinFruitVeggiesWhite;
+
+  /// Black side of the Fruit × Vegetables piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Vegetables'**
+  String get pieceSkinFruitVeggiesBlack;
 }
 
 class _AppLocalizationsDelegate

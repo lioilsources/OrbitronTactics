@@ -1,0 +1,75 @@
+{
+ "id": "cats_dogs",
+ "name_cs": "Kočky × Psi",
+ "style": "KIDS",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#EDE3F0",
+  "dark": "#A3BFD0"
+ },
+ "sides": [
+  {
+   "id": "cats",
+   "color": "white",
+   "name_cs": "Kočky",
+   "pieces": {
+    "king": {
+     "name_cs": "Hřivnatý kocour-král",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Siamská královna",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Škrabadlo-věž",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Sphynx-mudrc",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Kočka na robotickém vysavači",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Kotě s klubíčkem",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "dogs",
+   "color": "black",
+   "name_cs": "Psi",
+   "pieces": {
+    "king": {
+     "name_cs": "Bernardýn se soudkem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Afghánská chrtice",
+     "candidate": 3
+    },
+    "rook": {
+     "name_cs": "Psí bouda",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Chrt-posel",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Jack Russell ve skoku",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Štěně s kostí",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

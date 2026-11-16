@@ -1,0 +1,75 @@
+{
+ "id": "dinos_iceage",
+ "name_cs": "Dinosauři × Doba ledová",
+ "style": "KIDS",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E9E1C8",
+  "dark": "#8EA7B5"
+ },
+ "sides": [
+  {
+   "id": "dinos",
+   "color": "white",
+   "name_cs": "Dinosauři",
+   "pieces": {
+    "king": {
+     "name_cs": "Tyrannosaurus",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Pteranodon",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Triceratops",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Brachiosaurus",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Velociraptor ve skoku",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Mládě z vejce",
+     "candidate": 0
+    }
+   }
+  },
+  {
+   "id": "iceage",
+   "color": "black",
+   "name_cs": "Doba ledová",
+   "pieces": {
+    "king": {
+     "name_cs": "Mamut",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Velejelen s obřím parožím",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Srstnatý nosorožec",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Obří lenochod",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Šavlozubý tygr",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Mamutí mládě",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

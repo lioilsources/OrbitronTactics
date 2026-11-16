@@ -143,7 +143,7 @@
         rook: { name_cs: "Perníková chaloupka", subject: "A living gingerbread cottage toy with a sly face, candies and icing and a crooked chimney, alone" }
         bishop: { name_cs: "Vědma s kotlíkem", subject: "A tall thin fortune teller witch with a long pointed hat, holding a long ladle diagonally over a tiny bubbling pot" }
         knight: { name_cs: "Obří černý kocour", subject: "A big purple-black cat with glowing green eyes and an arched back" }
-        pawn: { name_cs: "Ropucha v kloboučku", subject: "A small round toad wearing a tiny pointed witch hat" }
+        pawn: { name_cs: "Ropucha v kloboučku", subject: "A living round toad toy with a tiny pointed witch hat on its head, alone, the toad is the whole figure" }
 
 - id: bees_hornets
   name_cs: "Včely × Sršni"
@@ -205,7 +205,7 @@
       dna: "Shaggy brown fur, ice blue and white; tusks, snow, icicles"
       base: "ice blue"
       rim: "white"
-      outline: dark
+      outline: light
       seed: 2501
       pieces:
         king: { name_cs: "Mamut", subject: "A huge shaggy mammoth with long curved tusks and a crown of icicles, trunk raised upright" }
@@ -240,7 +240,7 @@
       dna: "Tan and sky blue with red collars; bones, tennis balls, floppy ears"
       base: "sky blue"
       rim: "warm white"
-      outline: dark
+      outline: light
       seed: 2601
       pieces:
         king: { name_cs: "Bernardýn se soudkem", subject: "A big saint bernard dog king with a barrel collar and a crown, holding a bone scepter upright" }
@@ -303,7 +303,7 @@
         queen: { name_cs: "Héra s pávím vějířem", subject: "Hera in a flowing gown with a wide peacock-feather fan spread behind her and a golden diadem" }
         rook: { name_cs: "Chrám se sloupy", subject: "A lone small Greek temple with marble columns and a flat roof, an empty building with nobody around it" }
         bishop: { name_cs: "Apollón s lukem", subject: "Apollo, a slender young god with a sun-ray crown, holding a long golden staff diagonally" }
-        knight: { name_cs: "Kentaur Cheirón", subject: "The centaur Chiron rearing in side profile, with a curved horse neck and a laurel wreath" }
+        knight: { name_cs: "Kentaur Cheirón", subject: "The centaur Chiron: the upper body of a bearded old man rising from the body of a white horse, rearing in side profile, a laurel wreath on his head" }
         pawn: { name_cs: "Hoplít se štítem", subject: "A small stout hoplite with a crested helmet and a round bronze shield" }
     - id: titans
       name_cs: "Titáni"
@@ -380,7 +380,7 @@
       dna: "Steel blue and white with gold; plate armor, heraldic surcoats, plumed great helms"
       base: "steel blue"
       rim: "cold white"
-      outline: dark
+      outline: light
       seed: 2911
       pieces:
         king: { name_cs: "Císař Zikmund", subject: "A bearded emperor in plate armor and a golden crown, holding a sword upright" }

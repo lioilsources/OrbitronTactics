@@ -56,18 +56,6 @@
   "@pieceSkinRomeCarthageBlack": {
     "description": "Black side of the Rome × Carthage piece pack"
   },
-  "pieceSkinFairytaleDevils": "Fairy-tale Kingdom × Devils",
-  "@pieceSkinFairytaleDevils": {
-    "description": "Name of the Fairy-tale Kingdom × Devils piece pack"
-  },
-  "pieceSkinFairytaleDevilsWhite": "Kingdom",
-  "@pieceSkinFairytaleDevilsWhite": {
-    "description": "White side of the Fairy-tale Kingdom × Devils piece pack"
-  },
-  "pieceSkinFairytaleDevilsBlack": "Devils",
-  "@pieceSkinFairytaleDevilsBlack": {
-    "description": "Black side of the Fairy-tale Kingdom × Devils piece pack"
-  },
   "pieceSkinKnightsOrcs": "Knights × Orcs",
   "@pieceSkinKnightsOrcs": {
     "description": "Name of the Knights × Orcs piece pack"
@@ -79,18 +67,6 @@
   "pieceSkinKnightsOrcsBlack": "Orcs",
   "@pieceSkinKnightsOrcsBlack": {
     "description": "Black side of the Knights × Orcs piece pack"
-  },
-  "pieceSkinFairiesWitches": "Fairies × Witches",
-  "@pieceSkinFairiesWitches": {
-    "description": "Name of the Fairies × Witches piece pack"
-  },
-  "pieceSkinFairiesWitchesWhite": "Fairies",
-  "@pieceSkinFairiesWitchesWhite": {
-    "description": "White side of the Fairies × Witches piece pack"
-  },
-  "pieceSkinFairiesWitchesBlack": "Witches",
-  "@pieceSkinFairiesWitchesBlack": {
-    "description": "Black side of the Fairies × Witches piece pack"
   },
   "pieceSkinOlympusTitans": "Olympus × Titans",
   "@pieceSkinOlympusTitans": {
@@ -104,18 +80,6 @@
   "@pieceSkinOlympusTitansBlack": {
     "description": "Black side of the Olympus × Titans piece pack"
   },
-  "pieceSkinBeesHornets": "Bees × Hornets",
-  "@pieceSkinBeesHornets": {
-    "description": "Name of the Bees × Hornets piece pack"
-  },
-  "pieceSkinBeesHornetsWhite": "Bees",
-  "@pieceSkinBeesHornetsWhite": {
-    "description": "White side of the Bees × Hornets piece pack"
-  },
-  "pieceSkinBeesHornetsBlack": "Hornets",
-  "@pieceSkinBeesHornetsBlack": {
-    "description": "Black side of the Bees × Hornets piece pack"
-  },
   "pieceSkinSamuraiYokai": "Samurai × Yōkai",
   "@pieceSkinSamuraiYokai": {
     "description": "Name of the Samurai × Yōkai piece pack"
@@ -128,18 +92,6 @@
   "@pieceSkinSamuraiYokaiBlack": {
     "description": "Black side of the Samurai × Yōkai piece pack"
   },
-  "pieceSkinDinosIceAge": "Dinosaurs × Ice Age",
-  "@pieceSkinDinosIceAge": {
-    "description": "Name of the Dinosaurs × Ice Age piece pack"
-  },
-  "pieceSkinDinosIceAgeWhite": "Dinosaurs",
-  "@pieceSkinDinosIceAgeWhite": {
-    "description": "White side of the Dinosaurs × Ice Age piece pack"
-  },
-  "pieceSkinDinosIceAgeBlack": "Ice Age",
-  "@pieceSkinDinosIceAgeBlack": {
-    "description": "Black side of the Dinosaurs × Ice Age piece pack"
-  },
   "pieceSkinHussitesCrusaders": "Hussites × Crusaders",
   "@pieceSkinHussitesCrusaders": {
     "description": "Name of the Hussites × Crusaders piece pack"
@@ -151,30 +103,6 @@
   "pieceSkinHussitesCrusadersBlack": "Crusaders",
   "@pieceSkinHussitesCrusadersBlack": {
     "description": "Black side of the Hussites × Crusaders piece pack"
-  },
-  "pieceSkinCatsDogs": "Cats × Dogs",
-  "@pieceSkinCatsDogs": {
-    "description": "Name of the Cats × Dogs piece pack"
-  },
-  "pieceSkinCatsDogsWhite": "Cats",
-  "@pieceSkinCatsDogsWhite": {
-    "description": "White side of the Cats × Dogs piece pack"
-  },
-  "pieceSkinCatsDogsBlack": "Dogs",
-  "@pieceSkinCatsDogsBlack": {
-    "description": "Black side of the Cats × Dogs piece pack"
-  },
-  "pieceSkinFruitVeggies": "Fruit × Vegetables",
-  "@pieceSkinFruitVeggies": {
-    "description": "Name of the Fruit × Vegetables piece pack"
-  },
-  "pieceSkinFruitVeggiesWhite": "Fruit",
-  "@pieceSkinFruitVeggiesWhite": {
-    "description": "White side of the Fruit × Vegetables piece pack"
-  },
-  "pieceSkinFruitVeggiesBlack": "Vegetables",
-  "@pieceSkinFruitVeggiesBlack": {
-    "description": "Black side of the Fruit × Vegetables piece pack"
   },
   "appTitle": "OrbitronTactics",
   "@appTitle": {

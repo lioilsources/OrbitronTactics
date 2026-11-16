@@ -29,3 +29,5 @@ python3 sheets.py heaven_hell                       # akceptační testy
 Výstupy jdou do `out/<pack>/`, ta složka je v `.gitignore`. Do appky se kopírují jen hotové figurky z `out/<pack>/final/`.
 
 Model: Qwen-Image (Apache 2.0) podle rozhodnutí Olina. FLUX.1-dev je nekomerční a slouží jen ke srovnání (`python3 sheets.py <pack> --compare`).
+
+Dětské packy (styl KIDS) appka Archion nepoužívá, podle rozhodnutí Olina patří do Chess4Princesses (předávka `Prompts/04-HANDOFF-archion-armies.md` v tom repu). `postprocess.py` proto ukládá i `final/plain/{board,battle}/`: 512 px bez zapečeného obrysu, protože Chess4Princesses kreslí obrubu armády samo.

@@ -56,6 +56,8 @@ flutter:
     - assets/pieces/heaven_hell/
     - assets/pieces/fairytale_devils/
     - assets/pieces/rome_carthage/
+    - assets/pieces/knights_orcs/
+    - assets/pieces/fairies_witches/
 
 flutter_launcher_icons:
   android: "ic_launcher"

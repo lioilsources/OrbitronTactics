@@ -44,7 +44,8 @@ def piece_prompt(styles, pack, side, piece):
     kind = styles["kinds"].get(piece, styles["kinds"]["default"])
     frame = styles["frame"].format(kind=kind, rim=side["rim"])
     return styles["piece"].format(
-        style=styles["styles"][pack["style"]],
+        style=styles.get("style_overrides", {}).get(pack["style"], {}).get(
+            piece, styles["styles"][pack["style"]]),
         subject=side["pieces"][piece]["subject"],
         silhouette=styles["silhouettes"][piece],
         dna=side["dna"],

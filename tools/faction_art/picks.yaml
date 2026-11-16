@@ -12,3 +12,11 @@ fairytale_devils:
   qwen:
     kingdom: { king: 3, queen: 2, rook: 3, bishop: 1, knight: 1, pawn: 1 }
     devils: { king: 1, queen: 1, rook: 1, bishop: 2, knight: 1, pawn: 0 }
+knights_orcs:
+  qwen:
+    knights: {king: 2, queen: 2, rook: 2, bishop: 1, knight: 2, pawn: 2}
+    orcs: {king: 2, queen: 3, rook: 2, bishop: 1, knight: 2, pawn: 0}
+fairies_witches:
+  qwen:
+    fairies: {king: 2, queen: 3, rook: 2, bishop: 2, knight: 3, pawn: 2}
+    witches: {king: 2, queen: 0, rook: 0, bishop: 1, knight: 2, pawn: 1}

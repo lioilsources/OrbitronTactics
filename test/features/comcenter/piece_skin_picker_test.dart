@@ -12,7 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   testWidgets('the board tab picks a pack and the classic marks',
       (tester) async {
-    tester.view.physicalSize = const Size(420, 1400);
+    // Tall enough for every pack card, so the lazy list builds them all.
+    tester.view.physicalSize = Size(420, 400.0 + 300 * PieceSkin.values.length);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 

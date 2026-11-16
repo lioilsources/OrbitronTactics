@@ -67,5 +67,29 @@
   "pieceSkinFairytaleDevilsBlack": "Devils",
   "@pieceSkinFairytaleDevilsBlack": {
     "description": "Black side of the Fairy-tale Kingdom × Devils piece pack"
+  },
+  "pieceSkinKnightsOrcs": "Knights × Orcs",
+  "@pieceSkinKnightsOrcs": {
+    "description": "Name of the Knights × Orcs piece pack"
+  },
+  "pieceSkinKnightsOrcsWhite": "Knights",
+  "@pieceSkinKnightsOrcsWhite": {
+    "description": "White side of the Knights × Orcs piece pack"
+  },
+  "pieceSkinKnightsOrcsBlack": "Orcs",
+  "@pieceSkinKnightsOrcsBlack": {
+    "description": "Black side of the Knights × Orcs piece pack"
+  },
+  "pieceSkinFairiesWitches": "Fairies × Witches",
+  "@pieceSkinFairiesWitches": {
+    "description": "Name of the Fairies × Witches piece pack"
+  },
+  "pieceSkinFairiesWitchesWhite": "Fairies",
+  "@pieceSkinFairiesWitchesWhite": {
+    "description": "White side of the Fairies × Witches piece pack"
+  },
+  "pieceSkinFairiesWitchesBlack": "Witches",
+  "@pieceSkinFairiesWitchesBlack": {
+    "description": "Black side of the Fairies × Witches piece pack"
   }
 }

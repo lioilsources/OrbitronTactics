@@ -179,6 +179,11 @@ def main():
                     folder = final / str(size) if variant == "board" else final / "battle" / str(size)
                     folder.mkdir(parents=True, exist_ok=True)
                     with_outline(small, side["outline"]).save(folder / f"{piece}_{color}.png")
+                # Without the baked outline, for apps that draw their own
+                # army rim (Chess4Princesses).
+                plain = final / "plain" / variant
+                plain.mkdir(parents=True, exist_ok=True)
+                big.resize((512, 512), Image.LANCZOS).save(plain / f"{piece}_{color}.png")
     (final / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
     print(f"wrote {final}")
 

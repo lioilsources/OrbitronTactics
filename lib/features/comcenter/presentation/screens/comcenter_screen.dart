@@ -21,15 +21,16 @@ class ComcenterScreen extends ConsumerWidget {
     // The player's saved fleet — the upgrades, ship art and maneuvers
     // single-player battles use.
     final fleet = ref.watch(fleetProgressProvider(playerFleetIdentity));
+    final l10n = context.l10n;
 
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFF0D0D1A),
         appBar: AppBar(
-          title: const Text(
-            'COMCENTER',
-            style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold),
+          title: Text(
+            l10n.comcenterTitle,
+            style: const TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -42,7 +43,7 @@ class ComcenterScreen extends ConsumerWidget {
                       color: Colors.amber, size: 18),
                   const SizedBox(width: 4),
                   Text(
-                    '${fleet.credits} cr',
+                    l10n.creditsAmount(fleet.credits),
                     style: const TextStyle(
                       color: Colors.amber,
                       fontWeight: FontWeight.bold,
@@ -58,9 +59,9 @@ class ComcenterScreen extends ConsumerWidget {
             unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.amber,
             tabs: [
-              const Tab(text: 'UNITS'),
-              const Tab(text: 'MANEUVERS'),
-              Tab(text: context.l10n.boardTab),
+              Tab(text: l10n.unitsTab),
+              Tab(text: l10n.maneuversTab),
+              Tab(text: l10n.boardTab),
             ],
           ),
         ),
@@ -94,7 +95,7 @@ class _UnitsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your fleet: ${skin.displayName}',
+            context.l10n.yourFleet(skin.localizedName(context.l10n)),
             style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -116,7 +117,7 @@ class _UnitsTab extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Upgrade your units to gain advantage in battle',
+            context.l10n.upgradeHint,
             style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
           ),
           const SizedBox(height: 16),
@@ -181,7 +182,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
               itemBuilder: (context, index) {
                 final ship = PieceType.values[index];
                 return ChoiceChip(
-                  label: Text(ship.name.toUpperCase()),
+                  label: Text(context.l10n.pieceTypeName(ship).toUpperCase()),
                   labelStyle: TextStyle(
                     fontSize: 11,
                     color: ship == _ship ? Colors.black : Colors.white70,
@@ -199,7 +200,8 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
           Row(
             children: [
               Text(
-                'ARMED ${learned.active.length}/${ShipManeuvers.slots}',
+                context.l10n.armedCount(
+                    learned.active.length, ShipManeuvers.slots),
                 style: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 11,
@@ -207,7 +209,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
               ),
               const SizedBox(width: 10),
               Text(
-                '${fleet.battleWinsWith(_ship)} battles won',
+                context.l10n.battlesWon(fleet.battleWinsWith(_ship)),
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
               ),
             ],
@@ -331,7 +333,7 @@ class _FleetCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              skin.displayName,
+              skin.localizedName(context.l10n),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(

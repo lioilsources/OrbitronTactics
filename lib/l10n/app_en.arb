@@ -175,5 +175,780 @@
   "pieceSkinFruitVeggiesBlack": "Vegetables",
   "@pieceSkinFruitVeggiesBlack": {
     "description": "Black side of the Fruit × Vegetables piece pack"
+  },
+  "appTitle": "OrbitronTactics",
+  "@appTitle": {
+    "description": "App name in the title bar"
+  },
+  "comcenterTooltip": "Comcenter",
+  "@comcenterTooltip": {
+    "description": "Tooltip of the button that opens the Comcenter"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel button"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Button back to the lobby"
+  },
+  "leave": "Leave",
+  "@leave": {
+    "description": "Button that leaves the game"
+  },
+  "newGame": "New Game",
+  "@newGame": {
+    "description": "Starts a new game"
+  },
+  "creditsAmount": "{credits} cr",
+  "@creditsAmount": {
+    "description": "An amount of credits",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsReward": "+{credits} cr",
+  "@creditsReward": {
+    "description": "Credits earned in one game",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultPlayerName": "Player",
+  "@defaultPlayerName": {
+    "description": "Default name of the local player"
+  },
+  "defaultHostName": "Host",
+  "@defaultHostName": {
+    "description": "Default name of the WiFi host"
+  },
+  "defaultGuestName": "Guest",
+  "@defaultGuestName": {
+    "description": "Default name of the WiFi guest"
+  },
+  "defaultOpponentName": "Opponent",
+  "@defaultOpponentName": {
+    "description": "Placeholder name until the opponent joins"
+  },
+  "lobbyYourName": "Your name",
+  "@lobbyYourName": {
+    "description": "Label of the player name field"
+  },
+  "lobbySinglePlayer": "Single Player",
+  "@lobbySinglePlayer": {
+    "description": "Starts a game against the AI"
+  },
+  "lobbyCreateGame": "Create Game",
+  "@lobbyCreateGame": {
+    "description": "Creates an online game"
+  },
+  "lobbyLocalGame": "Local Game",
+  "@lobbyLocalGame": {
+    "description": "Starts a hot-seat game on one device"
+  },
+  "lobbyHostWifi": "Host WiFi",
+  "@lobbyHostWifi": {
+    "description": "Hosts a game on the local network"
+  },
+  "lobbyJoinWifi": "Join WiFi",
+  "@lobbyJoinWifi": {
+    "description": "Joins a game on the local network"
+  },
+  "lobbyWifiHint": "WiFi mode includes realtime battle arena",
+  "@lobbyWifiHint": {
+    "description": "Hint under the WiFi buttons"
+  },
+  "lobbyOpenGames": "Open Games",
+  "@lobbyOpenGames": {
+    "description": "Heading of the list of games waiting for a player"
+  },
+  "lobbyNoOpenGames": "No open games.\nCreate one to start!",
+  "@lobbyNoOpenGames": {
+    "description": "Shown when no online game waits for a player"
+  },
+  "lobbyJustNow": "just now",
+  "@lobbyJustNow": {
+    "description": "Age of a game created less than a minute ago"
+  },
+  "lobbyMinutesAgo": "{minutes}m ago",
+  "@lobbyMinutesAgo": {
+    "description": "Age of an open game in minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lobbyJoin": "Join",
+  "@lobbyJoin": {
+    "description": "Joins an open online game"
+  },
+  "lobbyCannotConnect": "Cannot connect to server",
+  "@lobbyCannotConnect": {
+    "description": "Shown when the lobby cannot reach the server"
+  },
+  "errorCreatingGame": "Error creating game: {error}",
+  "@errorCreatingGame": {
+    "description": "Snackbar when creating an online game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorJoiningGame": "Error joining game: {error}",
+  "@errorJoiningGame": {
+    "description": "Snackbar when joining an online game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorWifiHost": "WiFi host error: {error}",
+  "@errorWifiHost": {
+    "description": "Snackbar when hosting a WiFi game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorWifiJoin": "WiFi join error: {error}",
+  "@errorWifiJoin": {
+    "description": "Snackbar when joining a WiFi game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "singlePlayerDifficulty": "Difficulty",
+  "@singlePlayerDifficulty": {
+    "description": "Label of the AI difficulty picker"
+  },
+  "singlePlayerAiFleets": "AI fleets",
+  "@singlePlayerAiFleets": {
+    "description": "Label of the AI fleets' progress list"
+  },
+  "singlePlayerYourSide": "Your side",
+  "@singlePlayerYourSide": {
+    "description": "Label of the side picker; the options are the active piece skin's side names"
+  },
+  "singlePlayerYouMoveFirst": "You move first",
+  "@singlePlayerYouMoveFirst": {
+    "description": "Shown when the player picks the side that moves first"
+  },
+  "singlePlayerAiMovesFirst": "The AI moves first",
+  "@singlePlayerAiMovesFirst": {
+    "description": "Shown when the AI gets the side that moves first"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Starts the single-player game"
+  },
+  "difficultyEasy": "Easy",
+  "@difficultyEasy": {
+    "description": "Easy AI difficulty"
+  },
+  "difficultyMedium": "Medium",
+  "@difficultyMedium": {
+    "description": "Medium AI difficulty"
+  },
+  "difficultyHard": "Hard",
+  "@difficultyHard": {
+    "description": "Hard AI difficulty"
+  },
+  "aiPlayerName": "Orbitron AI · {difficulty}",
+  "@aiPlayerName": {
+    "description": "Name of the AI opponent, with its difficulty",
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetRecord": "{wins}W / {losses}L",
+  "@fleetRecord": {
+    "description": "An AI fleet's wins and losses",
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      }
+    }
+  },
+  "wifiHostTitle": "WiFi Host",
+  "@wifiHostTitle": {
+    "description": "Title of the dialog shown while hosting a WiFi game"
+  },
+  "wifiShareAddress": "Share this address with your opponent:",
+  "@wifiShareAddress": {
+    "description": "Above the host's address"
+  },
+  "wifiWaitingForGuest": "Waiting for guest to connect...",
+  "@wifiWaitingForGuest": {
+    "description": "Shown while the WiFi host waits"
+  },
+  "wifiJoinTitle": "Join WiFi Game",
+  "@wifiJoinTitle": {
+    "description": "Title of the WiFi join dialog"
+  },
+  "wifiEnterHostAddress": "Enter the host's IP address:",
+  "@wifiEnterHostAddress": {
+    "description": "Above the host address field"
+  },
+  "connect": "Connect",
+  "@connect": {
+    "description": "Connects to the WiFi host"
+  },
+  "waitingTitle": "Waiting for opponent",
+  "@waitingTitle": {
+    "description": "Title of the screen waiting for an online opponent"
+  },
+  "waitingGameId": "Game ID:",
+  "@waitingGameId": {
+    "description": "Label above the online game's id"
+  },
+  "waitingForPlayer": "Waiting for another player to join...",
+  "@waitingForPlayer": {
+    "description": "Shown while waiting for an online opponent"
+  },
+  "leaveGameTooltip": "Leave Game",
+  "@leaveGameTooltip": {
+    "description": "Tooltip of the leave button"
+  },
+  "leaveGameTitle": "Leave Game?",
+  "@leaveGameTitle": {
+    "description": "Title of the leave confirmation"
+  },
+  "leaveGameBody": "Your opponent will be able to claim victory.",
+  "@leaveGameBody": {
+    "description": "Body of the leave confirmation"
+  },
+  "turnBadge": "TURN",
+  "@turnBadge": {
+    "description": "Badge on the player whose turn it is"
+  },
+  "thinkingBadge": "THINKING…",
+  "@thinkingBadge": {
+    "description": "Badge on the AI while it picks a move"
+  },
+  "powerFieldsLabel": "Power Fields:",
+  "@powerFieldsLabel": {
+    "description": "Label of the power field count"
+  },
+  "powerFieldsNeed": "(need {total})",
+  "@powerFieldsNeed": {
+    "description": "How many power fields win the game",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "opponentDisconnected": "Opponent Disconnected",
+  "@opponentDisconnected": {
+    "description": "Title of the disconnect overlay"
+  },
+  "opponentLeftBody": "Your opponent has left the game.",
+  "@opponentLeftBody": {
+    "description": "Body of the disconnect overlay"
+  },
+  "claimVictory": "Claim Victory",
+  "@claimVictory": {
+    "description": "Claims the win after the opponent left"
+  },
+  "sideWins": "{side} Wins!",
+  "@sideWins": {
+    "description": "Game over title; side is the winning side's name from the piece skin",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "victoryPowerFieldDomination": "Power Field Domination!",
+  "@victoryPowerFieldDomination": {
+    "description": "Victory by holding the power fields"
+  },
+  "victoryRoyalElimination": "Royal Elimination!",
+  "@victoryRoyalElimination": {
+    "description": "Victory by capturing both royals"
+  },
+  "victoryInfiltration": "Pawn Infiltration!",
+  "@victoryInfiltration": {
+    "description": "Victory by a pawn reaching the far row"
+  },
+  "victoryAbandonment": "Opponent Abandoned!",
+  "@victoryAbandonment": {
+    "description": "Victory because the opponent left"
+  },
+  "battleTitle": "BATTLE",
+  "@battleTitle": {
+    "description": "Title bar of the battle arena"
+  },
+  "battleElapsed": "{seconds}s",
+  "@battleElapsed": {
+    "description": "Battle time in seconds, already formatted",
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "soundOn": "Sound on",
+  "@soundOn": {
+    "description": "Tooltip that unmutes battle audio"
+  },
+  "soundOff": "Sound off",
+  "@soundOff": {
+    "description": "Tooltip that mutes battle audio"
+  },
+  "yourShield": "YOUR SHIELD",
+  "@yourShield": {
+    "description": "Shield button of the local player"
+  },
+  "sideShield": "{side} SHIELD",
+  "@sideShield": {
+    "description": "Shield button in hot-seat; side is the side's name in capitals",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "battleVictory": "VICTORY!",
+  "@battleVictory": {
+    "description": "Battle result for the winner"
+  },
+  "battleDefeated": "DEFEATED",
+  "@battleDefeated": {
+    "description": "Battle result for the loser"
+  },
+  "unitSurvives": "{side} unit survives",
+  "@unitSurvives": {
+    "description": "Battle result; side is the winning side's name",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "newManeuvers": "{count, plural, one{NEW MANEUVER} other{NEW MANEUVERS}}",
+  "@newManeuvers": {
+    "description": "Heading above the maneuvers a battle win unlocked",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToContinue": "Tap to continue",
+  "@tapToContinue": {
+    "description": "Hint on the battle result"
+  },
+  "comcenterTitle": "COMCENTER",
+  "@comcenterTitle": {
+    "description": "Title of the Comcenter"
+  },
+  "unitsTab": "UNITS",
+  "@unitsTab": {
+    "description": "Comcenter tab with unit upgrades"
+  },
+  "maneuversTab": "MANEUVERS",
+  "@maneuversTab": {
+    "description": "Comcenter tab with maneuvers"
+  },
+  "yourFleet": "Your fleet: {fleet}",
+  "@yourFleet": {
+    "description": "The player's chosen fleet",
+    "placeholders": {
+      "fleet": {
+        "type": "String"
+      }
+    }
+  },
+  "upgradeHint": "Upgrade your units to gain advantage in battle",
+  "@upgradeHint": {
+    "description": "Hint above the unit upgrades"
+  },
+  "armedCount": "ARMED {armed}/{slots}",
+  "@armedCount": {
+    "description": "How many maneuver slots are armed",
+    "placeholders": {
+      "armed": {
+        "type": "int"
+      },
+      "slots": {
+        "type": "int"
+      }
+    }
+  },
+  "battlesWon": "{count, plural, one{{count} battle won} other{{count} battles won}}",
+  "@battlesWon": {
+    "description": "Battles a ship has won",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statHp": "HP",
+  "@statHp": {
+    "description": "Hit points stat label"
+  },
+  "statDamage": "DMG",
+  "@statDamage": {
+    "description": "Damage stat label"
+  },
+  "upgradeMax": "MAX",
+  "@upgradeMax": {
+    "description": "Upgrade button when no level is left"
+  },
+  "upgradeMaxLevel": "MAX LEVEL",
+  "@upgradeMaxLevel": {
+    "description": "Badge on a fully upgraded unit"
+  },
+  "maneuverLevel": "L{level}",
+  "@maneuverLevel": {
+    "description": "Badge with a maneuver's trained level",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "maneuverStats": "{energy} energy · {seconds} s",
+  "@maneuverStats": {
+    "description": "A maneuver's energy cost and duration (already formatted)",
+    "placeholders": {
+      "energy": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "maneuverMirrors": "mirrors",
+  "@maneuverMirrors": {
+    "description": "The maneuver can be flown mirrored"
+  },
+  "maneuverTrain": "TRAIN {price}",
+  "@maneuverTrain": {
+    "description": "Button that trains a maneuver to the next level",
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "maneuverBuy": "BUY {price}",
+  "@maneuverBuy": {
+    "description": "Button that buys a maneuver",
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "maneuverArmed": "ARMED",
+  "@maneuverArmed": {
+    "description": "Button on an armed maneuver; tap disarms it"
+  },
+  "maneuverArm": "ARM",
+  "@maneuverArm": {
+    "description": "Arms an owned maneuver"
+  },
+  "maneuverPadFull": "PAD FULL",
+  "@maneuverPadFull": {
+    "description": "All maneuver slots are taken"
+  },
+  "maneuverWinBattles": "Win {won}/{needed} battles",
+  "@maneuverWinBattles": {
+    "description": "Battles still needed to unlock a maneuver",
+    "placeholders": {
+      "won": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "maneuverInAcePack": "In the Ace pack",
+  "@maneuverInAcePack": {
+    "description": "The maneuver comes with the Ace pack"
+  },
+  "maneuverFromStart": "From the start",
+  "@maneuverFromStart": {
+    "description": "The maneuver is available from the start"
+  },
+  "maneuverUnlockPack": "UNLOCK PACK",
+  "@maneuverUnlockPack": {
+    "description": "Debug button that grants a pack"
+  },
+  "tierStarter": "START",
+  "@tierStarter": {
+    "description": "Maneuver tier badge"
+  },
+  "tierBasic": "BASIC",
+  "@tierBasic": {
+    "description": "Maneuver tier badge"
+  },
+  "tierAdvanced": "ADVANCED",
+  "@tierAdvanced": {
+    "description": "Maneuver tier badge"
+  },
+  "tierSignature": "SIGNATURE",
+  "@tierSignature": {
+    "description": "Maneuver tier badge: the ship's own maneuver"
+  },
+  "tierPack": "PACK",
+  "@tierPack": {
+    "description": "Maneuver tier badge"
+  },
+  "pieceTypePawn": "Pawn",
+  "@pieceTypePawn": {
+    "description": "Unit type"
+  },
+  "pieceTypeRook": "Rook",
+  "@pieceTypeRook": {
+    "description": "Unit type"
+  },
+  "pieceTypeKnight": "Knight",
+  "@pieceTypeKnight": {
+    "description": "Unit type"
+  },
+  "pieceTypeBishop": "Bishop",
+  "@pieceTypeBishop": {
+    "description": "Unit type"
+  },
+  "pieceTypeQueen": "Queen",
+  "@pieceTypeQueen": {
+    "description": "Unit type"
+  },
+  "pieceTypeKing": "King",
+  "@pieceTypeKing": {
+    "description": "Unit type"
+  },
+  "fleetVanguard": "Orbitron Vanguard",
+  "@fleetVanguard": {
+    "description": "Fleet name"
+  },
+  "fleetSolarCrusade": "Solar Crusade",
+  "@fleetSolarCrusade": {
+    "description": "Fleet name"
+  },
+  "fleetVoidHive": "Void Hive",
+  "@fleetVoidHive": {
+    "description": "Fleet name"
+  },
+  "fleetNeonRunners": "Neon Runners",
+  "@fleetNeonRunners": {
+    "description": "Fleet name"
+  },
+  "fleetIronArmada": "Iron Armada",
+  "@fleetIronArmada": {
+    "description": "Fleet name"
+  },
+  "fleetCrystalChoir": "Crystal Choir",
+  "@fleetCrystalChoir": {
+    "description": "Fleet name"
+  },
+  "fleetRoninBlades": "Ronin Blades",
+  "@fleetRoninBlades": {
+    "description": "Fleet name"
+  },
+  "fleetAtomicAge": "Atomic Age",
+  "@fleetAtomicAge": {
+    "description": "Fleet name"
+  },
+  "fleetAbyssalTide": "Abyssal Tide",
+  "@fleetAbyssalTide": {
+    "description": "Fleet name"
+  },
+  "fleetStarNomads": "Star Nomads",
+  "@fleetStarNomads": {
+    "description": "Fleet name"
+  },
+  "maneuverSidestep": "Sidestep",
+  "@maneuverSidestep": {
+    "description": "Maneuver name"
+  },
+  "maneuverSidestepDesc": "A quick step aside, matching the enemy's altitude.",
+  "@maneuverSidestepDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverCastle": "Castle",
+  "@maneuverCastle": {
+    "description": "Maneuver name"
+  },
+  "maneuverCastleDesc": "A long slide across the arena onto the enemy's altitude.",
+  "@maneuverCastleDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverStrike": "Strike",
+  "@maneuverStrike": {
+    "description": "Maneuver name"
+  },
+  "maneuverStrikeDesc": "Climbs onto the enemy, fires twice and drops back.",
+  "@maneuverStrikeDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverSteamroller": "Steamroller",
+  "@maneuverSteamroller": {
+    "description": "Maneuver name"
+  },
+  "maneuverSteamrollerDesc": "Grinds forward, firing all the way.",
+  "@maneuverSteamrollerDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverRetreat": "Retreat",
+  "@maneuverRetreat": {
+    "description": "Maneuver name"
+  },
+  "maneuverRetreatDesc": "Falls back to its own edge behind a shield.",
+  "@maneuverRetreatDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverRoll": "Barrel Roll",
+  "@maneuverRoll": {
+    "description": "Maneuver name"
+  },
+  "maneuverRollDesc": "Rolls out of the way; shots pass through.",
+  "@maneuverRollDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverFeint": "Feint",
+  "@maneuverFeint": {
+    "description": "Maneuver name"
+  },
+  "maneuverFeintDesc": "Leans one way, cuts back the other and fires.",
+  "@maneuverFeintDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverChargedShot": "Charged Shot",
+  "@maneuverChargedShot": {
+    "description": "Maneuver name"
+  },
+  "maneuverChargedShotDesc": "Holds still, charges, and lands one heavy round.",
+  "@maneuverChargedShotDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverVolley": "Volley",
+  "@maneuverVolley": {
+    "description": "Maneuver name"
+  },
+  "maneuverVolleyDesc": "Four rounds in a row from a standing ship.",
+  "@maneuverVolleyDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverVolleyHeavyDesc": "Two heavy rounds from a standing ship.",
+  "@maneuverVolleyHeavyDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverSlalom": "Slalom",
+  "@maneuverSlalom": {
+    "description": "Maneuver name"
+  },
+  "maneuverSlalomDesc": "Weaves across the enemy's altitude, firing throughout.",
+  "@maneuverSlalomDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverDash": "Dash",
+  "@maneuverDash": {
+    "description": "Maneuver name"
+  },
+  "maneuverDashDesc": "Crosses the arena at the enemy's altitude, firing.",
+  "@maneuverDashDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverShadow": "Shadow",
+  "@maneuverShadow": {
+    "description": "Maneuver name"
+  },
+  "maneuverShadowDesc": "Sticks to the enemy wherever it goes, firing steadily.",
+  "@maneuverShadowDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverOverdrive": "Overdrive",
+  "@maneuverOverdrive": {
+    "description": "Maneuver name"
+  },
+  "maneuverOverdriveDesc": "Keeps the helm, but the guns run hot for three seconds.",
+  "@maneuverOverdriveDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverLoop": "Loop",
+  "@maneuverLoop": {
+    "description": "Maneuver name"
+  },
+  "maneuverLoopDesc": "Over the top and down; shots pass under the ship.",
+  "@maneuverLoopDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverCorkscrew": "Corkscrew",
+  "@maneuverCorkscrew": {
+    "description": "Maneuver name"
+  },
+  "maneuverCorkscrewDesc": "Climbs and dives through a rolling spiral.",
+  "@maneuverCorkscrewDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverDoubleStep": "Double Step",
+  "@maneuverDoubleStep": {
+    "description": "Maneuver name"
+  },
+  "maneuverDoubleStepDesc": "Two hops forward, a burst after each.",
+  "@maneuverDoubleStepDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverLeap": "Leap",
+  "@maneuverLeap": {
+    "description": "Maneuver name"
+  },
+  "maneuverLeapDesc": "Jumps clear and lands a lane over, on the enemy.",
+  "@maneuverLeapDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverSniperShot": "Sniper Shot",
+  "@maneuverSniperShot": {
+    "description": "Maneuver name"
+  },
+  "maneuverSniperShotDesc": "Stands still for a second, then one devastating round.",
+  "@maneuverSniperShotDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverBulwark": "Bulwark",
+  "@maneuverBulwark": {
+    "description": "Maneuver name"
+  },
+  "maneuverBulwarkDesc": "Shield up even on cooldown, three heavy rounds out.",
+  "@maneuverBulwarkDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverRoyalWaltz": "Royal Waltz",
+  "@maneuverRoyalWaltz": {
+    "description": "Maneuver name"
+  },
+  "maneuverRoyalWaltzDesc": "Sweeps the whole arena on the enemy's altitude.",
+  "@maneuverRoyalWaltzDesc": {
+    "description": "What the maneuver does"
+  },
+  "maneuverCrown": "Crown",
+  "@maneuverCrown": {
+    "description": "Maneuver name"
+  },
+  "maneuverCrownDesc": "Holds the line behind a shield, every battery firing.",
+  "@maneuverCrownDesc": {
+    "description": "What the maneuver does"
   }
 }

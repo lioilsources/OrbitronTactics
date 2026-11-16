@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'generated/app_localizations.dart';
 
+export 'game_l10n.dart';
 export 'generated/app_localizations.dart';
 
 extension AppLocalizationsContext on BuildContext {

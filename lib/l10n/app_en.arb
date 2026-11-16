@@ -91,5 +91,89 @@
   "pieceSkinFairiesWitchesBlack": "Witches",
   "@pieceSkinFairiesWitchesBlack": {
     "description": "Black side of the Fairies × Witches piece pack"
+  },
+  "pieceSkinOlympusTitans": "Olympus × Titans",
+  "@pieceSkinOlympusTitans": {
+    "description": "Name of the Olympus × Titans piece pack"
+  },
+  "pieceSkinOlympusTitansWhite": "Olympus",
+  "@pieceSkinOlympusTitansWhite": {
+    "description": "White side of the Olympus × Titans piece pack"
+  },
+  "pieceSkinOlympusTitansBlack": "Titans",
+  "@pieceSkinOlympusTitansBlack": {
+    "description": "Black side of the Olympus × Titans piece pack"
+  },
+  "pieceSkinBeesHornets": "Bees × Hornets",
+  "@pieceSkinBeesHornets": {
+    "description": "Name of the Bees × Hornets piece pack"
+  },
+  "pieceSkinBeesHornetsWhite": "Bees",
+  "@pieceSkinBeesHornetsWhite": {
+    "description": "White side of the Bees × Hornets piece pack"
+  },
+  "pieceSkinBeesHornetsBlack": "Hornets",
+  "@pieceSkinBeesHornetsBlack": {
+    "description": "Black side of the Bees × Hornets piece pack"
+  },
+  "pieceSkinSamuraiYokai": "Samurai × Yōkai",
+  "@pieceSkinSamuraiYokai": {
+    "description": "Name of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinSamuraiYokaiWhite": "Samurai",
+  "@pieceSkinSamuraiYokaiWhite": {
+    "description": "White side of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinSamuraiYokaiBlack": "Yōkai",
+  "@pieceSkinSamuraiYokaiBlack": {
+    "description": "Black side of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinDinosIceAge": "Dinosaurs × Ice Age",
+  "@pieceSkinDinosIceAge": {
+    "description": "Name of the Dinosaurs × Ice Age piece pack"
+  },
+  "pieceSkinDinosIceAgeWhite": "Dinosaurs",
+  "@pieceSkinDinosIceAgeWhite": {
+    "description": "White side of the Dinosaurs × Ice Age piece pack"
+  },
+  "pieceSkinDinosIceAgeBlack": "Ice Age",
+  "@pieceSkinDinosIceAgeBlack": {
+    "description": "Black side of the Dinosaurs × Ice Age piece pack"
+  },
+  "pieceSkinHussitesCrusaders": "Hussites × Crusaders",
+  "@pieceSkinHussitesCrusaders": {
+    "description": "Name of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinHussitesCrusadersWhite": "Hussites",
+  "@pieceSkinHussitesCrusadersWhite": {
+    "description": "White side of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinHussitesCrusadersBlack": "Crusaders",
+  "@pieceSkinHussitesCrusadersBlack": {
+    "description": "Black side of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinCatsDogs": "Cats × Dogs",
+  "@pieceSkinCatsDogs": {
+    "description": "Name of the Cats × Dogs piece pack"
+  },
+  "pieceSkinCatsDogsWhite": "Cats",
+  "@pieceSkinCatsDogsWhite": {
+    "description": "White side of the Cats × Dogs piece pack"
+  },
+  "pieceSkinCatsDogsBlack": "Dogs",
+  "@pieceSkinCatsDogsBlack": {
+    "description": "Black side of the Cats × Dogs piece pack"
+  },
+  "pieceSkinFruitVeggies": "Fruit × Vegetables",
+  "@pieceSkinFruitVeggies": {
+    "description": "Name of the Fruit × Vegetables piece pack"
+  },
+  "pieceSkinFruitVeggiesWhite": "Fruit",
+  "@pieceSkinFruitVeggiesWhite": {
+    "description": "White side of the Fruit × Vegetables piece pack"
+  },
+  "pieceSkinFruitVeggiesBlack": "Vegetables",
+  "@pieceSkinFruitVeggiesBlack": {
+    "description": "Black side of the Fruit × Vegetables piece pack"
   }
 }

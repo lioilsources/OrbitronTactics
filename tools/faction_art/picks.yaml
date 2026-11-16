@@ -10,7 +10,7 @@ rome_carthage:
     carthage: { king: 1, queen: 2, rook: 1, bishop: 1, knight: 0, pawn: 2 }
 fairytale_devils:
   qwen:
-    kingdom: { king: 3, queen: 2, rook: 3, bishop: 1, knight: 1, pawn: 1 }
+    kingdom: { king: 3, queen: 2, rook: 2, bishop: 1, knight: 1, pawn: 1 }
     devils: { king: 1, queen: 1, rook: 1, bishop: 2, knight: 1, pawn: 0 }
 knights_orcs:
   qwen:
@@ -20,3 +20,31 @@ fairies_witches:
   qwen:
     fairies: {king: 2, queen: 3, rook: 2, bishop: 2, knight: 3, pawn: 2}
     witches: {king: 2, queen: 0, rook: 0, bishop: 1, knight: 2, pawn: 1}
+olympus_titans:
+  qwen:
+    olympus: {king: 2, queen: 0, rook: 2, bishop: 0, knight: 1, pawn: 0}
+    titans: {king: 2, queen: 3, rook: 0, bishop: 3, knight: 2, pawn: 2}
+bees_hornets:
+  qwen:
+    bees: {king: 3, queen: 0, rook: 3, bishop: 0, knight: 1, pawn: 1}
+    hornets: {king: 3, queen: 0, rook: 3, bishop: 1, knight: 0, pawn: 3}
+samurai_yokai:
+  qwen:
+    samurai: {king: 2, queen: 1, rook: 0, bishop: 2, knight: 2, pawn: 1}
+    yokai: {king: 2, queen: 2, rook: 2, bishop: 1, knight: 2, pawn: 1}
+dinos_iceage:
+  qwen:
+    dinos: {king: 1, queen: 1, rook: 3, bishop: 3, knight: 0, pawn: 0}
+    iceage: {king: 1, queen: 1, rook: 1, bishop: 1, knight: 1, pawn: 2}
+hussites_crusaders:
+  qwen:
+    hussites: {king: 3, queen: 1, rook: 3, bishop: 3, knight: 3, pawn: 3}
+    crusaders: {king: 1, queen: 0, rook: 2, bishop: 3, knight: 1, pawn: 3}
+cats_dogs:
+  qwen:
+    cats: {king: 1, queen: 2, rook: 1, bishop: 2, knight: 3, pawn: 1}
+    dogs: {king: 2, queen: 3, rook: 1, bishop: 3, knight: 3, pawn: 1}
+fruit_veggies:
+  qwen:
+    fruit: {king: 0, queen: 0, rook: 0, bishop: 2, knight: 2, pawn: 2}
+    veggies: {king: 3, queen: 1, rook: 1, bishop: 3, knight: 1, pawn: 1}

@@ -77,4 +77,67 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get pieceSkinFairiesWitchesBlack => 'Čarodějnice';
+
+  @override
+  String get pieceSkinOlympusTitans => 'Olymp × Titáni';
+
+  @override
+  String get pieceSkinOlympusTitansWhite => 'Olymp';
+
+  @override
+  String get pieceSkinOlympusTitansBlack => 'Titáni';
+
+  @override
+  String get pieceSkinBeesHornets => 'Včely × Sršni';
+
+  @override
+  String get pieceSkinBeesHornetsWhite => 'Včely';
+
+  @override
+  String get pieceSkinBeesHornetsBlack => 'Sršni';
+
+  @override
+  String get pieceSkinSamuraiYokai => 'Samurajové × Yōkai';
+
+  @override
+  String get pieceSkinSamuraiYokaiWhite => 'Samurajové';
+
+  @override
+  String get pieceSkinSamuraiYokaiBlack => 'Yōkai';
+
+  @override
+  String get pieceSkinDinosIceAge => 'Dinosauři × Doba ledová';
+
+  @override
+  String get pieceSkinDinosIceAgeWhite => 'Dinosauři';
+
+  @override
+  String get pieceSkinDinosIceAgeBlack => 'Doba ledová';
+
+  @override
+  String get pieceSkinHussitesCrusaders => 'Husité × Křižáci';
+
+  @override
+  String get pieceSkinHussitesCrusadersWhite => 'Husité';
+
+  @override
+  String get pieceSkinHussitesCrusadersBlack => 'Křižáci';
+
+  @override
+  String get pieceSkinCatsDogs => 'Kočky × Psi';
+
+  @override
+  String get pieceSkinCatsDogsWhite => 'Kočky';
+
+  @override
+  String get pieceSkinCatsDogsBlack => 'Psi';
+
+  @override
+  String get pieceSkinFruitVeggies => 'Ovoce × Zelenina';
+
+  @override
+  String get pieceSkinFruitVeggiesWhite => 'Ovoce';
+
+  @override
+  String get pieceSkinFruitVeggiesBlack => 'Zelenina';
 }

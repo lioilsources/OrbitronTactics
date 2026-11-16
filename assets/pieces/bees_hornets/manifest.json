@@ -1,0 +1,75 @@
+{
+ "id": "bees_hornets",
+ "name_cs": "Včely × Sršni",
+ "style": "KIDS",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#F2E4C4",
+  "dark": "#8FB7B3"
+ },
+ "sides": [
+  {
+   "id": "bees",
+   "color": "white",
+   "name_cs": "Včely",
+   "pieces": {
+    "king": {
+     "name_cs": "Včelí král s korunkou",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Včelí královna",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Úl s plástvemi",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Strážkyně s žihadlem jako kopím",
+     "candidate": 0
+    },
+    "knight": {
+     "name_cs": "Čmelák",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Dělnice s kyblíčkem medu",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "hornets",
+   "color": "black",
+   "name_cs": "Sršni",
+   "pieces": {
+    "king": {
+     "name_cs": "Sršní král",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Vosí královna",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Papírové hnízdo",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Vosa-lučištnice",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Vážka",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Vosí voják",
+     "candidate": 3
+    }
+   }
+  }
+ ]
+}

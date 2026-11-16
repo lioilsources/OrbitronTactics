@@ -1,0 +1,75 @@
+{
+ "id": "fruit_veggies",
+ "name_cs": "Ovoce × Zelenina",
+ "style": "KIDS",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#F4E7CF",
+  "dark": "#A5B88E"
+ },
+ "sides": [
+  {
+   "id": "fruit",
+   "color": "white",
+   "name_cs": "Ovoce",
+   "pieces": {
+    "king": {
+     "name_cs": "Ananas",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Granátové jablko s korunkou",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Meloun",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Banán",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Pták kiwi",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Borůvka",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "veggies",
+   "color": "black",
+   "name_cs": "Zelenina",
+   "pieces": {
+    "king": {
+     "name_cs": "Brokolice",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Kukuřice se zlatými vlasy",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Dýně",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Mrkev",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Chilli paprička",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Hrášek",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

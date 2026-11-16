@@ -77,4 +77,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pieceSkinFairiesWitchesBlack => 'Witches';
+
+  @override
+  String get pieceSkinOlympusTitans => 'Olympus × Titans';
+
+  @override
+  String get pieceSkinOlympusTitansWhite => 'Olympus';
+
+  @override
+  String get pieceSkinOlympusTitansBlack => 'Titans';
+
+  @override
+  String get pieceSkinBeesHornets => 'Bees × Hornets';
+
+  @override
+  String get pieceSkinBeesHornetsWhite => 'Bees';
+
+  @override
+  String get pieceSkinBeesHornetsBlack => 'Hornets';
+
+  @override
+  String get pieceSkinSamuraiYokai => 'Samurai × Yōkai';
+
+  @override
+  String get pieceSkinSamuraiYokaiWhite => 'Samurai';
+
+  @override
+  String get pieceSkinSamuraiYokaiBlack => 'Yōkai';
+
+  @override
+  String get pieceSkinDinosIceAge => 'Dinosaurs × Ice Age';
+
+  @override
+  String get pieceSkinDinosIceAgeWhite => 'Dinosaurs';
+
+  @override
+  String get pieceSkinDinosIceAgeBlack => 'Ice Age';
+
+  @override
+  String get pieceSkinHussitesCrusaders => 'Hussites × Crusaders';
+
+  @override
+  String get pieceSkinHussitesCrusadersWhite => 'Hussites';
+
+  @override
+  String get pieceSkinHussitesCrusadersBlack => 'Crusaders';
+
+  @override
+  String get pieceSkinCatsDogs => 'Cats × Dogs';
+
+  @override
+  String get pieceSkinCatsDogsWhite => 'Cats';
+
+  @override
+  String get pieceSkinCatsDogsBlack => 'Dogs';
+
+  @override
+  String get pieceSkinFruitVeggies => 'Fruit × Vegetables';
+
+  @override
+  String get pieceSkinFruitVeggiesWhite => 'Fruit';
+
+  @override
+  String get pieceSkinFruitVeggiesBlack => 'Vegetables';
 }

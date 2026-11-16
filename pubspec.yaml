@@ -58,6 +58,13 @@ flutter:
     - assets/pieces/rome_carthage/
     - assets/pieces/knights_orcs/
     - assets/pieces/fairies_witches/
+    - assets/pieces/olympus_titans/
+    - assets/pieces/bees_hornets/
+    - assets/pieces/samurai_yokai/
+    - assets/pieces/dinos_iceage/
+    - assets/pieces/hussites_crusaders/
+    - assets/pieces/cats_dogs/
+    - assets/pieces/fruit_veggies/
 
 flutter_launcher_icons:
   android: "ic_launcher"

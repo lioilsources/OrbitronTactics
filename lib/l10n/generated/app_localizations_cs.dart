@@ -52,15 +52,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get pieceSkinRomeCarthageBlack => 'Kartágo';
 
   @override
-  String get pieceSkinFairytaleDevils => 'Pohádkové království × Čerti';
-
-  @override
-  String get pieceSkinFairytaleDevilsWhite => 'Království';
-
-  @override
-  String get pieceSkinFairytaleDevilsBlack => 'Čerti';
-
-  @override
   String get pieceSkinKnightsOrcs => 'Rytíři × Orkové';
 
   @override
@@ -68,15 +59,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get pieceSkinKnightsOrcsBlack => 'Orkové';
-
-  @override
-  String get pieceSkinFairiesWitches => 'Víly × Čarodějnice';
-
-  @override
-  String get pieceSkinFairiesWitchesWhite => 'Víly';
-
-  @override
-  String get pieceSkinFairiesWitchesBlack => 'Čarodějnice';
 
   @override
   String get pieceSkinOlympusTitans => 'Olymp × Titáni';
@@ -88,15 +70,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get pieceSkinOlympusTitansBlack => 'Titáni';
 
   @override
-  String get pieceSkinBeesHornets => 'Včely × Sršni';
-
-  @override
-  String get pieceSkinBeesHornetsWhite => 'Včely';
-
-  @override
-  String get pieceSkinBeesHornetsBlack => 'Sršni';
-
-  @override
   String get pieceSkinSamuraiYokai => 'Samurajové × Yōkai';
 
   @override
@@ -106,15 +79,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get pieceSkinSamuraiYokaiBlack => 'Yōkai';
 
   @override
-  String get pieceSkinDinosIceAge => 'Dinosauři × Doba ledová';
-
-  @override
-  String get pieceSkinDinosIceAgeWhite => 'Dinosauři';
-
-  @override
-  String get pieceSkinDinosIceAgeBlack => 'Doba ledová';
-
-  @override
   String get pieceSkinHussitesCrusaders => 'Husité × Křižáci';
 
   @override
@@ -122,22 +86,4 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get pieceSkinHussitesCrusadersBlack => 'Křižáci';
-
-  @override
-  String get pieceSkinCatsDogs => 'Kočky × Psi';
-
-  @override
-  String get pieceSkinCatsDogsWhite => 'Kočky';
-
-  @override
-  String get pieceSkinCatsDogsBlack => 'Psi';
-
-  @override
-  String get pieceSkinFruitVeggies => 'Ovoce × Zelenina';
-
-  @override
-  String get pieceSkinFruitVeggiesWhite => 'Ovoce';
-
-  @override
-  String get pieceSkinFruitVeggiesBlack => 'Zelenina';
 }

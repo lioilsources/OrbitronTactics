@@ -25,6 +25,16 @@ enum PieceSkin {
     'fairytale_devils',
     lightSquare: Color(0xFFF2E6D0),
     darkSquare: Color(0xFF9DB4C0),
+  ),
+  knightsOrcs(
+    'knights_orcs',
+    lightSquare: Color(0xFFE6DECB),
+    darkSquare: Color(0xFF7E8F9E),
+  ),
+  fairiesWitches(
+    'fairies_witches',
+    lightSquare: Color(0xFFF3E3EA),
+    darkSquare: Color(0xFFA9C7B8),
   );
 
   const PieceSkin(this.slug, {Color? lightSquare, Color? darkSquare})
@@ -65,6 +75,8 @@ enum PieceSkin {
         heavenHell => l10n.pieceSkinHeavenHell,
         fairytaleDevils => l10n.pieceSkinFairytaleDevils,
         romeCarthage => l10n.pieceSkinRomeCarthage,
+        knightsOrcs => l10n.pieceSkinKnightsOrcs,
+        fairiesWitches => l10n.pieceSkinFairiesWitches,
       };
 
   /// The name of [color]'s army in this skin.
@@ -78,6 +90,10 @@ enum PieceSkin {
         white ? l10n.pieceSkinFairytaleDevilsWhite : l10n.pieceSkinFairytaleDevilsBlack,
       romeCarthage =>
         white ? l10n.pieceSkinRomeCarthageWhite : l10n.pieceSkinRomeCarthageBlack,
+      knightsOrcs =>
+        white ? l10n.pieceSkinKnightsOrcsWhite : l10n.pieceSkinKnightsOrcsBlack,
+      fairiesWitches =>
+        white ? l10n.pieceSkinFairiesWitchesWhite : l10n.pieceSkinFairiesWitchesBlack,
     };
   }
 }

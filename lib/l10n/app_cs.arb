@@ -16,5 +16,11 @@
   "pieceSkinRomeCarthageBlack": "Kartágo",
   "pieceSkinFairytaleDevils": "Pohádkové království × Čerti",
   "pieceSkinFairytaleDevilsWhite": "Království",
-  "pieceSkinFairytaleDevilsBlack": "Čerti"
+  "pieceSkinFairytaleDevilsBlack": "Čerti",
+  "pieceSkinKnightsOrcs": "Rytíři × Orkové",
+  "pieceSkinKnightsOrcsWhite": "Rytíři",
+  "pieceSkinKnightsOrcsBlack": "Orkové",
+  "pieceSkinFairiesWitches": "Víly × Čarodějnice",
+  "pieceSkinFairiesWitchesWhite": "Víly",
+  "pieceSkinFairiesWitchesBlack": "Čarodějnice"
 }

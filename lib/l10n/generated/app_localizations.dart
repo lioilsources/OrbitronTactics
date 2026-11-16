@@ -199,6 +199,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Devils'**
   String get pieceSkinFairytaleDevilsBlack;
+
+  /// Name of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Knights × Orcs'**
+  String get pieceSkinKnightsOrcs;
+
+  /// White side of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Knights'**
+  String get pieceSkinKnightsOrcsWhite;
+
+  /// Black side of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Orcs'**
+  String get pieceSkinKnightsOrcsBlack;
+
+  /// Name of the Fairies × Witches piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Fairies × Witches'**
+  String get pieceSkinFairiesWitches;
+
+  /// White side of the Fairies × Witches piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Fairies'**
+  String get pieceSkinFairiesWitchesWhite;
+
+  /// Black side of the Fairies × Witches piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Witches'**
+  String get pieceSkinFairiesWitchesBlack;
 }
 
 class _AppLocalizationsDelegate

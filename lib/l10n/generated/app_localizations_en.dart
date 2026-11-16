@@ -59,4 +59,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pieceSkinFairytaleDevilsBlack => 'Devils';
+
+  @override
+  String get pieceSkinKnightsOrcs => 'Knights × Orcs';
+
+  @override
+  String get pieceSkinKnightsOrcsWhite => 'Knights';
+
+  @override
+  String get pieceSkinKnightsOrcsBlack => 'Orcs';
+
+  @override
+  String get pieceSkinFairiesWitches => 'Fairies × Witches';
+
+  @override
+  String get pieceSkinFairiesWitchesWhite => 'Fairies';
+
+  @override
+  String get pieceSkinFairiesWitchesBlack => 'Witches';
 }

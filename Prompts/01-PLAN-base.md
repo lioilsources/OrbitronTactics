@@ -4,7 +4,7 @@
 
 Strategická desková hra pro dva hráče přes síť, inspirovaná šachy, ale s unikátními mechanikami: power fields (kontrolní body), sniping, infiltrace a pravidlo Last Warrior. Cílem je vytvořit kompletní Flutter mobilní aplikaci (iOS + Android) s real-time multiplayer přes Supabase.
 
-Projekt startuje z prázdného adresáře `/Volumes/YOTTA/Dev/OrbitronTactics`.
+Projekt startuje z prázdného adresáře `$DEV_ROOT/OrbitronTactics`.
 
 ---
 

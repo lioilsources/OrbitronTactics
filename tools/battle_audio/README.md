@@ -11,7 +11,7 @@ Generates the battle's music and sound effects in `assets/audio/`: a theme per a
 ## Requirements
 
 - Python 3 and ffmpeg on the Mac. Homebrew's ffmpeg has no libvorbis, so the final encoding runs in the `ai-audio` container on SPARK.
-- `ssh spark` and the audio service at `http://192.168.88.66:8093` (`AUDIO_API` overrides it).
+- `ssh spark` and the audio service at `http://$SPARK_HOST:8093` (set `AUDIO_API`; the script has a built-in default).
 
 ## Workflow
 

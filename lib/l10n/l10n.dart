@@ -8,6 +8,7 @@ import 'app_localizations.dart';
 import 'content_cs.dart';
 
 export 'app_localizations.dart';
+export 'game_l10n.dart';
 
 /// The language the app speaks for the device's [locales]: the first one it
 /// supports, else English. Flutter's own fallback is the first supported

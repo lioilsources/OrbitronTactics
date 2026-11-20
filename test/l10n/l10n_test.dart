@@ -49,7 +49,7 @@ void main() {
         () {
       const same = {
         'appTitle', 'tierStarter', 'upgradeMax', 'difficultyEasy',
-        'maneuverStats', 'musicStandard', 'itemMusicTitle',
+        'maneuverStats', 'musicStandard', 'itemMusicTitle', 'aiPlayerName',
       };
       for (final key in keys.difference(same)) {
         final english = en[key] as String;

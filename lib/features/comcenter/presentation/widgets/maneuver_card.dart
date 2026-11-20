@@ -45,6 +45,9 @@ class ManeuverCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final trainPrice =
         level < Maneuver.maxLevel ? ManeuverCatalog.upgradePrice(maneuver, level + 1) : null;
+    final l10n = context.l10n;
+    final stats = l10n.maneuverStats(maneuver.costAt(level),
+        (maneuver.durationAt(level) / 1000).toStringAsFixed(1));
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(10),
@@ -77,7 +80,7 @@ class ManeuverCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            context.l10n.maneuverName(maneuver),
+                            l10n.maneuverName(maneuver),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -88,29 +91,24 @@ class ManeuverCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        _Badge(text: _tierName(context), color: accent),
+                        _Badge(text: l10n.maneuverTierName(maneuver.tier), color: accent),
                         if (owned && level > 1) ...[
                           const SizedBox(width: 4),
-                          _Badge(text: 'L$level', color: Colors.amber),
+                          _Badge(text: l10n.maneuverLevel(level), color: Colors.amber),
                         ],
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      context.l10n.maneuverDescription(maneuver),
+                      l10n.maneuverDescription(maneuver),
                       style: TextStyle(
                           color: Colors.grey.shade400, fontSize: 11, height: 1.3),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      context.l10n.maneuverStats(
-                            maneuver.costAt(level),
-                            (maneuver.durationAt(level) / 1000)
-                                .toStringAsFixed(1),
-                          ) +
-                          (maneuver.mirrorable
-                              ? context.l10n.maneuverMirrors
-                              : ''),
+                      maneuver.mirrorable
+                          ? '$stats · ${l10n.maneuverMirrors}'
+                          : stats,
                       style: TextStyle(color: accent, fontSize: 11),
                     ),
                   ],
@@ -126,7 +124,7 @@ class ManeuverCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: credits >= trainPrice ? onTrain : null,
-                  child: Text(context.l10n.trainPrice(trainPrice)),
+                  child: Text(l10n.maneuverTrain(trainPrice)),
                 ),
               ],
             ],
@@ -142,24 +140,15 @@ class ManeuverCard extends StatelessWidget {
           orElse: () =>
               ManeuverPack(id: packId, name: 'pack', description: '')));
 
-  String _tierName(BuildContext context) => switch (maneuver.tier) {
-        ManeuverTier.starter => context.l10n.tierStarter,
-        ManeuverTier.basic => context.l10n.tierBasic,
-        ManeuverTier.advanced => context.l10n.tierAdvanced,
-        ManeuverTier.signature => context.l10n.tierSignature,
-        ManeuverTier.pack => context.l10n.tierPack,
-      };
-
   Widget _wayIn(BuildContext context) {
+    final l10n = context.l10n;
     if (armed) {
-      return OutlinedButton(onPressed: onUnarm, child: Text(context.l10n.maneuverArmed));
+      return OutlinedButton(onPressed: onUnarm, child: Text(l10n.maneuverArmed));
     }
     if (owned) {
       return FilledButton(
         onPressed: hasFreeSlot ? onArm : null,
-        child: Text(hasFreeSlot
-            ? context.l10n.maneuverArm
-            : context.l10n.maneuverPadFull),
+        child: Text(hasFreeSlot ? l10n.maneuverArm : l10n.maneuverPadFull),
       );
     }
     final price = maneuver.price;

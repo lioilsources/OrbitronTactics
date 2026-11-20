@@ -33,6 +33,7 @@ class UpgradeCard extends StatelessWidget {
     final canUpgrade = level < 3 && credits >= cost && onUpgrade != null;
     final base = unitBaseStats[pieceType]!;
     final upgraded = UpgradeEngine.applyUpgrades(base, level);
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -65,7 +66,7 @@ class UpgradeCard extends StatelessWidget {
             const SizedBox(height: 4),
             // Name
             Text(
-              context.l10n.unit(pieceType),
+              l10n.pieceTypeName(pieceType),
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 12,
@@ -86,8 +87,8 @@ class UpgradeCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             // Stats
-            _StatRow(context.l10n.statHp, base.maxHp, upgraded.maxHp),
-            _StatRow(context.l10n.statDamage, base.damage, upgraded.damage),
+            _StatRow(l10n.statHp, base.maxHp, upgraded.maxHp),
+            _StatRow(l10n.statDamage, base.damage, upgraded.damage),
             const SizedBox(height: 8),
             // Upgrade button
             if (level < 3)
@@ -105,9 +106,7 @@ class UpgradeCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    cost < 0
-                        ? context.l10n.upgradeMax
-                        : context.l10n.upgradeCost(cost),
+                    cost < 0 ? l10n.upgradeMax : l10n.creditsAmount(cost),
                     style: const TextStyle(fontSize: 11),
                   ),
                 ),
@@ -121,8 +120,8 @@ class UpgradeCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  context.l10n.maxLevel,
-                  style: TextStyle(
+                  l10n.upgradeMaxLevel,
+                  style: const TextStyle(
                     color: Colors.amber,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,

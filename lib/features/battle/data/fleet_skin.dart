@@ -1,4 +1,5 @@
 import '../../../core/game_logic/models/piece.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Ship art for the battle arena: ten fleets, each drawing every unit type
 /// in a white and a black variant. Sprites are bow-up PNGs in
@@ -31,6 +32,20 @@ enum FleetSkin {
   /// The fleet stored as [slug], or [fallback] for none or an unknown id.
   static FleetSkin fromSlug(String? slug) =>
       values.firstWhere((skin) => skin.slug == slug, orElse: () => fallback);
+
+  /// The fleet's name as shown to the player.
+  String localizedName(AppLocalizations l10n) => switch (this) {
+        vanguard => l10n.fleetVanguard,
+        solarCrusade => l10n.fleetSolarCrusade,
+        voidHive => l10n.fleetVoidHive,
+        neonRunners => l10n.fleetNeonRunners,
+        ironArmada => l10n.fleetIronArmada,
+        crystalChoir => l10n.fleetCrystalChoir,
+        roninBlades => l10n.fleetRoninBlades,
+        atomicAge => l10n.fleetAtomicAge,
+        abyssalTide => l10n.fleetAbyssalTide,
+        starNomads => l10n.fleetStarNomads,
+      };
 
   /// The bow-up sprite of [type]'s ship in [color]'s variant.
   String assetFor(PieceType type, PlayerColor color) =>

@@ -17,6 +17,7 @@ import '../../../onboarding/presentation/how_to_play_screen.dart';
 import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../../../l10n/l10n.dart';
+import '../providers/piece_skin_provider.dart';
 
 // Last single-player setup picked in the lobby, kept for the app session.
 final _singlePlayerDifficultyProvider =
@@ -34,11 +35,13 @@ class LobbyScreen extends ConsumerStatefulWidget {
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   final _nameController = TextEditingController();
   bool _isLoading = false;
+  bool _nameSeeded = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_nameController.text.isEmpty) {
+    if (!_nameSeeded) {
+      _nameSeeded = true;
       _nameController.text = context.l10n.defaultPlayerName;
     }
   }
@@ -223,7 +226,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.wifiHostError('$e'))),
+          SnackBar(content: Text(context.l10n.errorWifiHost('$e'))),
         );
       }
     } finally {
@@ -232,6 +235,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   Future<void> _joinLocalWifi() async {
+    final defaultGuestName = context.l10n.defaultGuestName;
     final ip = await showDialog<String>(
       context: context,
       builder: (_) => const _WifiJoinDialog(),
@@ -241,7 +245,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     setState(() => _isLoading = true);
     try {
       final playerName = _nameController.text.trim().isEmpty
-          ? context.l10n.defaultGuestName
+          ? defaultGuestName
           : _nameController.text.trim();
 
       final session = GameSession.createLocalWifiGuestSession(
@@ -263,7 +267,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.wifiJoinError('$e'))),
+          SnackBar(content: Text(context.l10n.errorWifiJoin('$e'))),
         );
       }
     } finally {
@@ -274,11 +278,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   @override
   Widget build(BuildContext context) {
     final waitingGames = ref.watch(waitingGamesProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: Text(context.l10n.appTitle),
+        title: Text(l10n.appTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -289,7 +294,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.military_tech),
-            tooltip: context.l10n.comcenterTooltip,
+            tooltip: l10n.comcenterTooltip,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ComcenterScreen()),
             ),
@@ -307,7 +312,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: context.l10n.lobbyYourName,
+                  labelText: l10n.lobbyYourName,
                   labelStyle: TextStyle(color: Colors.grey.shade400),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade700),
@@ -325,7 +330,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ElevatedButton.icon(
                 onPressed: _isLoading ? null : _startSinglePlayer,
                 icon: const Icon(Icons.smart_toy),
-                label: Text(context.l10n.lobbySinglePlayer),
+                label: Text(l10n.lobbySinglePlayer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
@@ -341,7 +346,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _isLoading ? null : _createGame,
                       icon: const Icon(Icons.add),
-                      label: Text(context.l10n.lobbyCreateGame),
+                      label: Text(l10n.lobbyCreateGame),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -353,7 +358,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _startLocalGame,
                       icon: const Icon(Icons.people),
-                      label: Text(context.l10n.lobbyLocalGame),
+                      label: Text(l10n.lobbyLocalGame),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white70,
                         side: BorderSide(color: Colors.grey.shade700),
@@ -372,7 +377,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _hostLocalWifi,
                       icon: const Icon(Icons.wifi, size: 16),
-                      label: Text(context.l10n.lobbyHostWifi),
+                      label: Text(l10n.lobbyHostWifi),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.greenAccent,
                         side: const BorderSide(color: Colors.green),
@@ -385,7 +390,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _joinLocalWifi,
                       icon: const Icon(Icons.wifi_find, size: 16),
-                      label: Text(context.l10n.lobbyJoinWifi),
+                      label: Text(l10n.lobbyJoinWifi),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.greenAccent,
                         side: const BorderSide(color: Colors.green),
@@ -397,7 +402,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                context.l10n.lobbyWifiNote,
+                l10n.lobbyWifiHint,
                 style: TextStyle(color: Colors.green.shade700, fontSize: 11),
                 textAlign: TextAlign.center,
               ),
@@ -405,7 +410,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
               // Waiting games list
               Text(
-                context.l10n.lobbyOpenGames,
+                l10n.lobbyOpenGames,
                 style: TextStyle(
                   color: Colors.grey.shade400,
                   fontSize: 14,
@@ -420,7 +425,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     if (games.isEmpty) {
                       return Center(
                         child: Text(
-                          context.l10n.lobbyNoOpenGames,
+                          l10n.lobbyNoOpenGames,
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
@@ -432,8 +437,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                         final game = games[index];
                         final age = DateTime.now().difference(game.createdAt);
                         final ageText = age.inMinutes < 1
-                            ? context.l10n.lobbyJustNow
-                            : context.l10n.lobbyMinutesAgo(age.inMinutes);
+                            ? l10n.lobbyJustNow
+                            : l10n.lobbyMinutesAgo(age.inMinutes);
 
                         return Card(
                           color: const Color(0xFF16213E),
@@ -458,7 +463,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green.shade700,
                               ),
-                              child: Text(context.l10n.join),
+                              child: Text(l10n.lobbyJoin),
                             ),
                           ),
                         );
@@ -476,7 +481,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                             color: Colors.grey.shade600, size: 48),
                         const SizedBox(height: 8),
                         Text(
-                          context.l10n.lobbyCannotConnect,
+                          l10n.lobbyCannotConnect,
                           style: TextStyle(color: Colors.grey.shade500),
                         ),
                         const SizedBox(height: 4),
@@ -514,14 +519,16 @@ class _SinglePlayerDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final difficulty = ref.watch(_singlePlayerDifficultyProvider);
     final color = ref.watch(_singlePlayerColorProvider);
+    final l10n = context.l10n;
+    final skin = ref.watch(pieceSkinProvider).skin;
 
     return AlertDialog(
       backgroundColor: const Color(0xFF1A1A2E),
       title: Row(
         children: [
-          Icon(Icons.smart_toy, color: Colors.deepPurpleAccent),
-          SizedBox(width: 8),
-          Text(context.l10n.lobbySinglePlayer,
+          const Icon(Icons.smart_toy, color: Colors.deepPurpleAccent),
+          const SizedBox(width: 8),
+          Text(l10n.lobbySinglePlayer,
               style: const TextStyle(color: Colors.white)),
         ],
       ),
@@ -529,18 +536,12 @@ class _SinglePlayerDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _DialogLabel(context.l10n.dialogDifficulty),
+          _DialogLabel(l10n.singlePlayerDifficulty),
           SegmentedButton<AiDifficulty>(
             segments: [
-              ButtonSegment(
-                  value: AiDifficulty.easy,
-                  label: Text(context.l10n.difficultyEasy)),
-              ButtonSegment(
-                  value: AiDifficulty.medium,
-                  label: Text(context.l10n.difficultyMedium)),
-              ButtonSegment(
-                  value: AiDifficulty.hard,
-                  label: Text(context.l10n.difficultyHard)),
+              for (final option in AiDifficulty.values)
+                ButtonSegment(
+                    value: option, label: Text(l10n.difficultyName(option))),
             ],
             selected: {difficulty},
             showSelectedIcon: false,
@@ -549,19 +550,16 @@ class _SinglePlayerDialog extends ConsumerWidget {
                 .state = selection.first,
           ),
           const SizedBox(height: 12),
-          _DialogLabel(context.l10n.dialogAiFleets),
+          _DialogLabel(l10n.singlePlayerAiFleets),
           for (final option in AiDifficulty.values)
             _FleetRow(difficulty: option, selected: option == difficulty),
           const SizedBox(height: 16),
-          _DialogLabel(context.l10n.dialogYourColor),
+          _DialogLabel(l10n.singlePlayerYourSide),
           SegmentedButton<PlayerColor>(
             segments: [
-              ButtonSegment(
-                  value: PlayerColor.white,
-                  label: Text(context.l10n.colorWhite)),
-              ButtonSegment(
-                  value: PlayerColor.black,
-                  label: Text(context.l10n.colorBlack)),
+              for (final side in PlayerColor.values)
+                ButtonSegment(
+                    value: side, label: Text(skin.sideName(l10n, side))),
             ],
             selected: {color},
             showSelectedIcon: false,
@@ -572,8 +570,8 @@ class _SinglePlayerDialog extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             color == PlayerColor.white
-                ? context.l10n.youMoveFirst
-                : context.l10n.aiMovesFirst,
+                ? l10n.singlePlayerYouMoveFirst
+                : l10n.singlePlayerAiMovesFirst,
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
             textAlign: TextAlign.center,
           ),
@@ -582,13 +580,13 @@ class _SinglePlayerDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(context.l10n.cancel),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton.icon(
           onPressed: () => Navigator.of(context)
               .pop((difficulty: difficulty, color: color)),
           icon: const Icon(Icons.play_arrow),
-          label: Text(context.l10n.start),
+          label: Text(l10n.start),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -610,6 +608,7 @@ class _FleetRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final fleet =
         ref.watch(fleetProgressProvider(AiProfile.of(difficulty).identity));
+    final l10n = context.l10n;
     final style = TextStyle(
       color: selected ? Colors.white : Colors.grey.shade600,
       fontSize: 12,
@@ -623,11 +622,7 @@ class _FleetRow extends ConsumerWidget {
           SizedBox(
             width: 64,
             child: Text(
-              switch (difficulty) {
-                AiDifficulty.easy => context.l10n.difficultyEasy,
-                AiDifficulty.medium => context.l10n.difficultyMedium,
-                AiDifficulty.hard => context.l10n.difficultyHard,
-              },
+              l10n.difficultyName(difficulty),
               style: style,
             ),
           ),
@@ -639,10 +634,9 @@ class _FleetRow extends ConsumerWidget {
           const SizedBox(width: 2),
           Text('${fleet.totalLevels}', style: style),
           const Spacer(),
-          Text(context.l10n.credits(fleet.credits), style: style),
+          Text(l10n.creditsAmount(fleet.credits), style: style),
           const SizedBox(width: 12),
-          Text(context.l10n.fleetRecord(fleet.wins, fleet.losses),
-              style: style),
+          Text(l10n.fleetRecord(fleet.wins, fleet.losses), style: style),
         ],
       ),
     );
@@ -688,7 +682,7 @@ class _WifiHostDialog extends StatelessWidget {
         children: [
           Text(
             context.l10n.wifiShareAddress,
-            style: TextStyle(color: Colors.white70),
+            style: const TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
           SelectableText(
@@ -704,8 +698,8 @@ class _WifiHostDialog extends StatelessWidget {
           const CircularProgressIndicator(color: Colors.greenAccent),
           const SizedBox(height: 8),
           Text(
-            context.l10n.wifiWaitingGuest,
-            style: TextStyle(color: Colors.white54, fontSize: 12),
+            context.l10n.wifiWaitingForGuest,
+            style: const TextStyle(color: Colors.white54, fontSize: 12),
           ),
         ],
       ),
@@ -745,8 +739,8 @@ class _WifiJoinDialogState extends State<_WifiJoinDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            context.l10n.wifiEnterIp,
-            style: TextStyle(color: Colors.white70),
+            context.l10n.wifiEnterHostAddress,
+            style: const TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -801,19 +795,24 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
   GameSession? _session;
   StreamSubscription<GameEvent>? _joinSub;
 
+  bool _started = false;
+
   @override
-  void initState() {
-    super.initState();
-    _setupSession();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_started) {
+      _started = true;
+      _setupSession(context.l10n.defaultOpponentName);
+    }
   }
 
-  Future<void> _setupSession() async {
+  Future<void> _setupSession(String opponentName) async {
     // Host is always white
     final session = GameSession.createOnlineSession(
       gameId: widget.gameId,
       localColor: PlayerColor.white,
       localPlayerName: widget.playerName,
-      remotePlayerName: context.l10n.defaultOpponentName,
+      remotePlayerName: opponentName,
       client: Supabase.instance.client,
     );
 
@@ -851,7 +850,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: Text(context.l10n.waitingForOpponent),
+        title: Text(context.l10n.waitingTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -862,7 +861,7 @@ class _WaitingScreenState extends ConsumerState<_WaitingScreen> {
             const CircularProgressIndicator(),
             const SizedBox(height: 24),
             Text(
-              context.l10n.gameIdLabel,
+              context.l10n.waitingGameId,
               style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
             ),
             const SizedBox(height: 4),

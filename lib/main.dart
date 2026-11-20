@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/release_constants.dart';
 import 'core/constants/supabase_constants.dart';
 import 'features/game/data/game_repository.dart';
+import 'features/game/presentation/providers/piece_skin_provider.dart';
 import 'features/game/presentation/screens/lobby_screen.dart';
 import 'features/onboarding/data/onboarding_store.dart';
 import 'features/onboarding/presentation/onboarding_provider.dart';
@@ -48,6 +49,7 @@ Future<void> main() async {
           .overrideWithValue(PrefsEntitlementsStore(prefs)),
       onboardingStoreProvider.overrideWithValue(PrefsOnboardingStore(prefs)),
       musicChoiceStoreProvider.overrideWithValue(PrefsMusicChoiceStore(prefs)),
+      pieceSkinStoreProvider.overrideWithValue(PieceSkinStore(prefs)),
     ],
   );
 
@@ -114,7 +116,7 @@ class OrbitronTacticsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OrbitronTactics',
+      onGenerateTitle: (context) => context.l10n.appTitle,
       debugShowCheckedModeBanner: false,
       locale: locale,
       // The device's language when the app speaks it, else English.

@@ -50,3 +50,17 @@ app.*.map.json
 
 # Release keys for --dart-define-from-file (see release.example.json)
 release.json
+out_compare/
+tools/faction_art/out/
+# devconv:start
+!.env.example
+*.p8
+*.p12
+*.jks
+key.properties
+.claude/settings.local.json
+CLAUDE.local.md
+build/
+.flutter-plugins
+lib/**/secrets.dart
+# devconv:end

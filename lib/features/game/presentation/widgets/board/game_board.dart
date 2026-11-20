@@ -10,6 +10,7 @@ import '../../../../../core/game_logic/models/position.dart';
 import '../../../../../core/game_logic/services/threat_analyzer.dart';
 import '../../providers/board_interaction_provider.dart';
 import '../../providers/game_state_provider.dart';
+import '../../providers/piece_skin_provider.dart';
 import 'board_background_painter.dart';
 import 'board_overlay_painter.dart';
 import 'piece_renderer.dart';
@@ -194,6 +195,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
     final interaction = ref.watch(boardInteractionProvider);
+    final look = ref.watch(pieceSkinProvider);
     ref.listen<GameState>(gameStateProvider, _onGameStateChanged);
 
     // Compute threatened positions (only during playing phase)
@@ -236,6 +238,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                       board: gameState.board,
                       glowOpacity: _powerFieldGlow.value,
                       flipBoard: widget.flipBoard,
+                      lightSquare: look.skin.lightSquare,
+                      darkSquare: look.skin.darkSquare,
                     ),
                   ),
                 ),
@@ -267,6 +271,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                             isThreatened: threatenedPositions.contains(
                               Position(row: row, col: col),
                             ),
+                            skin: look.skin,
+                            classicMarks: look.classicMarks,
                           ),
                         ),
 
@@ -286,6 +292,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                             child: PieceRenderer.build(
                               _currentCaptureAnim!.piece,
                               squareSize,
+                              skin: look.skin,
+                              classicMarks: look.classicMarks,
                             ),
                           ),
                         ),
@@ -317,6 +325,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                         child: PieceRenderer.build(
                           _currentMoveAnim!.piece,
                           squareSize,
+                          skin: look.skin,
+                          classicMarks: look.classicMarks,
                         ),
                       );
                     },

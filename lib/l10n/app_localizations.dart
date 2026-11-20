@@ -266,12 +266,6 @@ abstract class AppLocalizations {
   /// **'Join WiFi'**
   String get lobbyJoinWifi;
 
-  /// No description provided for @lobbyWifiNote.
-  ///
-  /// In en, this message translates to:
-  /// **'WiFi mode includes realtime battle arena'**
-  String get lobbyWifiNote;
-
   /// No description provided for @lobbyOpenGames.
   ///
   /// In en, this message translates to:
@@ -320,36 +314,6 @@ abstract class AppLocalizations {
   /// **'That game is no longer open'**
   String get gameNotOpen;
 
-  /// No description provided for @wifiHostError.
-  ///
-  /// In en, this message translates to:
-  /// **'WiFi host error: {error}'**
-  String wifiHostError(String error);
-
-  /// No description provided for @wifiJoinError.
-  ///
-  /// In en, this message translates to:
-  /// **'WiFi join error: {error}'**
-  String wifiJoinError(String error);
-
-  /// No description provided for @dialogDifficulty.
-  ///
-  /// In en, this message translates to:
-  /// **'Difficulty'**
-  String get dialogDifficulty;
-
-  /// No description provided for @dialogAiFleets.
-  ///
-  /// In en, this message translates to:
-  /// **'AI fleets'**
-  String get dialogAiFleets;
-
-  /// No description provided for @dialogYourColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Your color'**
-  String get dialogYourColor;
-
   /// No description provided for @difficultyEasy.
   ///
   /// In en, this message translates to:
@@ -367,30 +331,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hard'**
   String get difficultyHard;
-
-  /// No description provided for @colorWhite.
-  ///
-  /// In en, this message translates to:
-  /// **'White'**
-  String get colorWhite;
-
-  /// No description provided for @colorBlack.
-  ///
-  /// In en, this message translates to:
-  /// **'Black'**
-  String get colorBlack;
-
-  /// No description provided for @youMoveFirst.
-  ///
-  /// In en, this message translates to:
-  /// **'You move first'**
-  String get youMoveFirst;
-
-  /// No description provided for @aiMovesFirst.
-  ///
-  /// In en, this message translates to:
-  /// **'The AI moves first'**
-  String get aiMovesFirst;
 
   /// No description provided for @fleetRecord.
   ///
@@ -410,35 +350,11 @@ abstract class AppLocalizations {
   /// **'Share this address with your opponent:'**
   String get wifiShareAddress;
 
-  /// No description provided for @wifiWaitingGuest.
-  ///
-  /// In en, this message translates to:
-  /// **'Waiting for guest to connect...'**
-  String get wifiWaitingGuest;
-
   /// No description provided for @wifiJoinTitle.
   ///
   /// In en, this message translates to:
   /// **'Join WiFi Game'**
   String get wifiJoinTitle;
-
-  /// No description provided for @wifiEnterIp.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the host\'s IP address:'**
-  String get wifiEnterIp;
-
-  /// No description provided for @waitingForOpponent.
-  ///
-  /// In en, this message translates to:
-  /// **'Waiting for opponent'**
-  String get waitingForOpponent;
-
-  /// No description provided for @gameIdLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Game ID:'**
-  String get gameIdLabel;
 
   /// No description provided for @waitingForPlayer.
   ///
@@ -452,12 +368,6 @@ abstract class AppLocalizations {
   /// **'Leave Game'**
   String get leaveGameTooltip;
 
-  /// No description provided for @newGameTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'New Game'**
-  String get newGameTooltip;
-
   /// No description provided for @leaveGameTitle.
   ///
   /// In en, this message translates to:
@@ -470,28 +380,16 @@ abstract class AppLocalizations {
   /// **'Your opponent will be able to claim victory.'**
   String get leaveGameBody;
 
-  /// No description provided for @turnThinking.
-  ///
-  /// In en, this message translates to:
-  /// **'THINKING…'**
-  String get turnThinking;
-
-  /// No description provided for @turnLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'TURN'**
-  String get turnLabel;
-
   /// No description provided for @powerFieldsLabel.
   ///
   /// In en, this message translates to:
-  /// **'Power Fields: '**
+  /// **'Power Fields:'**
   String get powerFieldsLabel;
 
   /// No description provided for @powerFieldsNeed.
   ///
   /// In en, this message translates to:
-  /// **'  (need {total})'**
+  /// **'(need {total})'**
   String powerFieldsNeed(int total);
 
   /// No description provided for @opponentDisconnected.
@@ -512,18 +410,6 @@ abstract class AppLocalizations {
   /// **'Claim Victory'**
   String get claimVictory;
 
-  /// No description provided for @victoryPowerFields.
-  ///
-  /// In en, this message translates to:
-  /// **'Power Field Domination!'**
-  String get victoryPowerFields;
-
-  /// No description provided for @victoryRoyal.
-  ///
-  /// In en, this message translates to:
-  /// **'Royal Elimination!'**
-  String get victoryRoyal;
-
   /// No description provided for @victoryInfiltration.
   ///
   /// In en, this message translates to:
@@ -536,35 +422,11 @@ abstract class AppLocalizations {
   /// **'Opponent Abandoned!'**
   String get victoryAbandonment;
 
-  /// No description provided for @whiteWins.
-  ///
-  /// In en, this message translates to:
-  /// **'White Wins!'**
-  String get whiteWins;
-
-  /// No description provided for @blackWins.
-  ///
-  /// In en, this message translates to:
-  /// **'Black Wins!'**
-  String get blackWins;
-
   /// No description provided for @yourShield.
   ///
   /// In en, this message translates to:
   /// **'YOUR SHIELD'**
   String get yourShield;
-
-  /// No description provided for @whiteShield.
-  ///
-  /// In en, this message translates to:
-  /// **'WHITE SHIELD'**
-  String get whiteShield;
-
-  /// No description provided for @blackShield.
-  ///
-  /// In en, this message translates to:
-  /// **'BLACK SHIELD'**
-  String get blackShield;
 
   /// No description provided for @battleTitle.
   ///
@@ -619,18 +481,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'COMCENTER'**
   String get comcenterTitle;
-
-  /// No description provided for @tabUnits.
-  ///
-  /// In en, this message translates to:
-  /// **'UNITS'**
-  String get tabUnits;
-
-  /// No description provided for @tabManeuvers.
-  ///
-  /// In en, this message translates to:
-  /// **'MANEUVERS'**
-  String get tabManeuvers;
 
   /// No description provided for @tabStore.
   ///
@@ -701,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @maneuverMirrors.
   ///
   /// In en, this message translates to:
-  /// **' · mirrors'**
+  /// **'mirrors'**
   String get maneuverMirrors;
 
   /// No description provided for @trainPrice.
@@ -1075,6 +925,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The whole game is free. The store only sells new looks and maneuver packs.'**
   String get rulesFleet3;
+
+  /// Comcenter tab with the board piece skin picker
+  ///
+  /// In en, this message translates to:
+  /// **'BOARD'**
+  String get boardTab;
+
+  /// Heading above the piece skin packs
+  ///
+  /// In en, this message translates to:
+  /// **'Board pieces'**
+  String get pieceSkinTitle;
+
+  /// Explains what the piece skin picker changes
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the armies drawn on the board in every game mode.'**
+  String get pieceSkinHint;
+
+  /// Toggle that draws a small chess glyph on every image piece
+  ///
+  /// In en, this message translates to:
+  /// **'Classic marks'**
+  String get classicMarks;
+
+  /// Subtitle of the classic marks toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Show a small chess symbol on each figure.'**
+  String get classicMarksHint;
+
+  /// Name of the default symbol pieces
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get pieceSkinClassic;
+
+  /// White side of the classic pieces
+  ///
+  /// In en, this message translates to:
+  /// **'White'**
+  String get pieceSkinClassicWhite;
+
+  /// Black side of the classic pieces
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get pieceSkinClassicBlack;
+
+  /// Name of the Heaven against Hell piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Heaven × Hell'**
+  String get pieceSkinHeavenHell;
+
+  /// White side of the Heaven against Hell pack
+  ///
+  /// In en, this message translates to:
+  /// **'Heaven'**
+  String get pieceSkinHeavenHellWhite;
+
+  /// Black side of the Heaven against Hell pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hell'**
+  String get pieceSkinHeavenHellBlack;
+
+  /// Name of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Rome × Carthage'**
+  String get pieceSkinRomeCarthage;
+
+  /// White side of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Rome'**
+  String get pieceSkinRomeCarthageWhite;
+
+  /// Black side of the Rome × Carthage piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Carthage'**
+  String get pieceSkinRomeCarthageBlack;
+
+  /// Name of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Knights × Orcs'**
+  String get pieceSkinKnightsOrcs;
+
+  /// White side of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Knights'**
+  String get pieceSkinKnightsOrcsWhite;
+
+  /// Black side of the Knights × Orcs piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Orcs'**
+  String get pieceSkinKnightsOrcsBlack;
+
+  /// Name of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Olympus × Titans'**
+  String get pieceSkinOlympusTitans;
+
+  /// White side of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Olympus'**
+  String get pieceSkinOlympusTitansWhite;
+
+  /// Black side of the Olympus × Titans piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Titans'**
+  String get pieceSkinOlympusTitansBlack;
+
+  /// Name of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Samurai × Yōkai'**
+  String get pieceSkinSamuraiYokai;
+
+  /// White side of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Samurai'**
+  String get pieceSkinSamuraiYokaiWhite;
+
+  /// Black side of the Samurai × Yōkai piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Yōkai'**
+  String get pieceSkinSamuraiYokaiBlack;
+
+  /// Name of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hussites × Crusaders'**
+  String get pieceSkinHussitesCrusaders;
+
+  /// White side of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Hussites'**
+  String get pieceSkinHussitesCrusadersWhite;
+
+  /// Black side of the Hussites × Crusaders piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Crusaders'**
+  String get pieceSkinHussitesCrusadersBlack;
+
+  /// An amount of credits
+  ///
+  /// In en, this message translates to:
+  /// **'{credits} cr'**
+  String creditsAmount(int credits);
+
+  /// Hint under the WiFi buttons
+  ///
+  /// In en, this message translates to:
+  /// **'WiFi mode includes realtime battle arena'**
+  String get lobbyWifiHint;
+
+  /// Joins an open online game
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get lobbyJoin;
+
+  /// Snackbar when hosting a WiFi game fails
+  ///
+  /// In en, this message translates to:
+  /// **'WiFi host error: {error}'**
+  String errorWifiHost(String error);
+
+  /// Snackbar when joining a WiFi game fails
+  ///
+  /// In en, this message translates to:
+  /// **'WiFi join error: {error}'**
+  String errorWifiJoin(String error);
+
+  /// Label of the AI difficulty picker
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get singlePlayerDifficulty;
+
+  /// Label of the AI fleets' progress list
+  ///
+  /// In en, this message translates to:
+  /// **'AI fleets'**
+  String get singlePlayerAiFleets;
+
+  /// Label of the side picker; the options are the active piece skin's side names
+  ///
+  /// In en, this message translates to:
+  /// **'Your side'**
+  String get singlePlayerYourSide;
+
+  /// Shown when the player picks the side that moves first
+  ///
+  /// In en, this message translates to:
+  /// **'You move first'**
+  String get singlePlayerYouMoveFirst;
+
+  /// Shown when the AI gets the side that moves first
+  ///
+  /// In en, this message translates to:
+  /// **'The AI moves first'**
+  String get singlePlayerAiMovesFirst;
+
+  /// Name of the AI opponent, with its difficulty
+  ///
+  /// In en, this message translates to:
+  /// **'Orbitron AI · {difficulty}'**
+  String aiPlayerName(String difficulty);
+
+  /// Shown while the WiFi host waits
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for guest to connect...'**
+  String get wifiWaitingForGuest;
+
+  /// Above the host address field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the host\'s IP address:'**
+  String get wifiEnterHostAddress;
+
+  /// Title of the screen waiting for an online opponent
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent'**
+  String get waitingTitle;
+
+  /// Label above the online game's id
+  ///
+  /// In en, this message translates to:
+  /// **'Game ID:'**
+  String get waitingGameId;
+
+  /// Badge on the player whose turn it is
+  ///
+  /// In en, this message translates to:
+  /// **'TURN'**
+  String get turnBadge;
+
+  /// Badge on the AI while it picks a move
+  ///
+  /// In en, this message translates to:
+  /// **'THINKING…'**
+  String get thinkingBadge;
+
+  /// Game over title; side is the winning side's name from the piece skin
+  ///
+  /// In en, this message translates to:
+  /// **'{side} Wins!'**
+  String sideWins(String side);
+
+  /// Victory by holding the power fields
+  ///
+  /// In en, this message translates to:
+  /// **'Power Field Domination!'**
+  String get victoryPowerFieldDomination;
+
+  /// Victory by capturing both royals
+  ///
+  /// In en, this message translates to:
+  /// **'Royal Elimination!'**
+  String get victoryRoyalElimination;
+
+  /// Battle time in seconds, already formatted
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String battleElapsed(String seconds);
+
+  /// Shield button in hot-seat; side is the side's name in capitals
+  ///
+  /// In en, this message translates to:
+  /// **'{side} SHIELD'**
+  String sideShield(String side);
+
+  /// Battle result; side is the winning side's name
+  ///
+  /// In en, this message translates to:
+  /// **'{side} unit survives'**
+  String unitSurvives(String side);
+
+  /// Comcenter tab with unit upgrades
+  ///
+  /// In en, this message translates to:
+  /// **'UNITS'**
+  String get unitsTab;
+
+  /// Comcenter tab with maneuvers
+  ///
+  /// In en, this message translates to:
+  /// **'MANEUVERS'**
+  String get maneuversTab;
+
+  /// Badge on a fully upgraded unit
+  ///
+  /// In en, this message translates to:
+  /// **'MAX LEVEL'**
+  String get upgradeMaxLevel;
+
+  /// Badge with a maneuver's trained level
+  ///
+  /// In en, this message translates to:
+  /// **'L{level}'**
+  String maneuverLevel(int level);
+
+  /// Button that trains a maneuver to the next level
+  ///
+  /// In en, this message translates to:
+  /// **'TRAIN {price}'**
+  String maneuverTrain(int price);
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'Pawn'**
+  String get pieceTypePawn;
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'Rook'**
+  String get pieceTypeRook;
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'Knight'**
+  String get pieceTypeKnight;
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'Bishop'**
+  String get pieceTypeBishop;
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'Queen'**
+  String get pieceTypeQueen;
+
+  /// Unit type
+  ///
+  /// In en, this message translates to:
+  /// **'King'**
+  String get pieceTypeKing;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Orbitron Vanguard'**
+  String get fleetVanguard;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Solar Crusade'**
+  String get fleetSolarCrusade;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Void Hive'**
+  String get fleetVoidHive;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Neon Runners'**
+  String get fleetNeonRunners;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Iron Armada'**
+  String get fleetIronArmada;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Crystal Choir'**
+  String get fleetCrystalChoir;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Ronin Blades'**
+  String get fleetRoninBlades;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Atomic Age'**
+  String get fleetAtomicAge;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Abyssal Tide'**
+  String get fleetAbyssalTide;
+
+  /// Fleet name
+  ///
+  /// In en, this message translates to:
+  /// **'Star Nomads'**
+  String get fleetStarNomads;
 }
 
 class _AppLocalizationsDelegate

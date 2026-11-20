@@ -45,7 +45,7 @@ class UnitCombatPanel extends StatelessWidget {
       children: [
         // Unit name
         Text(
-          context.l10n.unit(unit.piece.type).toUpperCase(),
+          context.l10n.pieceTypeName(unit.piece.type).toUpperCase(),
           style: TextStyle(
             color: isWhite ? Colors.white : Colors.grey.shade400,
             fontSize: 11,

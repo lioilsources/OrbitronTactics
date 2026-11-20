@@ -12,7 +12,7 @@ A strategic 2-player chess variant with custom piece movement rules, power field
 ## Features
 
 - 8×8 board with custom piece types and movement rules
-- 5 power fields — control majority to win
+- 5 power fields — control all five at the end of your turn to win
 - Real-time multiplayer via Supabase Realtime (Broadcast + Presence)
 - Local hot-seat mode
 - Single Player against an on-device AI, with fleet progress

@@ -1,0 +1,426 @@
+# Faction packs from Prompts/13-PLAN-frakce.md, chapter 2 (schema of
+# chapter 6). The first side plays white, the second black. `dna`, `base`,
+# `rim` and `subject` go into the prompt verbatim.
+
+- id: heaven_hell
+  name_cs: "Nebe × Peklo"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E8DCC4", dark: "#7C8FA8" }
+  sides:
+    - id: heaven
+      name_cs: "Nebe"
+      dna: "Ivory, warm gold and sky blue; polished marble, white feathers, cloud wisps, halos"
+      base: "sky blue"
+      rim: "warm gold"
+      outline: dark
+      seed: 1001
+      pieces:
+        king: { name_cs: "Archanděl s plamenným mečem", subject: "An archangel commander in golden plate armor with huge folded white wings and a radiant halo crown, holding a flaming sword upright" }
+        queen: { name_cs: "Šestikřídlý seraf", subject: "A graceful seraph queen with six white wings spread wide like a fan and a crown of light" }
+        rook: { name_cs: "Nebeská brána na oblaku", subject: "A lone heavenly gate tower built of white marble on a puffy cloud, with closed golden doors and battlements, an empty building with nobody around it" }
+        bishop: { name_cs: "Anděl-zvěstovatel s trubkou", subject: "A slender herald angel in a long pointed hood, holding only a long golden trumpet diagonally to its lips" }
+        knight: { name_cs: "Pegas", subject: "A white pegasus with a curved neck, small folded wings and a golden bridle" }
+        pawn: { name_cs: "Cherubín se štítkem", subject: "A small chubby cherub with tiny wings holding a little round golden shield" }
+    - id: hell
+      name_cs: "Peklo"
+      dna: "Deep crimson and charcoal with glowing orange lava cracks; horns, obsidian, embers"
+      base: "lava orange"
+      rim: "fiery orange"
+      outline: light
+      seed: 2001
+      pieces:
+        king: { name_cs: "Pán pekel s trojzubcem", subject: "A towering devil lord with large curved horns, a crown of fire and a cape of smoke, holding a huge iron trident upright" }
+        queen: { name_cs: "Ďáblice s netopýřími křídly", subject: "A she-devil queen with bat wings spread wide like a fan, a horned tiara and a long crimson gown" }
+        rook: { name_cs: "Sopečná bašta s lávou", subject: "A lone volcanic rock bastion with glowing lava cracks, battlements and a small burning gate, an empty building with nobody around it" }
+        bishop: { name_cs: "Pokušitel v kápi", subject: "A thin hooded tempter with a pointed cowl, holding only a long crooked staff topped with a glowing ember" }
+        knight: { name_cs: "Ohnivý hřebec", subject: "An infernal stallion with a mane and tail of fire and glowing hooves" }
+        pawn: { name_cs: "Čertík s vidlemi", subject: "A small round imp with stubby horns and a cheeky grin holding a tiny pitchfork" }
+
+- id: rome_carthage
+  name_cs: "Řím × Kartágo"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E6D5B8", dark: "#8C7A6B" }
+  sides:
+    - id: rome
+      name_cs: "Řím"
+      dna: "Legion red and gold on polished iron; eagles, laurel, rectangular shields, crested helmets"
+      base: "red"
+      rim: "gold"
+      outline: dark
+      seed: 1101
+      pieces:
+        king: { name_cs: "Vojevůdce s vavřínem", subject: "A Roman general in a muscle cuirass and red cloak wearing a golden laurel wreath, holding an eagle-topped scepter upright" }
+        queen: { name_cs: "Bohyně Roma s kopím", subject: "The goddess Roma as a tall armored woman with a crested helmet, a wide flowing red cloak, a spear and a large round shield" }
+        rook: { name_cs: "Testudo, želva ze štítů", subject: "A testudo formation shown as one solid block of interlocked red rectangular shields, with small sandaled feet below, with nobody else around it" }
+        bishop: { name_cs: "Aquilifer, nosič orla", subject: "A slender standard bearer wearing a wolf pelt, holding a tall golden eagle standard diagonally" }
+        knight: { name_cs: "Jezdec equites", subject: "A Roman cavalryman with a crested helmet and oval shield riding a horse" }
+        pawn: { name_cs: "Legionář se scutem", subject: "A small stout legionary with a big rectangular red shield and a short javelin" }
+    - id: carthage
+      name_cs: "Kartágo"
+      dna: "Tyrian purple, sand and bronze; crescent-and-disc emblems, palm leaves, elephant tusks, round shields"
+      base: "purple"
+      rim: "bronze"
+      outline: light
+      seed: 2101
+      pieces:
+        king: { name_cs: "Hannibal", subject: "A bearded Carthaginian general in a bronze cuirass, purple cloak and crested helmet, holding a curved sword upright" }
+        queen: { name_cs: "Královna Dídó", subject: "Queen Dido of Carthage in a wide layered purple gown with a tall golden diadem and a fan of palm leaves behind her" }
+        rook: { name_cs: "Válečný slon s věžičkou", subject: "A lone heavy war elephant standing square, carrying a wooden battlement tower on its back, with bronze tusk caps" }
+        bishop: { name_cs: "Baleárský prakovník", subject: "A slender slinger with a pointed cap, swinging a long sling diagonally above his head" }
+        knight: { name_cs: "Numidský jezdec", subject: "A light horseman riding bareback, holding javelins and a small round shield" }
+        pawn: { name_cs: "Libyjský kopiník", subject: "A small spearman with a conical helmet and a round shield painted with a crescent and disc" }
+
+- id: fairytale_devils
+  name_cs: "Pohádkové království × Čerti"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#F2E6D0", dark: "#9DB4C0" }
+  sides:
+    - id: kingdom
+      name_cs: "Království"
+      dna: "Sky blue, white and gold with red hearts; fairy-tale costumes, embroidered folk patterns"
+      base: "sky blue"
+      rim: "gold"
+      outline: dark
+      seed: 1201
+      pieces:
+        king: { name_cs: "Dobrotivý král se zlatým jablkem", subject: "A kind old fairy-tale king with a white beard, a big golden crown and a red ermine cloak, holding a golden apple and a scepter upright" }
+        queen: { name_cs: "Princezna se zlatou hvězdou na čele", subject: "A princess with a small golden star on her forehead, a wide bell-shaped blue gown and a radiant star crown" }
+        rook: { name_cs: "Zámecká věž s praporkem", subject: "A living round castle tower toy with a friendly face on its wall, battlements, a small arched door and a little flag, alone" }
+        bishop: { name_cs: "Kouzelný dědeček", subject: "A tall thin wise old grandfather with a long white beard, a pointed hat and a long walking staff" }
+        knight: { name_cs: "Bílý kůň se zlatou hřívou", subject: "A white horse with a flowing golden mane and a red saddle" }
+        pawn: { name_cs: "Honza s uzlíčkem buchet", subject: "A small round village boy with a straw hat, carrying a bundle on a stick over his shoulder" }
+    - id: devils
+      name_cs: "Čerti"
+      dna: "Sooty brown fur with red tongues and orange fire; little horns, hooves, chains, pitchforks"
+      base: "orange"
+      rim: "fire yellow"
+      outline: light
+      seed: 2201
+      pieces:
+        king: { name_cs: "Lucifer s knihou hříchů", subject: "A big furry comical devil king with tall horns, a tiny crown and a huge book under his arm, holding a pitchfork upright" }
+        queen: { name_cs: "Čertova babička", subject: "A devil grandmother with a wide layered skirt, a big headscarf with horns poking through and a wooden spoon" }
+        rook: { name_cs: "Pekelný kotel", subject: "A living big iron cauldron toy with a cheeky face, stubby legs, orange fire beneath and puffs of steam, alone" }
+        bishop: { name_cs: "Čert-písař s brkem a pytlem", subject: "A tall thin devil scribe with one long pointed horn, holding a long quill diagonally and a sack over his shoulder" }
+        knight: { name_cs: "Kozel", subject: "A mischievous billy goat with curved horns and a little bell" }
+        pawn: { name_cs: "Čertík s vidlemi", subject: "A small round furry devil kid with tiny horns and a red tongue sticking out, holding a tiny pitchfork" }
+
+# First batch of plan 13 (ch. 3, "Doporučená první dávka"). The subjects are
+# written from the tables of ch. 2: one sentence, subject first, 10-30 words.
+
+- id: fairies_witches
+  name_cs: "Víly × Čarodějnice"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#F3E3EA", dark: "#A9C7B8" }
+  sides:
+    - id: fairies
+      name_cs: "Víly"
+      dna: "Pink, mint and gold glitter; petals, dragonfly wings, dewdrops"
+      base: "mint"
+      rim: "pink gold"
+      outline: dark
+      seed: 1301
+      pieces:
+        king: { name_cs: "Král skřítků", subject: "A jolly elf king with pointed ears, a crown of golden leaves and a mint cloak, holding a flower scepter upright" }
+        queen: { name_cs: "Královna víl", subject: "A fairy queen with large dragonfly wings spread wide like a fan, a petal gown and a tiny star wand" }
+        rook: { name_cs: "Muchomůrkový domeček", subject: "A living toadstool cottage toy with a big spotted cap roof, a friendly face in its round door and tiny windows, alone" }
+        bishop: { name_cs: "Světluška s lucerničkou", subject: "A slender firefly sprite with a glowing tail and a pointed hat, holding a long stick with a tiny lantern diagonally" }
+        knight: { name_cs: "Jednorožec", subject: "A pastel unicorn with a curly mint mane and a golden spiral horn" }
+        pawn: { name_cs: "Skřítek se žaludovou čepičkou", subject: "A small round pixie wearing an acorn cap, holding a little leaf shield" }
+    - id: witches
+      name_cs: "Čarodějnice"
+      dna: "Purple, pumpkin orange and slime green; pointed hats, patched cloaks, cobwebs"
+      base: "purple"
+      rim: "orange"
+      outline: light
+      seed: 2301
+      pieces:
+        king: { name_cs: "Zlý čaroděj s havranem", subject: "A grumpy old warlock with a crooked crown on his pointed hat and a raven on his shoulder, holding a gnarled staff upright" }
+        queen: { name_cs: "Královna čarodějnic na koštěti", subject: "A witch queen in a wide patched cloak spread like a fan, sitting sideways on a broomstick, with a tall pointed hat" }
+        rook: { name_cs: "Perníková chaloupka", subject: "A living gingerbread cottage toy with a sly face, candies and icing and a crooked chimney, alone" }
+        bishop: { name_cs: "Vědma s kotlíkem", subject: "A tall thin fortune teller witch with a long pointed hat, holding a long ladle diagonally over a tiny bubbling pot" }
+        knight: { name_cs: "Obří černý kocour", subject: "A big purple-black cat with glowing green eyes and an arched back" }
+        pawn: { name_cs: "Ropucha v kloboučku", subject: "A living round toad toy with a tiny pointed witch hat on its head, alone, the toad is the whole figure" }
+
+- id: bees_hornets
+  name_cs: "Včely × Sršni"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#F2E4C4", dark: "#8FB7B3" }
+  sides:
+    - id: bees
+      name_cs: "Včely"
+      dna: "Honey yellow and warm brown; fuzzy and round, honeycomb hexagons, tiny crowns"
+      base: "honey yellow"
+      rim: "warm white"
+      outline: dark
+      seed: 1401
+      pieces:
+        king: { name_cs: "Včelí král s korunkou", subject: "A fuzzy round bee king with a golden crown and a honey dipper scepter held upright" }
+        queen: { name_cs: "Včelí královna", subject: "A bee queen with four wide translucent wings spread like a fan and a honeycomb crown" }
+        rook: { name_cs: "Úl s plástvemi", subject: "A living round beehive toy made of honeycomb with a friendly face and a small door, alone" }
+        bishop: { name_cs: "Strážkyně s žihadlem jako kopím", subject: "A slender guard bee with a pointed helmet, holding a long stinger spear diagonally" }
+        knight: { name_cs: "Čmelák", subject: "A plump fluffy bumblebee rearing up with a curved body, seen in side profile" }
+        pawn: { name_cs: "Dělnice s kyblíčkem medu", subject: "A small round worker bee carrying a tiny bucket of honey" }
+    - id: hornets
+      name_cs: "Sršni"
+      dna: "Red-orange and dark maroon with turquoise wings; sharp and angular, paper-nest texture"
+      base: "turquoise"
+      rim: "red-orange"
+      outline: light
+      seed: 2401
+      pieces:
+        king: { name_cs: "Sršní král", subject: "A sharp angular hornet king with a spiky crown and long jaws, holding a thorn scepter upright" }
+        queen: { name_cs: "Vosí královna", subject: "A slender wasp queen with turquoise wings spread wide like a fan and a pointed crown" }
+        rook: { name_cs: "Papírové hnízdo", subject: "A living grey paper wasp nest toy shaped like a squat lantern with a grumpy face, alone" }
+        bishop: { name_cs: "Vosa-lučištnice", subject: "A thin wasp archer with a pointed cap, holding a long staff tipped with a stinger diagonally" }
+        knight: { name_cs: "Vážka", subject: "A turquoise dragonfly with a long curved body and wings raised, seen in side profile" }
+        pawn: { name_cs: "Vosí voják", subject: "A small round wasp soldier with a tiny pointed helmet and a short pin sword" }
+
+- id: dinos_iceage
+  name_cs: "Dinosauři × Doba ledová"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#E9E1C8", dark: "#8EA7B5" }
+  sides:
+    - id: dinos
+      name_cs: "Dinosauři"
+      dna: "Jungle green and orange with yellow stripes; scales, ferns, volcano glow"
+      base: "orange"
+      rim: "yellow"
+      outline: dark
+      seed: 1501
+      pieces:
+        king: { name_cs: "Tyrannosaurus", subject: "A big friendly tyrannosaurus standing tall with a tiny golden crown and a fern held upright like a scepter" }
+        queen: { name_cs: "Pteranodon", subject: "A pteranodon with wide wings spread like a fan and a long crest" }
+        rook: { name_cs: "Triceratops", subject: "A stocky square triceratops with a wide bony frill and three horns, standing alone" }
+        bishop: { name_cs: "Brachiosaurus", subject: "A tall slender brachiosaurus with a long neck stretched up diagonally" }
+        knight: { name_cs: "Velociraptor ve skoku", subject: "A velociraptor leaping in side profile with a curved neck and raised claws" }
+        pawn: { name_cs: "Mládě z vejce", subject: "A small round baby dinosaur hatching from a spotted egg" }
+    - id: iceage
+      name_cs: "Doba ledová"
+      dna: "Shaggy brown fur, ice blue and white; tusks, snow, icicles"
+      base: "ice blue"
+      rim: "white"
+      outline: light
+      seed: 2501
+      pieces:
+        king: { name_cs: "Mamut", subject: "A huge shaggy mammoth with long curved tusks and a crown of icicles, trunk raised upright" }
+        queen: { name_cs: "Velejelen s obřím parožím", subject: "A giant elk with enormous wide antlers spread like a fan" }
+        rook: { name_cs: "Srstnatý nosorožec", subject: "A stocky square woolly rhinoceros with a big horn, standing alone" }
+        bishop: { name_cs: "Obří lenochod", subject: "A tall slender giant ground sloth standing upright, holding a long icy branch diagonally" }
+        knight: { name_cs: "Šavlozubý tygr", subject: "A sabre-toothed tiger leaping in side profile with a curved back" }
+        pawn: { name_cs: "Mamutí mládě", subject: "A small round baby mammoth with tiny tusks and fluffy fur" }
+
+- id: cats_dogs
+  name_cs: "Kočky × Psi"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#EDE3F0", dark: "#A3BFD0" }
+  sides:
+    - id: cats
+      name_cs: "Kočky"
+      dna: "Lilac and cream with pink noses; yarn balls, bells, whiskers"
+      base: "lilac"
+      rim: "pink"
+      outline: dark
+      seed: 1601
+      pieces:
+        king: { name_cs: "Hřivnatý kocour-král", subject: "A fluffy maned cat king with a golden crown and a red cape, holding a scepter with a bell upright" }
+        queen: { name_cs: "Siamská královna", subject: "An elegant siamese cat queen with a long tail curled like a fan and a jeweled tiara" }
+        rook: { name_cs: "Škrabadlo-věž", subject: "A living cat scratching tower toy with a friendly face, a flat top and rope-wrapped posts, alone" }
+        bishop: { name_cs: "Sphynx-mudrc", subject: "A tall thin hairless sphynx cat sage in a pointed hat, holding a long yarn-wrapped staff diagonally" }
+        knight: { name_cs: "Kočka na robotickém vysavači", subject: "A cat riding a round robot vacuum, rearing up with its paws raised, seen in side profile" }
+        pawn: { name_cs: "Kotě s klubíčkem", subject: "A small round kitten holding a ball of yarn" }
+    - id: dogs
+      name_cs: "Psi"
+      dna: "Tan and sky blue with red collars; bones, tennis balls, floppy ears"
+      base: "sky blue"
+      rim: "warm white"
+      outline: light
+      seed: 2601
+      pieces:
+        king: { name_cs: "Bernardýn se soudkem", subject: "A big saint bernard dog king with a barrel collar and a crown, holding a bone scepter upright" }
+        queen: { name_cs: "Afghánská chrtice", subject: "An afghan hound queen with long silky ears and fur flowing wide like a fan and a tiara" }
+        rook: { name_cs: "Psí bouda", subject: "A living wooden doghouse toy with a happy face, a flat roof and a bone sign, alone" }
+        bishop: { name_cs: "Chrt-posel", subject: "A tall thin greyhound messenger in a pointed cap, holding a long stick diagonally" }
+        knight: { name_cs: "Jack Russell ve skoku", subject: "A jack russell terrier leaping in side profile with a curved body" }
+        pawn: { name_cs: "Štěně s kostí", subject: "A small round puppy holding a bone in its mouth" }
+
+- id: fruit_veggies
+  name_cs: "Ovoce × Zelenina"
+  sensitivity: green
+  style: KIDS
+  board: { light: "#F4E7CF", dark: "#A5B88E" }
+  sides:
+    - id: fruit
+      name_cs: "Ovoce"
+      dna: "Tropical yellow, pink and orange; glossy juicy skin, leaf crowns"
+      base: "yellow"
+      rim: "pink"
+      outline: dark
+      seed: 1701
+      pieces:
+        king: { name_cs: "Ananas", subject: "A pineapple king with a tall leaf crown and a friendly face, holding a banana scepter upright" }
+        queen: { name_cs: "Granátové jablko s korunkou", subject: "A pomegranate queen with a small crown and a skirt of leaves spread like a fan" }
+        rook: { name_cs: "Meloun", subject: "A living squat watermelon toy with a friendly face, cut flat on top like a fortress, alone" }
+        bishop: { name_cs: "Banán", subject: "A tall slender banana sage with a pointed peel hat, holding a long stick diagonally" }
+        knight: { name_cs: "Pták kiwi", subject: "A round kiwi bird with a long curved beak, seen in side profile" }
+        pawn: { name_cs: "Borůvka", subject: "A small round blueberry with a tiny leaf on top and a happy face" }
+    - id: veggies
+      name_cs: "Zelenina"
+      dna: "Leafy green and purple with earthy brown; matte skin, leaf capes, soil crumbs"
+      base: "purple"
+      rim: "lime"
+      outline: light
+      seed: 2701
+      pieces:
+        king: { name_cs: "Brokolice", subject: "A broccoli king with a bushy green crown head and a leaf cape, holding a celery scepter upright" }
+        queen: { name_cs: "Kukuřice se zlatými vlasy", subject: "A corn cob queen with golden silk hair and husk leaves spread like a fan" }
+        rook: { name_cs: "Dýně", subject: "A living big squat pumpkin toy with a cheeky face and a flat top cut like battlements, alone" }
+        bishop: { name_cs: "Mrkev", subject: "A tall slender carrot with leafy green top, holding a long twig diagonally" }
+        knight: { name_cs: "Chilli paprička", subject: "A red chili pepper shaped like a curved horse head, seen in side profile" }
+        pawn: { name_cs: "Hrášek", subject: "A small round green pea with a tiny leaf and a cheeky face" }
+
+- id: olympus_titans
+  name_cs: "Olymp × Titáni"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E7E0CF", dark: "#7F95A3" }
+  sides:
+    - id: olympus
+      name_cs: "Olymp"
+      dna: "White marble, laurel green and gold; Greek columns, olive wreaths, lightning"
+      base: "azure"
+      rim: "white gold"
+      outline: dark
+      seed: 1801
+      pieces:
+        king: { name_cs: "Zeus s bleskem", subject: "Zeus, a bearded god in a white chiton with a golden laurel crown, holding a crackling thunderbolt upright" }
+        queen: { name_cs: "Héra s pávím vějířem", subject: "Hera in a flowing gown with a wide peacock-feather fan spread behind her and a golden diadem" }
+        rook: { name_cs: "Chrám se sloupy", subject: "A lone small Greek temple with marble columns and a flat roof, an empty building with nobody around it" }
+        bishop: { name_cs: "Apollón s lukem", subject: "Apollo, a slender young god with a sun-ray crown, holding a long golden staff diagonally" }
+        knight: { name_cs: "Kentaur Cheirón", subject: "The centaur Chiron: the upper body of a bearded old man rising from the body of a white horse, rearing in side profile, a laurel wreath on his head" }
+        pawn: { name_cs: "Hoplít se štítem", subject: "A small stout hoplite with a crested helmet and a round bronze shield" }
+    - id: titans
+      name_cs: "Titáni"
+      dna: "Weathered bronze and volcanic rock with teal patina; cracked stone skin, broken chains, primal fire"
+      base: "bronze"
+      rim: "molten amber"
+      outline: light
+      seed: 2801
+      pieces:
+        king: { name_cs: "Kronos se srpem", subject: "Kronos, a towering titan king of cracked bronze stone with a crown of fire, holding a great sickle upright" }
+        queen: { name_cs: "Rheia se lvy", subject: "Rhea, a titan queen with a tower crown and a wide cloak, flanked by two lions forming a fan shape" }
+        rook: { name_cs: "Atlas nesoucí nebeskou klenbu", subject: "Atlas, a squat massive titan crouching under a huge stone globe on his shoulders" }
+        bishop: { name_cs: "Prométheus s pochodní", subject: "Prometheus, a tall lean titan with broken chains, holding a long flaming torch diagonally" }
+        knight: { name_cs: "Chiméra", subject: "A chimera with a lion head, goat horns and a serpent tail, rearing in side profile" }
+        pawn: { name_cs: "Malý kyklop s balvanem", subject: "A small round one-eyed cyclops holding a little boulder" }
+
+- id: samurai_yokai
+  name_cs: "Samurajové × Yōkai"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#EADCC8", dark: "#7C86A6" }
+  sides:
+    - id: samurai
+      name_cs: "Samurajové"
+      dna: "Vermilion lacquer, indigo and gold; lamellar armor, silk cords, cherry blossoms, clan crests"
+      base: "indigo"
+      rim: "gold"
+      outline: dark
+      seed: 1901
+      pieces:
+        king: { name_cs: "Daimjó s válečným vějířem", subject: "A daimyo lord in ornate lacquered armor with a crescent helmet crest, holding a war fan upright" }
+        queen: { name_cs: "Onna-bugeiša s naginatou", subject: "A female samurai warrior with long hair and a wide flowing kimono sleeve fan, holding a naginata" }
+        rook: { name_cs: "Hradní věž tenšu", subject: "A lone small Japanese castle keep with curved tiled roofs, an empty building with nobody around it" }
+        bishop: { name_cs: "Lučištník s dlouhým lukem", subject: "A slender samurai archer with a tall pointed helmet, holding a long staff-like yumi diagonally" }
+        knight: { name_cs: "Jízdní samuraj", subject: "A mounted samurai on a rearing horse in side profile" }
+        pawn: { name_cs: "Ašigaru s kopím", subject: "A small round ashigaru foot soldier with a conical hat and a short spear" }
+    - id: yokai
+      name_cs: "Yōkai"
+      dna: "Night violet and oni red with pale blue spirit flames; paper lanterns, masks, mist"
+      base: "violet"
+      rim: "spirit blue"
+      outline: light
+      seed: 2901
+      pieces:
+        king: { name_cs: "Oni s okovaným kyjem", subject: "A big red oni ogre king with horns, a tiger-skin belt and a crown, holding a studded iron club upright" }
+        queen: { name_cs: "Kicune, devítiocasá liška", subject: "A nine-tailed fox spirit with her tails spread wide like a fan and blue spirit flames" }
+        rook: { name_cs: "Nurikabe, živá zeď", subject: "Nurikabe, a squat living stone wall with a sleepy face and stubby legs, standing alone" }
+        bishop: { name_cs: "Tengu s dlouhým nosem", subject: "A tall thin tengu with a long red nose and a pointed cap, holding a long feather staff diagonally" }
+        knight: { name_cs: "Raidžú, hromová šelma", subject: "Raiju, a thunder beast like a wolf of lightning, rearing in side profile" }
+        pawn: { name_cs: "Karakasa, jednooký deštník", subject: "A small one-eyed paper umbrella spirit hopping on one leg" }
+
+- id: hussites_crusaders
+  name_cs: "Husité × Křižáci"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E8DEC9", dark: "#8496A6" }
+  sides:
+    - id: hussites
+      name_cs: "Husité"
+      dna: "Earthy brown, red and wheat; chalice banners, wooden wagons, flails, simple kettle helmets"
+      base: "red"
+      rim: "warm white"
+      outline: dark
+      seed: 1911
+      pieces:
+        king: { name_cs: "Jan Žižka s palcátem", subject: "A one-eyed Hussite commander with an eye patch and a fur hat, holding a mace upright" }
+        queen: { name_cs: "Praporečnice s kalichem na korouhvi", subject: "A Hussite woman banner bearer holding a wide flag with a red chalice spread like a fan" }
+        rook: { name_cs: "Bojový vůz vozové hradby", subject: "A lone sturdy wooden war wagon with high plank sides, with nobody around it" }
+        bishop: { name_cs: "Kazatel s kalichem", subject: "A tall thin preacher in a long robe and pointed hood, holding a long staff with a chalice diagonally" }
+        knight: { name_cs: "Jízdní zeman s kuší", subject: "A Hussite rider with a crossbow on a rearing horse in side profile" }
+        pawn: { name_cs: "Cepník", subject: "A small stout peasant soldier with a kettle helmet and a flail" }
+    - id: crusaders
+      name_cs: "Křižáci"
+      dna: "Steel blue and white with gold; plate armor, heraldic surcoats, plumed great helms"
+      base: "steel blue"
+      rim: "cold white"
+      outline: light
+      seed: 2911
+      pieces:
+        king: { name_cs: "Císař Zikmund", subject: "A bearded emperor in plate armor and a golden crown, holding a sword upright" }
+        queen: { name_cs: "Královna Barbora Celjská", subject: "A queen in a wide blue gown with a long veil spread like a fan and a golden crown" }
+        rook: { name_cs: "Kamenný hrad", subject: "A lone small stone castle keep with battlements, an empty building with nobody around it" }
+        bishop: { name_cs: "Kardinál-legát", subject: "A tall thin cardinal legate in a pointed mitre, holding a long crosier diagonally" }
+        knight: { name_cs: "Těžký rytíř na koni", subject: "A heavy knight in plumed great helm on a barded horse rearing in side profile" }
+        pawn: { name_cs: "Žoldnéř s halapartnou", subject: "A small stout mercenary with a kettle helmet and a short halberd" }
+
+- id: knights_orcs
+  name_cs: "Rytíři × Orkové"
+  sensitivity: green
+  style: EPIC
+  board: { light: "#E6DECB", dark: "#7E8F9E" }
+  sides:
+    - id: knights
+      name_cs: "Rytíři"
+      dna: "Royal blue, silver and gold; plate armor, lion heraldry, banners"
+      base: "royal blue"
+      rim: "silver"
+      outline: dark
+      seed: 1921
+      pieces:
+        king: { name_cs: "Král v plné zbroji", subject: "A king in full plate armor with a lion crest and a golden crown, holding a great sword upright" }
+        queen: { name_cs: "Královna-válečnice", subject: "A warrior queen in silver armor with a wide royal blue cape spread like a fan" }
+        rook: { name_cs: "Hradní bašta", subject: "A lone squat castle bastion with battlements and a banner, an empty building with nobody around it" }
+        bishop: { name_cs: "Klerik s palcátem", subject: "A tall thin cleric in a pointed mitre helmet, holding a long staff mace diagonally" }
+        knight: { name_cs: "Rytíř na obrněném koni", subject: "A knight on an armored warhorse rearing in side profile" }
+        pawn: { name_cs: "Zbrojnoš s kopím", subject: "A small stout man-at-arms with a round helmet and a short spear" }
+    - id: orcs
+      name_cs: "Orkové"
+      dna: "Olive green skin, rust orange and bone; spiked scrap armor, tusks, war paint"
+      base: "rust orange"
+      rim: "sickly yellow"
+      outline: light
+      seed: 2921
+      pieces:
+        king: { name_cs: "Náčelník s kostěnou korunou", subject: "A huge orc chieftain with tusks and a crown of bones, holding a spiked axe upright" }
+        queen: { name_cs: "Šamanka, matka kmene", subject: "An orc matriarch shaman with a wide feathered headdress spread like a fan and bone jewelry" }
+        rook: { name_cs: "Jeskynní troll s balvanem", subject: "A squat massive cave troll hunched behind a big boulder, wide as it is tall" }
+        bishop: { name_cs: "Šaman s lebkovou holí", subject: "A tall thin orc shaman with a pointed hood, holding a long skull staff diagonally" }
+        knight: { name_cs: "Kančí jezdec", subject: "An orc rider on a big tusked boar charging in side profile" }
+        pawn: { name_cs: "Goblin se šavlí", subject: "A small round goblin with big ears and a rusty little sabre" }

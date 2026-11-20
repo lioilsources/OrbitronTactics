@@ -56,6 +56,13 @@ flutter:
     - assets/audio/music/
     - assets/audio/music_retro/
     - assets/audio/sfx/
+    # Board piece skin packs, one folder per pack (see PieceSkin)
+    - assets/pieces/heaven_hell/
+    - assets/pieces/rome_carthage/
+    - assets/pieces/knights_orcs/
+    - assets/pieces/olympus_titans/
+    - assets/pieces/samurai_yokai/
+    - assets/pieces/hussites_crusaders/
 
 flutter_launcher_icons:
   android: "ic_launcher"

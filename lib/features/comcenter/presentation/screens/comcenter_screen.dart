@@ -12,9 +12,10 @@ import '../../../store/data/store_catalog.dart';
 import '../../../store/presentation/providers/store_providers.dart';
 import '../../../store/presentation/widgets/store_item_sheet.dart';
 import '../../../store/presentation/widgets/store_tab.dart';
-import '../widgets/maneuver_card.dart';
-import '../widgets/upgrade_card.dart';
 import '../../../../l10n/l10n.dart';
+import '../widgets/maneuver_card.dart';
+import '../widgets/piece_skin_picker.dart';
+import '../widgets/upgrade_card.dart';
 
 class ComcenterScreen extends ConsumerWidget {
   const ComcenterScreen({super.key});
@@ -24,15 +25,16 @@ class ComcenterScreen extends ConsumerWidget {
     // The player's saved fleet — the upgrades, ship art and maneuvers
     // single-player battles use.
     final fleet = ref.watch(fleetProgressProvider(playerFleetIdentity));
+    final l10n = context.l10n;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: const Color(0xFF0D0D1A),
         appBar: AppBar(
           title: Text(
-            context.l10n.comcenterTitle,
-            style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold),
+            l10n.comcenterTitle,
+            style: const TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -45,7 +47,7 @@ class ComcenterScreen extends ConsumerWidget {
                       color: Colors.amber, size: 18),
                   const SizedBox(width: 4),
                   Text(
-                    context.l10n.credits(fleet.credits),
+                    l10n.creditsAmount(fleet.credits),
                     style: const TextStyle(
                       color: Colors.amber,
                       fontWeight: FontWeight.bold,
@@ -61,9 +63,10 @@ class ComcenterScreen extends ConsumerWidget {
             unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.amber,
             tabs: [
-              Tab(text: context.l10n.tabUnits),
-              Tab(text: context.l10n.tabManeuvers),
-              Tab(text: context.l10n.tabStore),
+              Tab(text: l10n.unitsTab),
+              Tab(text: l10n.maneuversTab),
+              Tab(text: l10n.boardTab),
+              Tab(text: l10n.tabStore),
             ],
           ),
         ),
@@ -71,6 +74,7 @@ class ComcenterScreen extends ConsumerWidget {
           children: [
             _UnitsTab(fleet: fleet),
             _ManeuversTab(fleet: fleet),
+            const PieceSkinPicker(),
             const StoreTab(),
           ],
         ),
@@ -98,7 +102,7 @@ class _UnitsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.l10n.yourFleet(skin.displayName),
+            context.l10n.yourFleet(skin.localizedName(context.l10n)),
             style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -191,7 +195,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
               itemBuilder: (context, index) {
                 final ship = PieceType.values[index];
                 return ChoiceChip(
-                  label: Text(context.l10n.unit(ship).toUpperCase()),
+                  label: Text(context.l10n.pieceTypeName(ship).toUpperCase()),
                   labelStyle: TextStyle(
                     fontSize: 11,
                     color: ship == _ship ? Colors.black : Colors.white70,
@@ -209,8 +213,8 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
           Row(
             children: [
               Text(
-                context.l10n
-                    .armedCount(learned.active.length, ShipManeuvers.slots),
+                context.l10n.armedCount(
+                    learned.active.length, ShipManeuvers.slots),
                 style: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 11,
@@ -360,7 +364,7 @@ class _FleetCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              skin.displayName,
+              skin.localizedName(context.l10n),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(

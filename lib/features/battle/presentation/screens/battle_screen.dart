@@ -9,6 +9,8 @@ import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../game/presentation/providers/ai_opponent_controller.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
+import '../../../game/presentation/providers/piece_skin_provider.dart';
+import '../../../../l10n/l10n.dart';
 import '../../data/battle_element.dart';
 import '../../data/fleet_skin.dart';
 import '../audio/battle_audio.dart';
@@ -24,7 +26,6 @@ import '../../../onboarding/presentation/onboarding_provider.dart';
 import '../../../store/presentation/providers/store_providers.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
-import '../../../../l10n/l10n.dart';
 
 class BattleScreen extends ConsumerStatefulWidget {
   final PlayerColor? attackerColor;
@@ -335,6 +336,10 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
             if (battleState.isFinished && _destruction.isCompleted)
               _BattleResultOverlay(
                 winner: battleState.winner!,
+                winnerName: ref
+                    .watch(pieceSkinProvider)
+                    .skin
+                    .sideName(context.l10n, battleState.winner!),
                 localColor: localColor,
                 unlocked:
                     ref.read(aiOpponentProvider)?.lastUnlocked.value ?? const [],
@@ -395,9 +400,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
   }
 
-  String _shieldLabel(PlayerColor color) => color == PlayerColor.white
-      ? context.l10n.whiteShield
-      : context.l10n.blackShield;
+  String _shieldLabel(PlayerColor color) {
+    final l10n = context.l10n;
+    final side = ref.watch(pieceSkinProvider).skin.sideName(l10n, color);
+    return l10n.sideShield(side.toUpperCase());
+  }
 }
 
 /// One player's battle controls: unit panel and shield button side by side.
@@ -503,7 +510,7 @@ class _BattleHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             context.l10n.battleTitle,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.amber,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -525,7 +532,8 @@ class _BattleHeader extends StatelessWidget {
               ),
             ),
           Text(
-            '${(battleState.elapsedMs / 1000).toStringAsFixed(1)}s',
+            context.l10n.battleElapsed(
+                (battleState.elapsedMs / 1000).toStringAsFixed(1)),
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
           ),
           IconButton(
@@ -544,6 +552,9 @@ class _BattleHeader extends StatelessWidget {
 
 class _BattleResultOverlay extends StatelessWidget {
   final PlayerColor winner;
+
+  /// The winning side's name in the active piece skin.
+  final String winnerName;
   final PlayerColor? localColor;
 
   /// Maneuvers this win has just unlocked.
@@ -552,6 +563,7 @@ class _BattleResultOverlay extends StatelessWidget {
 
   const _BattleResultOverlay({
     required this.winner,
+    required this.winnerName,
     required this.localColor,
     required this.onContinue,
     this.unlocked = const [],
@@ -560,6 +572,7 @@ class _BattleResultOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLocalWin = localColor == null || winner == localColor;
+    final l10n = context.l10n;
     return GestureDetector(
       onTap: onContinue,
       child: Container(
@@ -594,9 +607,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isLocalWin
-                      ? context.l10n.battleVictory
-                      : context.l10n.battleDefeated,
+                  isLocalWin ? l10n.battleVictory : l10n.battleDefeated,
                   style: TextStyle(
                     color: isLocalWin ? Colors.amber : Colors.redAccent,
                     fontSize: 28,
@@ -606,13 +617,13 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${winner == PlayerColor.white ? "White" : "Black"} unit survives',
+                  l10n.unitSurvives(winnerName),
                   style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
                 ),
                 if (unlocked.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   Text(
-                    context.l10n.newManeuvers(unlocked.length),
+                    l10n.newManeuvers(unlocked.length),
                     style: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 10,
@@ -633,7 +644,7 @@ class _BattleResultOverlay extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            context.l10n.maneuverName(maneuver),
+                            l10n.maneuverName(maneuver),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -646,7 +657,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 Text(
-                  context.l10n.tapToContinue,
+                  l10n.tapToContinue,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 11,

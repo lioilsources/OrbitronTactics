@@ -97,9 +97,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lobbyJoinWifi => 'Join WiFi';
 
   @override
-  String get lobbyWifiNote => 'WiFi mode includes realtime battle arena';
-
-  @override
   String get lobbyOpenGames => 'Open Games';
 
   @override
@@ -130,25 +127,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameNotOpen => 'That game is no longer open';
 
   @override
-  String wifiHostError(String error) {
-    return 'WiFi host error: $error';
-  }
-
-  @override
-  String wifiJoinError(String error) {
-    return 'WiFi join error: $error';
-  }
-
-  @override
-  String get dialogDifficulty => 'Difficulty';
-
-  @override
-  String get dialogAiFleets => 'AI fleets';
-
-  @override
-  String get dialogYourColor => 'Your color';
-
-  @override
   String get difficultyEasy => 'Easy';
 
   @override
@@ -156,18 +134,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get difficultyHard => 'Hard';
-
-  @override
-  String get colorWhite => 'White';
-
-  @override
-  String get colorBlack => 'Black';
-
-  @override
-  String get youMoveFirst => 'You move first';
-
-  @override
-  String get aiMovesFirst => 'The AI moves first';
 
   @override
   String fleetRecord(int wins, int losses) {
@@ -181,19 +147,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wifiShareAddress => 'Share this address with your opponent:';
 
   @override
-  String get wifiWaitingGuest => 'Waiting for guest to connect...';
-
-  @override
   String get wifiJoinTitle => 'Join WiFi Game';
-
-  @override
-  String get wifiEnterIp => 'Enter the host\'s IP address:';
-
-  @override
-  String get waitingForOpponent => 'Waiting for opponent';
-
-  @override
-  String get gameIdLabel => 'Game ID:';
 
   @override
   String get waitingForPlayer => 'Waiting for another player to join...';
@@ -202,26 +156,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leaveGameTooltip => 'Leave Game';
 
   @override
-  String get newGameTooltip => 'New Game';
-
-  @override
   String get leaveGameTitle => 'Leave Game?';
 
   @override
   String get leaveGameBody => 'Your opponent will be able to claim victory.';
 
   @override
-  String get turnThinking => 'THINKING…';
-
-  @override
-  String get turnLabel => 'TURN';
-
-  @override
-  String get powerFieldsLabel => 'Power Fields: ';
+  String get powerFieldsLabel => 'Power Fields:';
 
   @override
   String powerFieldsNeed(int total) {
-    return '  (need $total)';
+    return '(need $total)';
   }
 
   @override
@@ -234,31 +179,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get claimVictory => 'Claim Victory';
 
   @override
-  String get victoryPowerFields => 'Power Field Domination!';
-
-  @override
-  String get victoryRoyal => 'Royal Elimination!';
-
-  @override
   String get victoryInfiltration => 'Pawn Infiltration!';
 
   @override
   String get victoryAbandonment => 'Opponent Abandoned!';
 
   @override
-  String get whiteWins => 'White Wins!';
-
-  @override
-  String get blackWins => 'Black Wins!';
-
-  @override
   String get yourShield => 'YOUR SHIELD';
-
-  @override
-  String get whiteShield => 'WHITE SHIELD';
-
-  @override
-  String get blackShield => 'BLACK SHIELD';
 
   @override
   String get battleTitle => 'BATTLE';
@@ -295,12 +222,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comcenterTitle => 'COMCENTER';
-
-  @override
-  String get tabUnits => 'UNITS';
-
-  @override
-  String get tabManeuvers => 'MANEUVERS';
 
   @override
   String get tabStore => 'STORE';
@@ -352,7 +273,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get maneuverMirrors => ' · mirrors';
+  String get maneuverMirrors => 'mirrors';
 
   @override
   String trainPrice(int price) {
@@ -583,4 +504,235 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get rulesFleet3 =>
       'The whole game is free. The store only sells new looks and maneuver packs.';
+
+  @override
+  String get boardTab => 'BOARD';
+
+  @override
+  String get pieceSkinTitle => 'Board pieces';
+
+  @override
+  String get pieceSkinHint =>
+      'Pick the armies drawn on the board in every game mode.';
+
+  @override
+  String get classicMarks => 'Classic marks';
+
+  @override
+  String get classicMarksHint => 'Show a small chess symbol on each figure.';
+
+  @override
+  String get pieceSkinClassic => 'Classic';
+
+  @override
+  String get pieceSkinClassicWhite => 'White';
+
+  @override
+  String get pieceSkinClassicBlack => 'Black';
+
+  @override
+  String get pieceSkinHeavenHell => 'Heaven × Hell';
+
+  @override
+  String get pieceSkinHeavenHellWhite => 'Heaven';
+
+  @override
+  String get pieceSkinHeavenHellBlack => 'Hell';
+
+  @override
+  String get pieceSkinRomeCarthage => 'Rome × Carthage';
+
+  @override
+  String get pieceSkinRomeCarthageWhite => 'Rome';
+
+  @override
+  String get pieceSkinRomeCarthageBlack => 'Carthage';
+
+  @override
+  String get pieceSkinKnightsOrcs => 'Knights × Orcs';
+
+  @override
+  String get pieceSkinKnightsOrcsWhite => 'Knights';
+
+  @override
+  String get pieceSkinKnightsOrcsBlack => 'Orcs';
+
+  @override
+  String get pieceSkinOlympusTitans => 'Olympus × Titans';
+
+  @override
+  String get pieceSkinOlympusTitansWhite => 'Olympus';
+
+  @override
+  String get pieceSkinOlympusTitansBlack => 'Titans';
+
+  @override
+  String get pieceSkinSamuraiYokai => 'Samurai × Yōkai';
+
+  @override
+  String get pieceSkinSamuraiYokaiWhite => 'Samurai';
+
+  @override
+  String get pieceSkinSamuraiYokaiBlack => 'Yōkai';
+
+  @override
+  String get pieceSkinHussitesCrusaders => 'Hussites × Crusaders';
+
+  @override
+  String get pieceSkinHussitesCrusadersWhite => 'Hussites';
+
+  @override
+  String get pieceSkinHussitesCrusadersBlack => 'Crusaders';
+
+  @override
+  String creditsAmount(int credits) {
+    return '$credits cr';
+  }
+
+  @override
+  String get lobbyWifiHint => 'WiFi mode includes realtime battle arena';
+
+  @override
+  String get lobbyJoin => 'Join';
+
+  @override
+  String errorWifiHost(String error) {
+    return 'WiFi host error: $error';
+  }
+
+  @override
+  String errorWifiJoin(String error) {
+    return 'WiFi join error: $error';
+  }
+
+  @override
+  String get singlePlayerDifficulty => 'Difficulty';
+
+  @override
+  String get singlePlayerAiFleets => 'AI fleets';
+
+  @override
+  String get singlePlayerYourSide => 'Your side';
+
+  @override
+  String get singlePlayerYouMoveFirst => 'You move first';
+
+  @override
+  String get singlePlayerAiMovesFirst => 'The AI moves first';
+
+  @override
+  String aiPlayerName(String difficulty) {
+    return 'Orbitron AI · $difficulty';
+  }
+
+  @override
+  String get wifiWaitingForGuest => 'Waiting for guest to connect...';
+
+  @override
+  String get wifiEnterHostAddress => 'Enter the host\'s IP address:';
+
+  @override
+  String get waitingTitle => 'Waiting for opponent';
+
+  @override
+  String get waitingGameId => 'Game ID:';
+
+  @override
+  String get turnBadge => 'TURN';
+
+  @override
+  String get thinkingBadge => 'THINKING…';
+
+  @override
+  String sideWins(String side) {
+    return '$side Wins!';
+  }
+
+  @override
+  String get victoryPowerFieldDomination => 'Power Field Domination!';
+
+  @override
+  String get victoryRoyalElimination => 'Royal Elimination!';
+
+  @override
+  String battleElapsed(String seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String sideShield(String side) {
+    return '$side SHIELD';
+  }
+
+  @override
+  String unitSurvives(String side) {
+    return '$side unit survives';
+  }
+
+  @override
+  String get unitsTab => 'UNITS';
+
+  @override
+  String get maneuversTab => 'MANEUVERS';
+
+  @override
+  String get upgradeMaxLevel => 'MAX LEVEL';
+
+  @override
+  String maneuverLevel(int level) {
+    return 'L$level';
+  }
+
+  @override
+  String maneuverTrain(int price) {
+    return 'TRAIN $price';
+  }
+
+  @override
+  String get pieceTypePawn => 'Pawn';
+
+  @override
+  String get pieceTypeRook => 'Rook';
+
+  @override
+  String get pieceTypeKnight => 'Knight';
+
+  @override
+  String get pieceTypeBishop => 'Bishop';
+
+  @override
+  String get pieceTypeQueen => 'Queen';
+
+  @override
+  String get pieceTypeKing => 'King';
+
+  @override
+  String get fleetVanguard => 'Orbitron Vanguard';
+
+  @override
+  String get fleetSolarCrusade => 'Solar Crusade';
+
+  @override
+  String get fleetVoidHive => 'Void Hive';
+
+  @override
+  String get fleetNeonRunners => 'Neon Runners';
+
+  @override
+  String get fleetIronArmada => 'Iron Armada';
+
+  @override
+  String get fleetCrystalChoir => 'Crystal Choir';
+
+  @override
+  String get fleetRoninBlades => 'Ronin Blades';
+
+  @override
+  String get fleetAtomicAge => 'Atomic Age';
+
+  @override
+  String get fleetAbyssalTide => 'Abyssal Tide';
+
+  @override
+  String get fleetStarNomads => 'Star Nomads';
 }

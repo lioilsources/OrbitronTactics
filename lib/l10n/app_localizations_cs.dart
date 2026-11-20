@@ -97,9 +97,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get lobbyJoinWifi => 'Připojit přes WiFi';
 
   @override
-  String get lobbyWifiNote => 'Hra přes WiFi má i bitevní arénu v reálném čase';
-
-  @override
   String get lobbyOpenGames => 'Otevřené hry';
 
   @override
@@ -130,25 +127,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get gameNotOpen => 'Tahle hra už není otevřená';
 
   @override
-  String wifiHostError(String error) {
-    return 'Chyba hostování přes WiFi: $error';
-  }
-
-  @override
-  String wifiJoinError(String error) {
-    return 'Chyba připojení přes WiFi: $error';
-  }
-
-  @override
-  String get dialogDifficulty => 'Obtížnost';
-
-  @override
-  String get dialogAiFleets => 'Flotily AI';
-
-  @override
-  String get dialogYourColor => 'Tvá barva';
-
-  @override
   String get difficultyEasy => 'Lehká';
 
   @override
@@ -156,18 +134,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get difficultyHard => 'Těžká';
-
-  @override
-  String get colorWhite => 'Bílá';
-
-  @override
-  String get colorBlack => 'Černá';
-
-  @override
-  String get youMoveFirst => 'Táhneš první';
-
-  @override
-  String get aiMovesFirst => 'AI táhne první';
 
   @override
   String fleetRecord(int wins, int losses) {
@@ -181,19 +147,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get wifiShareAddress => 'Pošli tuhle adresu soupeři:';
 
   @override
-  String get wifiWaitingGuest => 'Čekám, až se soupeř připojí...';
-
-  @override
   String get wifiJoinTitle => 'Připojit ke hře přes WiFi';
-
-  @override
-  String get wifiEnterIp => 'Zadej IP adresu hostitele:';
-
-  @override
-  String get waitingForOpponent => 'Čekání na soupeře';
-
-  @override
-  String get gameIdLabel => 'ID hry:';
 
   @override
   String get waitingForPlayer => 'Čekám, až se připojí druhý hráč...';
@@ -202,26 +156,17 @@ class AppLocalizationsCs extends AppLocalizations {
   String get leaveGameTooltip => 'Opustit hru';
 
   @override
-  String get newGameTooltip => 'Nová hra';
-
-  @override
   String get leaveGameTitle => 'Opustit hru?';
 
   @override
   String get leaveGameBody => 'Soupeř si bude moct připsat vítězství.';
 
   @override
-  String get turnThinking => 'PŘEMÝŠLÍ…';
-
-  @override
-  String get turnLabel => 'NA TAHU';
-
-  @override
-  String get powerFieldsLabel => 'Silová pole: ';
+  String get powerFieldsLabel => 'Silová pole:';
 
   @override
   String powerFieldsNeed(int total) {
-    return '  (potřeba $total)';
+    return '(potřeba $total)';
   }
 
   @override
@@ -234,31 +179,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get claimVictory => 'Připsat vítězství';
 
   @override
-  String get victoryPowerFields => 'Ovládnutí silových polí!';
-
-  @override
-  String get victoryRoyal => 'Konec královského páru!';
-
-  @override
   String get victoryInfiltration => 'Průnik pěšce!';
 
   @override
   String get victoryAbandonment => 'Soupeř to vzdal!';
 
   @override
-  String get whiteWins => 'Vyhrává bílý!';
-
-  @override
-  String get blackWins => 'Vyhrává černý!';
-
-  @override
   String get yourShield => 'TVŮJ ŠTÍT';
-
-  @override
-  String get whiteShield => 'BÍLÝ ŠTÍT';
-
-  @override
-  String get blackShield => 'ČERNÝ ŠTÍT';
 
   @override
   String get battleTitle => 'BITVA';
@@ -296,12 +223,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get comcenterTitle => 'VELITELSTVÍ';
-
-  @override
-  String get tabUnits => 'JEDNOTKY';
-
-  @override
-  String get tabManeuvers => 'MANÉVRY';
 
   @override
   String get tabStore => 'OBCHOD';
@@ -354,7 +275,7 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get maneuverMirrors => ' · zrcadlí se';
+  String get maneuverMirrors => 'zrcadlí se';
 
   @override
   String trainPrice(int price) {
@@ -585,4 +506,235 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get rulesFleet3 =>
       'Celá hra je zdarma. Obchod prodává jen nový vzhled a balíčky manévrů.';
+
+  @override
+  String get boardTab => 'DESKA';
+
+  @override
+  String get pieceSkinTitle => 'Figurky na desce';
+
+  @override
+  String get pieceSkinHint =>
+      'Vyber armády, které se kreslí na desku ve všech režimech hry.';
+
+  @override
+  String get classicMarks => 'Klasické značky';
+
+  @override
+  String get classicMarksHint => 'Na každé figurce ukáže malý šachový symbol.';
+
+  @override
+  String get pieceSkinClassic => 'Klasické';
+
+  @override
+  String get pieceSkinClassicWhite => 'Bílí';
+
+  @override
+  String get pieceSkinClassicBlack => 'Černí';
+
+  @override
+  String get pieceSkinHeavenHell => 'Nebe × Peklo';
+
+  @override
+  String get pieceSkinHeavenHellWhite => 'Nebe';
+
+  @override
+  String get pieceSkinHeavenHellBlack => 'Peklo';
+
+  @override
+  String get pieceSkinRomeCarthage => 'Řím × Kartágo';
+
+  @override
+  String get pieceSkinRomeCarthageWhite => 'Řím';
+
+  @override
+  String get pieceSkinRomeCarthageBlack => 'Kartágo';
+
+  @override
+  String get pieceSkinKnightsOrcs => 'Rytíři × Orkové';
+
+  @override
+  String get pieceSkinKnightsOrcsWhite => 'Rytíři';
+
+  @override
+  String get pieceSkinKnightsOrcsBlack => 'Orkové';
+
+  @override
+  String get pieceSkinOlympusTitans => 'Olymp × Titáni';
+
+  @override
+  String get pieceSkinOlympusTitansWhite => 'Olymp';
+
+  @override
+  String get pieceSkinOlympusTitansBlack => 'Titáni';
+
+  @override
+  String get pieceSkinSamuraiYokai => 'Samurajové × Yōkai';
+
+  @override
+  String get pieceSkinSamuraiYokaiWhite => 'Samurajové';
+
+  @override
+  String get pieceSkinSamuraiYokaiBlack => 'Yōkai';
+
+  @override
+  String get pieceSkinHussitesCrusaders => 'Husité × Křižáci';
+
+  @override
+  String get pieceSkinHussitesCrusadersWhite => 'Husité';
+
+  @override
+  String get pieceSkinHussitesCrusadersBlack => 'Křižáci';
+
+  @override
+  String creditsAmount(int credits) {
+    return '$credits kr';
+  }
+
+  @override
+  String get lobbyWifiHint => 'Režim WiFi má bitevní arénu v reálném čase';
+
+  @override
+  String get lobbyJoin => 'Připojit';
+
+  @override
+  String errorWifiHost(String error) {
+    return 'Chyba hostování přes WiFi: $error';
+  }
+
+  @override
+  String errorWifiJoin(String error) {
+    return 'Chyba připojení přes WiFi: $error';
+  }
+
+  @override
+  String get singlePlayerDifficulty => 'Obtížnost';
+
+  @override
+  String get singlePlayerAiFleets => 'Flotily AI';
+
+  @override
+  String get singlePlayerYourSide => 'Tvoje strana';
+
+  @override
+  String get singlePlayerYouMoveFirst => 'Táhneš první';
+
+  @override
+  String get singlePlayerAiMovesFirst => 'AI táhne první';
+
+  @override
+  String aiPlayerName(String difficulty) {
+    return 'Orbitron AI · $difficulty';
+  }
+
+  @override
+  String get wifiWaitingForGuest => 'Čekám, až se host připojí…';
+
+  @override
+  String get wifiEnterHostAddress => 'Zadej IP adresu hostitele:';
+
+  @override
+  String get waitingTitle => 'Čekání na soupeře';
+
+  @override
+  String get waitingGameId => 'ID hry:';
+
+  @override
+  String get turnBadge => 'TAH';
+
+  @override
+  String get thinkingBadge => 'PŘEMÝŠLÍ…';
+
+  @override
+  String sideWins(String side) {
+    return '$side vítězí!';
+  }
+
+  @override
+  String get victoryPowerFieldDomination => 'Ovládnutí silových polí!';
+
+  @override
+  String get victoryRoyalElimination => 'Vyřazení královského páru!';
+
+  @override
+  String battleElapsed(String seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String sideShield(String side) {
+    return 'ŠTÍT: $side';
+  }
+
+  @override
+  String unitSurvives(String side) {
+    return 'Přežívá jednotka: $side';
+  }
+
+  @override
+  String get unitsTab => 'JEDNOTKY';
+
+  @override
+  String get maneuversTab => 'MANÉVRY';
+
+  @override
+  String get upgradeMaxLevel => 'MAX. ÚROVEŇ';
+
+  @override
+  String maneuverLevel(int level) {
+    return 'Ú$level';
+  }
+
+  @override
+  String maneuverTrain(int price) {
+    return 'TRÉNOVAT $price';
+  }
+
+  @override
+  String get pieceTypePawn => 'Pěšec';
+
+  @override
+  String get pieceTypeRook => 'Věž';
+
+  @override
+  String get pieceTypeKnight => 'Jezdec';
+
+  @override
+  String get pieceTypeBishop => 'Střelec';
+
+  @override
+  String get pieceTypeQueen => 'Dáma';
+
+  @override
+  String get pieceTypeKing => 'Král';
+
+  @override
+  String get fleetVanguard => 'Orbitronský předvoj';
+
+  @override
+  String get fleetSolarCrusade => 'Sluneční výprava';
+
+  @override
+  String get fleetVoidHive => 'Úl prázdnoty';
+
+  @override
+  String get fleetNeonRunners => 'Neonoví běžci';
+
+  @override
+  String get fleetIronArmada => 'Železná armada';
+
+  @override
+  String get fleetCrystalChoir => 'Křišťálový chór';
+
+  @override
+  String get fleetRoninBlades => 'Čepele róninů';
+
+  @override
+  String get fleetAtomicAge => 'Atomový věk';
+
+  @override
+  String get fleetAbyssalTide => 'Příliv hlubin';
+
+  @override
+  String get fleetStarNomads => 'Hvězdní nomádi';
 }

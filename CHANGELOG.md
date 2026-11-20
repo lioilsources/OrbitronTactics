@@ -1,5 +1,13 @@
 # Changelog
 
+## [20/11/2026]
+- Your own pieces are at the bottom of the board
+- Every store product costs USD 0.99; product ids follow com.ol1n.orbitrontactics.pack.*
+- A payment that completes later is applied at once; a refunded maneuver pack's maneuvers lock again
+- A finished online game is marked finished right away
+- Privacy policy, support and landing pages on GitHub Pages; App Store screenshots for iPhone 6.9" and iPad 13"
+- Release builds get the store and crash-report keys; the iOS build in CI works again
+
 ## [09/11/2026]
 - The app speaks Czech on a Czech device and English everywhere else; maneuver names and descriptions are translated too
 - Two more maneuver packs: Phantom (fades from sight and slips aside, no shots) and Strafing Run (two passes over the enemy, no cover); a balance test keeps them sidegrades

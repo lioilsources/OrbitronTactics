@@ -93,6 +93,11 @@ jobs:
         working-directory: .
         run: flutter pub get
 
+      - name: Install CocoaPods dependencies
+        working-directory: ./ios
+        # The runner's spec repo can predate a pod the lock pins.
+        run: pod install --repo-update
+
       - name: Build iOS (no signing)
         working-directory: .
         run: flutter build ios --debug --no-codesign

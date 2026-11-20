@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/telemetry/telemetry.dart';
@@ -54,6 +56,15 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
         _grantPack = grantPack,
         super(store.load() ?? _firstLaunch(playerSkin())) {
     if (store.load() == null) _store.save(state);
+    _changes = service.ownedChanges.listen(_apply);
+  }
+
+  late final StreamSubscription<Set<String>> _changes;
+
+  @override
+  void dispose() {
+    _changes.cancel();
+    super.dispose();
   }
 
   final EntitlementsStore _store;

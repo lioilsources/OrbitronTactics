@@ -74,6 +74,10 @@ abstract class PurchaseService {
   /// Asks the store for earlier purchases on this account. Throws when the
   /// store cannot tell.
   Future<Set<String>> restore();
+
+  /// Everything owned, whenever the store learns of a change on its own:
+  /// a pending payment that went through, a refund. Empty by default.
+  Stream<Set<String>> get ownedChanges => const Stream.empty();
 }
 
 /// Builds without a store key, and platforms without a store.

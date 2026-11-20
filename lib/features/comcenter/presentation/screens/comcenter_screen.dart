@@ -172,6 +172,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
   @override
   Widget build(BuildContext context) {
     final fleet = widget.fleet;
+    final entitlements = ref.watch(entitlementsProvider);
     final learned = fleet.maneuversFor(_ship);
     final accent = BattleElement.of(_ship).color;
     final player =
@@ -251,8 +252,11 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
                   ManeuverCard(
                     maneuver: maneuver,
                     accent: accent,
-                    owned: learned.owned.contains(maneuver.id),
-                    armed: learned.active.contains(maneuver.id),
+                    // A refunded pack's maneuvers show locked again.
+                    owned: learned.owned.contains(maneuver.id) &&
+                        entitlements.allowsManeuver(maneuver),
+                    armed: learned.active.contains(maneuver.id) &&
+                        entitlements.allowsManeuver(maneuver),
                     level: learned.levelOf(maneuver.id),
                     credits: fleet.credits,
                     battleWins: fleet.battleWinsWith(_ship),

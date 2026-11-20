@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -14,8 +16,18 @@ class RevenueCatPurchaseService extends PurchaseService {
   Future<void>? _configured;
   final Map<String, StoreProduct> _products = {};
 
-  Future<void> _ready() =>
-      _configured ??= Purchases.configure(PurchasesConfiguration(_apiKey));
+  final _changes = StreamController<Set<String>>.broadcast();
+
+  Future<void> _ready() => _configured ??=
+      Purchases.configure(PurchasesConfiguration(_apiKey)).then((_) {
+        // A pending payment completes later, maybe with the app closed;
+        // RevenueCat reports it here, and on the next start.
+        Purchases.addCustomerInfoUpdateListener(
+            (info) => _changes.add(_ids(info)));
+      });
+
+  @override
+  Stream<Set<String>> get ownedChanges => _changes.stream;
 
   @override
   bool get available => true;

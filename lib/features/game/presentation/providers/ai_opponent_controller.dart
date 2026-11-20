@@ -16,6 +16,7 @@ import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../store/presentation/providers/store_providers.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import 'game_state_provider.dart';
 
@@ -76,11 +77,16 @@ class AiOpponentController {
 
   /// The maneuvers the fleet playing [color] has armed on [ship].
   List<ManeuverSlot> maneuversFor(PlayerColor color, PieceType ship) {
-    final armed = _ref.read(fleetProgressProvider(_fleetOf(color))).maneuversFor(ship);
+    final fleet = _fleetOf(color);
+    final armed = _ref.read(fleetProgressProvider(fleet)).maneuversFor(ship);
+    // The player's pack maneuvers fly only while the pack is owned.
+    final entitlements =
+        fleet == playerFleetIdentity ? _ref.read(entitlementsProvider) : null;
     return [
       for (final id in armed.active)
         if (ManeuverCatalog.byId(id) case final maneuver?)
-          (maneuver: maneuver, level: armed.levelOf(id)),
+          if (entitlements?.allowsManeuver(maneuver) ?? true)
+            (maneuver: maneuver, level: armed.levelOf(id)),
     ];
   }
 

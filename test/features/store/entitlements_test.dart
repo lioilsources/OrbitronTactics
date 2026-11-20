@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orbitron_tactics/core/maneuvers/maneuver.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
@@ -86,6 +87,23 @@ void main() {
           const Entitlements(products: {StoreCatalog.fleetBundleId})
               .ownsMusic(BattleMusic.retro),
           isFalse);
+    });
+
+    test('a pack maneuver flies only while its pack is owned', () {
+      final pack = ManeuverCatalog.inPack('ace').first;
+      final earned = ManeuverCatalog.forShip(pack.ship)
+          .firstWhere((maneuver) => maneuver.unlock is! PackUnlock);
+
+      expect(const Entitlements().allowsManeuver(pack), isFalse);
+      expect(const Entitlements().allowsManeuver(earned), isTrue);
+      expect(
+          Entitlements(products: {StoreCatalog.packId('ace')})
+              .allowsManeuver(pack),
+          isTrue);
+      expect(
+          const Entitlements(products: {StoreCatalog.commanderId})
+              .allowsManeuver(pack),
+          isTrue);
     });
 
     test('a legacy fleet stays owned', () {

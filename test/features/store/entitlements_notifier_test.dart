@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/models/fleet_progress.dart';
@@ -128,6 +130,21 @@ void main() {
         contains(ManeuverCatalog.inPack('ace').first.id));
   });
 
+  test('a payment that completes later is applied when the store says so',
+      () async {
+    final service = _ReportingService(prefs);
+    addTearDown(service.changes.close);
+    final c = container(service: service);
+    c.read(entitlementsProvider);
+
+    service.changes.add({StoreCatalog.packId('ace')});
+    await Future<void>.delayed(Duration.zero);
+
+    expect(c.read(entitlementsProvider).ownsPack('ace'), isTrue);
+    expect(player(c).maneuversFor(PieceType.pawn).owned,
+        contains(ManeuverCatalog.inPack('ace').first.id));
+  });
+
   test('ids the game does not sell are ignored', () async {
     await prefs.setStringList(DebugPurchaseService.key, ['old.thing']);
     final c = container();
@@ -153,4 +170,14 @@ void main() {
     expect(c.read(entitlementsProvider), cached);
     expect(await notifier.restore(), isNull);
   });
+}
+
+/// The debug store, plus changes it reports on its own.
+class _ReportingService extends DebugPurchaseService {
+  _ReportingService(super.prefs);
+
+  final changes = StreamController<Set<String>>.broadcast();
+
+  @override
+  Stream<Set<String>> get ownedChanges => changes.stream;
 }

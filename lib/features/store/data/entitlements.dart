@@ -1,3 +1,4 @@
+import '../../../core/maneuvers/maneuver.dart';
 import '../../../core/maneuvers/maneuver_catalog.dart';
 import '../../battle/data/battle_music.dart';
 import '../../battle/data/fleet_skin.dart';
@@ -40,6 +41,14 @@ class Entitlements {
         StoreItemKind.fleet => ownsFleet(item.fleet!),
         StoreItemKind.maneuverPack => ownsPack(item.pack!.id),
         StoreItemKind.music => ownsMusic(item.music!),
+      };
+
+  /// Whether [maneuver] may fly: a pack maneuver only while its pack is
+  /// owned. A refunded pack stays learned in the fleet's progress, so it
+  /// comes back with a new purchase, but it no longer flies.
+  bool allowsManeuver(Maneuver maneuver) => switch (maneuver.unlock) {
+        PackUnlock(:final packId) => ownsPack(packId),
+        _ => true,
       };
 
   /// Ids of the maneuver packs owned, to grant to the player's fleet.

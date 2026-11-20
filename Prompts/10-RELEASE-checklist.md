@@ -6,9 +6,10 @@
 > Od té doby přibyly: balíčky manévrů Phantom a Striker, hudba Retro Arcade,
 > čeština v aplikaci a screenshoty do storu. Produktů je teď **12**.
 >
-> **Oprava 13/11/2026:** sekce 2, 6 a 7 neodpovídají existující release
-> pipeline (`.github/workflows/release-*.yml` už podepisuje a nahrává sám)
-> a iOS build v CI padá. Aktuální postup je v `11-PLAN-release-1.0.md`.
+> **Oprava 20/11/2026:** sekce 2, 6 a 7 přepsané podle existující release
+> pipeline (`.github/workflows/release-*.yml` podepisuje a nahrává sám,
+> spouští ho tag `v*`). Ruční postup zůstal jako záloha. Zbytek plánu je
+> v `11-PLAN-release-1.0.md`.
 >
 > Pro Claude v lokálním terminálu: postupuj po sekcích, nic z toho necommituj
 > kromě úprav označených **(commit)**. Klíče patří do `release.json` a
@@ -42,13 +43,22 @@ neověřený (chybí Mac).
 
 ## 2. Android upload klíč
 
+Upload klíč je v GitHub secrets (`ANDROID_KEYSTORE_BASE64`,
+`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`;
+nastavuje je `setup-gh-secrets.sh` z repa Distribution). Oldřich potvrdil
+20/11/2026, že je to upload klíč pro Play. `release-android.yml` z něj
+vytvoří `android/app/release.keystore` a `android/key.properties` a Gradle
+jím podepíše AAB i APK.
+
+**Pozor při prvním tagu po sloučení:** do té doby se release podepisoval
+debug klíčem runneru. Testeři z Firebase App Distribution musí starou verzi
+odinstalovat a přijdou o postup flotily (je jen v `shared_preferences`).
+
+Záloha, build na vlastním stroji:
 ```bash
-keytool -genkeypair -v -keystore android/upload-keystore.jks -storetype JKS \
-  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 cp android/key.properties.example android/key.properties   # vyplň hesla
+# storeFile ukazuje na keystore relativně k android/app/
 ```
-Keystore i hesla zálohuj mimo repo (password manager). Ztráta upload klíče
-se dá řešit přes Play podporu, ale stojí dny.
 
 ## 3. Sentry
 
@@ -61,9 +71,8 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
    uploadu už nejde změnit).
 2. Play App Signing: nech Google spravovat podpisový klíč, nahráváš
    upload klíčem z kroku 2.
-3. **Closed testing hned teď**: osobní účet potřebuje 12 testerů
-   přihlášených 14 dní v kuse, než povolí produkci. První build může jít
-   bez IAP klíčů (obchod se ukáže jako nedostupný).
+3. Účet je firemní (organizace): podmínka 12 testerů na 14 dní neplatí,
+   vydává se rovnou do produkce. Interní test pro vlastní kontrolu stačí.
 4. Monetize → In-app products: založ 12 jednorázových produktů podle
    tabulky v `docs/store-listing.md` (id musí sedět přesně), ceny ručně
    pro CZK a EUR, stav Active.
@@ -86,32 +95,49 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
    Offerings nejsou potřeba**, aplikace mapuje id produktů na obsah sama.
 4. API keys → public SDK keys `goog_...` a `appl_...` do `release.json`.
 
-## 6. Build
+## 6. Klíče do buildu (GitHub secrets)
+
+Release workflow předává `flutter build` tyto secrets přes `--dart-define`.
+Prázdný secret = služba vypnutá, build projde:
+
+| Secret | Odkud |
+|---|---|
+| `SENTRY_DSN` | sekce 3 |
+| `REVENUECAT_GOOGLE_KEY` | sekce 5, `goog_...` |
+| `REVENUECAT_APPLE_KEY` | sekce 5, `appl_...` |
 
 ```bash
-cp release.example.json release.json      # vyplň klíče
-# pubspec.yaml: version 1.0.0+10 (build číslo zvyšuj s každým uploadem)  (commit)
-flutter build appbundle --release --dart-define-from-file=release.json
-# build/app/outputs/bundle/release/app-release.aab → Play Console
+gh secret set SENTRY_DSN            # hodnotu vlož na výzvu, ne do příkazu
+gh secret set REVENUECAT_GOOGLE_KEY
+gh secret set REVENUECAT_APPLE_KEY
 ```
-`SUPABASE_URL` a `SUPABASE_ANON_KEY` v `release.json` můžeš vynechat,
-výchozí hodnoty v kódu míří na stávající projekt.
+`SUPABASE_URL` a `SUPABASE_ANON_KEY` nejsou potřeba, výchozí hodnoty
+v kódu míří na stávající projekt.
 
-## 7. iOS (na Macu)
+## 7. Vydání tagem
 
-1. Apple Developer Program (99 USD/rok), App ID `com.ol1n.orbitronTactics`.
-2. Xcode → Runner → Signing & Capabilities → přidej **In-App Purchase**,
-   vyber tým; v `ios/ExportOptions.plist` nahraď `REPLACE_WITH_YOUR_TEAM_ID`
-   **(commit)**.
-3. App Store Connect: nová aplikace, 12 In-App Purchases (Non-Consumable,
+1. Apple Developer Program, App ID `com.ol1n.orbitronTactics` s capability
+   **In-App Purchase**; provisioning profil a certifikát jsou v secrets
+   (`IOS_*`, `APP_STORE_CONNECT_API_*`, z repa Distribution).
+2. App Store Connect: nová aplikace, 12 In-App Purchases (Non-Consumable,
    stejná id), každý s review screenshotem; odeslat spolu s prvním buildem.
-4. `cd ios && pod install && cd ..`
-   `flutter build ipa --release --dart-define-from-file=release.json`
-   → Transporter / Xcode Organizer → TestFlight.
-5. Sandbox tester v App Store Connect → Users and Access → Sandbox.
-6. Review notes: „Single player works offline. Online play needs two
+3. `git tag v1.0.0 && git push origin v1.0.0` spustí oba workflow. Verze
+   se bere z tagu, číslo buildu je číslo běhu.
+   - Android: AAB a APK do GitHub Release a Firebase App Distribution.
+     AAB nahraj do Play Console.
+   - iOS: IPA do TestFlightu a GitHub Release.
+4. Sandbox tester v App Store Connect → Users and Access → Sandbox.
+5. Review notes: „Single player works offline. Online play needs two
    devices. Purchases: Comcenter (top right) → Store tab; Restore purchases
    at the bottom.“
+
+Záloha, build na vlastním stroji:
+```bash
+cp release.example.json release.json      # vyplň klíče
+flutter build appbundle --release --dart-define-from-file=release.json
+cd ios && pod install --repo-update && cd ..
+flutter build ipa --release --dart-define-from-file=release.json
+```
 
 ## 8. Test před odesláním
 

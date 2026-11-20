@@ -55,11 +55,13 @@ jobs:
 
       - name: Build release AAB
         working-directory: .
-        run: flutter build appbundle --release
+        # Store and crash-report keys; an empty secret leaves the service off.
+        run: flutter build appbundle --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} --dart-define=REVENUECAT_GOOGLE_KEY=${{ secrets.REVENUECAT_GOOGLE_KEY }} --dart-define=REVENUECAT_APPLE_KEY=${{ secrets.REVENUECAT_APPLE_KEY }}
 
       - name: Build release APK
         working-directory: .
-        run: flutter build apk --release
+        # Store and crash-report keys; an empty secret leaves the service off.
+        run: flutter build apk --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} --dart-define=REVENUECAT_GOOGLE_KEY=${{ secrets.REVENUECAT_GOOGLE_KEY }} --dart-define=REVENUECAT_APPLE_KEY=${{ secrets.REVENUECAT_APPLE_KEY }}
 
       - name: Verify APK signing certificate
         run: |

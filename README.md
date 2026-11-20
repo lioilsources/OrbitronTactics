@@ -112,6 +112,6 @@ flutter test --tags slow
 
 - [CHANGELOG.md](CHANGELOG.md) — development history
 - [GALLERY.md](GALLERY.md) — screenshots and videos
-- [docs/privacy-policy.md](docs/privacy-policy.md) — privacy policy
+- [docs/privacy.html](docs/privacy.html), [docs/support.html](docs/support.html) — privacy policy and support, served by GitHub Pages at `https://lioilsources.github.io/OrbitronTactics/`
 - [docs/store-listing.md](docs/store-listing.md) — store texts, products, Data safety
 - [Prompts/10-RELEASE-checklist.md](Prompts/10-RELEASE-checklist.md) — release steps that need accounts and keys

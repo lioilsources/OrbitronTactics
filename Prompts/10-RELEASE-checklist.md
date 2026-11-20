@@ -80,9 +80,10 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
    (nákupy zdarma, testovací karta).
 6. Data safety, Content rating, Target audience 13+: odpovědi jsou
    v `docs/store-listing.md`.
-7. Zásady soukromí: vyplň v `docs/privacy-policy.md` jméno, e-mail a datum
-   **(commit)** a zveřejni na veřejné URL (GitHub Pages z `docs/`, nebo
-   jakákoli stránka). URL vlož do Play Console i App Store Connect.
+7. Zásady soukromí a podpora jsou `docs/privacy.html` a `docs/support.html`
+   (GitHub Pages z `main /docs`). Do Play Console i App Store Connect:
+   `https://lioilsources.github.io/OrbitronTactics/privacy.html` a
+   `…/support.html`.
 
 ## 5. RevenueCat
 

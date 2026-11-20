@@ -2,7 +2,8 @@
 //
 //   STORE_SCREENSHOTS=1 flutter test test/store_screenshots
 //
-// writes docs/store/screenshots/{en,cs}/NN_name.png (1080 x 1920) and
+// writes docs/store/screenshots{,_ios,_ipad}/{en,cs}/NN_name.png (Play
+// 1080 x 1920, iPhone 6.9" 1290 x 2796, iPad 13" 2064 x 2752) and
 // docs/store/feature_graphic_{en,cs}.png (1024 x 500). Skipped unless the variable
 // is set, so CI and ordinary runs leave the images alone.
 import 'dart:io';
@@ -36,13 +37,22 @@ import 'package:orbitron_tactics/features/onboarding/presentation/how_to_play_sc
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
 import 'package:orbitron_tactics/features/store/data/purchase_service.dart';
-import 'package:orbitron_tactics/features/store/data/store_catalog.dart';
 import 'package:orbitron_tactics/features/store/presentation/providers/store_providers.dart';
 import 'package:orbitron_tactics/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _logical = Size(360, 640);
-const _scale = 3.0;
+/// A screen size the stores take: Play phones, App Store 6.9" iPhones and
+/// 13" iPads.
+typedef _Device = ({String folder, Size logical, double scale});
+
+const _devices = <_Device>[
+  (folder: 'screenshots', logical: Size(360, 640), scale: 3), // 1080 x 1920
+  (folder: 'screenshots_ios', logical: Size(430, 932), scale: 3), // 1290 x 2796
+  (folder: 'screenshots_ipad', logical: Size(1032, 1376), scale: 2), // 2064 x 2752
+];
+
+/// The device the running test renders for.
+_Device _device = _devices.first;
 
 final _enabled = Platform.environment['STORE_SCREENSHOTS'] != null;
 final _out = Directory('docs/store');
@@ -62,23 +72,9 @@ class _ShopWindow extends PurchaseService {
           id: _price(id),
       };
 
-  String _price(String id) {
-    final euro = switch (id) {
-      StoreCatalog.commanderId => 9.99,
-      StoreCatalog.fleetBundleId => 6.99,
-      final id when id.startsWith('fleet.') => 1.99,
-      final id when id.startsWith('music.') => 0.99,
-      _ => 2.99,
-    };
-    final crowns = switch (id) {
-      StoreCatalog.commanderId => 249,
-      StoreCatalog.fleetBundleId => 179,
-      final id when id.startsWith('fleet.') => 49,
-      final id when id.startsWith('music.') => 29,
-      _ => 79,
-    };
-    return czech ? '$crowns Kč' : '€${euro.toStringAsFixed(2)}';
-  }
+  // Every product costs USD 0.99; the Czech price stays in dollars because
+  // the store's own conversion to crowns is not known here.
+  String _price(String id) => czech ? '0,99 US\$' : '\$0.99';
 
   @override
   Future<Set<String>> owned() async => {};
@@ -157,7 +153,7 @@ Future<void> _shoot(WidgetTester tester, String path) async {
   await tester.runAsync(() async {
     final boundary =
         _boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    final image = await boundary.toImage(pixelRatio: _scale);
+    final image = await boundary.toImage(pixelRatio: _device.scale);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     final file = File('${_out.path}/$path')..createSync(recursive: true);
     file.writeAsBytesSync(data!.buffer.asUint8List());
@@ -334,8 +330,8 @@ List<ManeuverSlot> _slots(PieceType ship, List<ManeuverFamily> families) => [
 
 Future<void> _shootAll(WidgetTester tester, Locale locale) async {
   final lang = locale.languageCode;
-  tester.view.physicalSize = _logical * _scale;
-  tester.view.devicePixelRatio = _scale;
+  tester.view.physicalSize = _device.logical * _device.scale;
+  tester.view.devicePixelRatio = _device.scale;
   addTearDown(tester.view.reset);
 
   final container = await _container(locale);
@@ -343,11 +339,11 @@ Future<void> _shootAll(WidgetTester tester, Locale locale) async {
   final scene = _Scene(tester, container, locale);
 
   await scene.show(const OrbitronTacticsApp().home);
-  await _shoot(tester, 'screenshots/$lang/01_lobby.png');
+  await _shoot(tester, '${_device.folder}/$lang/01_lobby.png');
 
   _playOpening(container, lang == 'cs' ? 'Honza' : 'Alex');
   await scene.show(const GameScreen());
-  await _shoot(tester, 'screenshots/$lang/02_board.png');
+  await _shoot(tester, '${_device.folder}/$lang/02_board.png');
 
   final battle = container.read(battleStateProvider.notifier);
   battle.startBattle(initial: _midBattle(), attackerColor: PlayerColor.white);
@@ -362,24 +358,24 @@ Future<void> _shootAll(WidgetTester tester, Locale locale) async {
       ManeuverFamily.volley,
     ]),
   ));
-  await _shoot(tester, 'screenshots/$lang/03_battle.png');
+  await _shoot(tester, '${_device.folder}/$lang/03_battle.png');
   battle.stopBattle();
   await tester.pump();
 
   await scene.show(const ComcenterScreen());
-  await _shoot(tester, 'screenshots/$lang/04_fleet.png');
+  await _shoot(tester, '${_device.folder}/$lang/04_fleet.png');
 
   await tester.tap(find.text(lang == 'cs' ? 'MANÉVRY' : 'MANEUVERS'));
   await tester.pumpAndSettle();
   await tester.tap(find.text(lang == 'cs' ? 'JEZDEC' : 'KNIGHT'));
   await tester.pumpAndSettle();
   await _settle(tester);
-  await _shoot(tester, 'screenshots/$lang/05_maneuvers.png');
+  await _shoot(tester, '${_device.folder}/$lang/05_maneuvers.png');
 
   await tester.tap(find.text(lang == 'cs' ? 'OBCHOD' : 'STORE'));
   await tester.pumpAndSettle();
   await _settle(tester);
-  await _shoot(tester, 'screenshots/$lang/06_store.png');
+  await _shoot(tester, '${_device.folder}/$lang/06_store.png');
 
   await scene.show(const HowToPlayScreen());
   await tester.tap(find.text(lang == 'cs' ? 'DÁL' : 'NEXT'));
@@ -387,7 +383,7 @@ Future<void> _shootAll(WidgetTester tester, Locale locale) async {
   await tester.tap(find.text(lang == 'cs' ? 'DÁL' : 'NEXT'));
   await tester.pumpAndSettle();
   await _settle(tester);
-  await _shoot(tester, 'screenshots/$lang/07_how_to_play.png');
+  await _shoot(tester, '${_device.folder}/$lang/07_how_to_play.png');
 }
 
 /// The Play Store's 1024 x 500 banner: the title over a fleet in formation.
@@ -508,9 +504,13 @@ void main() {
     }, skip: !_enabled);
   }
 
-  for (final locale in const [Locale('en'), Locale('cs')]) {
-    testWidgets('screenshots in ${locale.languageCode}', (tester) async {
-      await _shootAll(tester, locale);
-    }, skip: !_enabled);
+  for (final device in _devices) {
+    for (final locale in const [Locale('en'), Locale('cs')]) {
+      testWidgets('${device.folder} in ${locale.languageCode}',
+          (tester) async {
+        _device = device;
+        await _shootAll(tester, locale);
+      }, skip: !_enabled);
+    }
   }
 }

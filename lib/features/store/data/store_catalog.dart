@@ -39,12 +39,16 @@ class StoreItem {
 class StoreCatalog {
   const StoreCatalog._();
 
-  static const commanderId = 'bundle.commander';
-  static const fleetBundleId = 'bundle.fleets';
+  /// Every product id is `com.ol1n.<app>.pack.<packId>` (lowercase: Google
+  /// Play takes no capitals in product ids).
+  static const _prefix = 'com.ol1n.orbitrontactics.pack.';
 
-  static String fleetId(FleetSkin skin) => 'fleet.${skin.slug}';
-  static String packId(String pack) => 'pack.$pack';
-  static String musicId(BattleMusic music) => 'music.${music.slug}';
+  static const commanderId = '${_prefix}commander';
+  static const fleetBundleId = '${_prefix}fleets';
+
+  static String fleetId(FleetSkin skin) => '${_prefix}fleet_${skin.slug}';
+  static String packId(String pack) => '$_prefix$pack';
+  static String musicId(BattleMusic music) => '${_prefix}music_${music.slug}';
 
   static final premiumFleets = [
     for (final skin in FleetSkin.values)

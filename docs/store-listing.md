@@ -88,20 +88,22 @@ ne to, kdo vyhraje.
 
 Product ids are the same on Google Play and in App Store Connect.
 
-| Product id | Name | EUR | CZK |
-|---|---|---|---|
-| `bundle.commander` | Commander Edition | 9.99 | 249 |
-| `bundle.fleets` | Fleet Collection | 6.99 | 179 |
-| `fleet.solar_crusade` | Solar Crusade | 1.99 | 49 |
-| `fleet.neon_runners` | Neon Runners | 1.99 | 49 |
-| `fleet.crystal_choir` | Crystal Choir | 1.99 | 49 |
-| `fleet.ronin_blades` | Ronin Blades | 1.99 | 49 |
-| `fleet.atomic_age` | Atomic Age | 1.99 | 49 |
-| `fleet.abyssal_tide` | Abyssal Tide | 1.99 | 49 |
-| `pack.ace` | Ace pack | 2.99 | 79 |
-| `pack.phantom` | Phantom pack | 2.99 | 79 |
-| `pack.striker` | Striker pack | 2.99 | 79 |
-| `music.retro` | Retro Arcade music | 0.99 | 29 |
+Price: **USD 0.99 each** (App Store price point USD 0.99; other currencies by the store's automatic conversion, the same on Google Play).
+
+| Product id | Name |
+|---|---|
+| `com.ol1n.orbitrontactics.pack.commander` | Commander Edition |
+| `com.ol1n.orbitrontactics.pack.fleets` | Fleet Collection |
+| `com.ol1n.orbitrontactics.pack.fleet_solar_crusade` | Solar Crusade |
+| `com.ol1n.orbitrontactics.pack.fleet_neon_runners` | Neon Runners |
+| `com.ol1n.orbitrontactics.pack.fleet_crystal_choir` | Crystal Choir |
+| `com.ol1n.orbitrontactics.pack.fleet_ronin_blades` | Ronin Blades |
+| `com.ol1n.orbitrontactics.pack.fleet_atomic_age` | Atomic Age |
+| `com.ol1n.orbitrontactics.pack.fleet_abyssal_tide` | Abyssal Tide |
+| `com.ol1n.orbitrontactics.pack.ace` | Ace pack |
+| `com.ol1n.orbitrontactics.pack.phantom` | Phantom pack |
+| `com.ol1n.orbitrontactics.pack.striker` | Striker pack |
+| `com.ol1n.orbitrontactics.pack.music_retro` | Retro Arcade music |
 
 The ids come from `StoreCatalog` in the app; a product the app does not
 know is ignored, and an item the store does not list shows "Not in the

@@ -28,7 +28,9 @@ void main() {
       expect(ids.toSet(), hasLength(ids.length));
       for (final id in ids) {
         // Google Play: lowercase letters, digits, _ and .; App Store: no -.
-        expect(RegExp(r'^[a-z0-9][a-z0-9_.]{0,39}$').hasMatch(id), isTrue,
+        expect(RegExp(r'^com\.ol1n\.orbitrontactics\.pack\.[a-z0-9_]{1,60}$')
+                .hasMatch(id),
+            isTrue,
             reason: id);
       }
     });

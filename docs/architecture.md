@@ -48,7 +48,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 ## Store
 
 - Free game, no ads; the store sells looks and sidegrades. `FleetSkin.premium` marks six fleets; Vanguard and the AI fleets are free.
-- `StoreCatalog` lists the products (`bundle.commander`, `bundle.fleets`, `fleet.<slug>`, `pack.<id>`, `music.<slug>`); the ids are the Google Play and App Store product ids. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
+- `StoreCatalog` lists the products as `com.ol1n.orbitrontactics.pack.<packId>` (`commander`, `fleets`, `fleet_<slug>`, `<pack id>`, `music_<slug>`), the same id on Google Play and the App Store; every product costs USD 0.99. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
 - `PurchaseService`: `RevenueCatPurchaseService` when the build has `REVENUECAT_GOOGLE_KEY` / `REVENUECAT_APPLE_KEY`, `DebugPurchaseService` (free, saved on device) in debug builds, else `UnavailablePurchaseService`. No RevenueCat entitlements or offerings: the app maps product ids itself.
 - `EntitlementsNotifier` (`entitlementsProvider`) caches in `store.entitlements`, syncs at start, grants owned packs with `FleetProgressNotifier.grantPack`, and swaps an unowned premium skin for the fallback (refunds). The first launch with a store grandfathers the premium skin the player flies.
 - Music: `BattleMusic` (`standard`, premium `retro` from `assets/audio/music_retro/`, built by `tools/battle_audio/chiptune.py`); `chosenBattleMusicProvider` keeps the pick in `battle_music`, `battleMusicProvider` falls back to standard when it is not owned; `BattleAudio.start(music:)` and `preview`.

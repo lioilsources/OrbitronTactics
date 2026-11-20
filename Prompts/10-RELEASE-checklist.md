@@ -74,8 +74,8 @@ sentry.io → nový projekt Flutter → zkopíruj DSN do `release.json`
 3. Účet je firemní (organizace): podmínka 12 testerů na 14 dní neplatí,
    vydává se rovnou do produkce. Interní test pro vlastní kontrolu stačí.
 4. Monetize → In-app products: založ 12 jednorázových produktů podle
-   tabulky v `docs/store-listing.md` (id musí sedět přesně), ceny ručně
-   pro CZK a EUR, stav Active.
+   tabulky v `docs/store-listing.md` (id musí sedět přesně), každý za
+   USD 0,99 (ostatní měny automatický přepočet), stav Active.
 5. Settings → License testing: přidej svůj Google účet a testery
    (nákupy zdarma, testovací karta).
 6. Data safety, Content rating, Target audience 13+: odpovědi jsou

@@ -124,13 +124,19 @@ Future<void> _loadFonts() async {
   await load('MaterialIcons', ['MaterialIcons-Regular.otf']);
 
   // Roboto has no chess symbols; phones fall back to a system font, and
-  // this machine's DejaVu Sans does the same here.
-  const dejaVu = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
-  if (File(dejaVu).existsSync()) {
+  // this machine's DejaVu Sans (Linux) or Apple Symbols (macOS) does the
+  // same here, loaded under one family name.
+  const symbolFonts = [
+    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    '/System/Library/Fonts/Apple Symbols.ttf',
+  ];
+  for (final path in symbolFonts) {
+    if (!File(path).existsSync()) continue;
     final loader = FontLoader('DejaVu Sans')
       ..addFont(Future.value(
-          ByteData.sublistView(File(dejaVu).readAsBytesSync())));
+          ByteData.sublistView(File(path).readAsBytesSync())));
     await loader.load();
+    break;
   }
 }
 

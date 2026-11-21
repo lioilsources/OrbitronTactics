@@ -50,6 +50,9 @@ void main() {
       const same = {
         'appTitle', 'tierStarter', 'upgradeMax', 'difficultyEasy',
         'maneuverStats', 'musicStandard', 'itemMusicTitle', 'aiPlayerName',
+        // Proper names of piece pack sides.
+        'pieceSkinAsgardRagnarokBlack', 'pieceSkinCamelotMorganaBlack',
+        'pieceSkinEgyptAssyriaWhite', 'pieceSkinHorusSethBlack',
       };
       for (final key in keys.difference(same)) {
         final english = en[key] as String;

@@ -1070,6 +1070,186 @@ abstract class AppLocalizations {
   /// **'Crusaders'**
   String get pieceSkinHussitesCrusadersBlack;
 
+  /// Name of the Asgard × Ragnarök piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Asgard × Ragnarök'**
+  String get pieceSkinAsgardRagnarok;
+
+  /// White side of the Asgard × Ragnarök piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Asgard'**
+  String get pieceSkinAsgardRagnarokWhite;
+
+  /// Black side of the Asgard × Ragnarök piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Ragnarök'**
+  String get pieceSkinAsgardRagnarokBlack;
+
+  /// Name of the Bogatyrs × Koschei piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Bogatyrs × Koschei'**
+  String get pieceSkinBogatyrsKoschei;
+
+  /// White side of the Bogatyrs × Koschei piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Bogatyrs'**
+  String get pieceSkinBogatyrsKoscheiWhite;
+
+  /// Black side of the Bogatyrs × Koschei piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Koschei'**
+  String get pieceSkinBogatyrsKoscheiBlack;
+
+  /// Name of the Round Table × Morgana piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Round Table × Morgana'**
+  String get pieceSkinCamelotMorgana;
+
+  /// White side of the Round Table × Morgana piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Round Table'**
+  String get pieceSkinCamelotMorganaWhite;
+
+  /// Black side of the Round Table × Morgana piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Morgana'**
+  String get pieceSkinCamelotMorganaBlack;
+
+  /// Name of the Dwarves × Dragons piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dwarves × Dragons'**
+  String get pieceSkinDwarvesDragons;
+
+  /// White side of the Dwarves × Dragons piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dwarves'**
+  String get pieceSkinDwarvesDragonsWhite;
+
+  /// Black side of the Dwarves × Dragons piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Dragons'**
+  String get pieceSkinDwarvesDragonsBlack;
+
+  /// Name of the Egypt × Assyria piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Egypt × Assyria'**
+  String get pieceSkinEgyptAssyria;
+
+  /// White side of the Egypt × Assyria piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Egypt'**
+  String get pieceSkinEgyptAssyriaWhite;
+
+  /// Black side of the Egypt × Assyria piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Assyria'**
+  String get pieceSkinEgyptAssyriaBlack;
+
+  /// Name of the Elves × Goblins piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Elves × Goblins'**
+  String get pieceSkinElvesGoblins;
+
+  /// White side of the Elves × Goblins piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Elves'**
+  String get pieceSkinElvesGoblinsWhite;
+
+  /// Black side of the Elves × Goblins piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Goblins'**
+  String get pieceSkinElvesGoblinsBlack;
+
+  /// Name of the Horus × Seth piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Horus × Seth'**
+  String get pieceSkinHorusSeth;
+
+  /// White side of the Horus × Seth piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Horus'**
+  String get pieceSkinHorusSethWhite;
+
+  /// Black side of the Horus × Seth piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Seth'**
+  String get pieceSkinHorusSethBlack;
+
+  /// Name of the Living × Undead piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Living × Undead'**
+  String get pieceSkinLivingUndead;
+
+  /// White side of the Living × Undead piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Living'**
+  String get pieceSkinLivingUndeadWhite;
+
+  /// Black side of the Living × Undead piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Undead'**
+  String get pieceSkinLivingUndeadBlack;
+
+  /// Name of the Vampires × Werewolves piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Vampires × Werewolves'**
+  String get pieceSkinVampiresWerewolves;
+
+  /// White side of the Vampires × Werewolves piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Vampires'**
+  String get pieceSkinVampiresWerewolvesWhite;
+
+  /// Black side of the Vampires × Werewolves piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Werewolves'**
+  String get pieceSkinVampiresWerewolvesBlack;
+
+  /// Name of the White Magic × Black Magic piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'White Magic × Black Magic'**
+  String get pieceSkinWhiteBlackMagic;
+
+  /// White side of the White Magic × Black Magic piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'White Magic'**
+  String get pieceSkinWhiteBlackMagicWhite;
+
+  /// Black side of the White Magic × Black Magic piece pack
+  ///
+  /// In en, this message translates to:
+  /// **'Black Magic'**
+  String get pieceSkinWhiteBlackMagicBlack;
+
   /// An amount of credits
   ///
   /// In en, this message translates to:

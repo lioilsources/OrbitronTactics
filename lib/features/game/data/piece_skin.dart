@@ -40,6 +40,56 @@ enum PieceSkin {
     'hussites_crusaders',
     lightSquare: Color(0xFFE8DEC9),
     darkSquare: Color(0xFF8496A6),
+  ),
+  asgardRagnarok(
+    'asgard_ragnarok',
+    lightSquare: Color(0xFFE6E1D3),
+    darkSquare: Color(0xFF7D8DA3),
+  ),
+  bogatyrsKoschei(
+    'bogatyrs_koschei',
+    lightSquare: Color(0xFFEBE2CF),
+    darkSquare: Color(0xFF80919F),
+  ),
+  camelotMorgana(
+    'camelot_morgana',
+    lightSquare: Color(0xFFE7E2D2),
+    darkSquare: Color(0xFF7D8E9E),
+  ),
+  dwarvesDragons(
+    'dwarves_dragons',
+    lightSquare: Color(0xFFE9E0CE),
+    darkSquare: Color(0xFF7C8BA0),
+  ),
+  egyptAssyria(
+    'egypt_assyria',
+    lightSquare: Color(0xFFEEE4CC),
+    darkSquare: Color(0xFF7E93A6),
+  ),
+  elvesGoblins(
+    'elves_goblins',
+    lightSquare: Color(0xFFE5E3D0),
+    darkSquare: Color(0xFF7F9A8E),
+  ),
+  horusSeth(
+    'horus_seth',
+    lightSquare: Color(0xFFEFE3C8),
+    darkSquare: Color(0xFF8A97A8),
+  ),
+  livingUndead(
+    'living_undead',
+    lightSquare: Color(0xFFECE3CF),
+    darkSquare: Color(0xFF7F8FA0),
+  ),
+  vampiresWerewolves(
+    'vampires_werewolves',
+    lightSquare: Color(0xFFE8E0D2),
+    darkSquare: Color(0xFF7E8AA3),
+  ),
+  whiteBlackMagic(
+    'white_black_magic',
+    lightSquare: Color(0xFFECE6DA),
+    darkSquare: Color(0xFF8792A8),
   );
 
   const PieceSkin(this.slug, {Color? lightSquare, Color? darkSquare})
@@ -83,6 +133,16 @@ enum PieceSkin {
         olympusTitans => l10n.pieceSkinOlympusTitans,
         samuraiYokai => l10n.pieceSkinSamuraiYokai,
         hussitesCrusaders => l10n.pieceSkinHussitesCrusaders,
+        asgardRagnarok => l10n.pieceSkinAsgardRagnarok,
+        bogatyrsKoschei => l10n.pieceSkinBogatyrsKoschei,
+        camelotMorgana => l10n.pieceSkinCamelotMorgana,
+        dwarvesDragons => l10n.pieceSkinDwarvesDragons,
+        egyptAssyria => l10n.pieceSkinEgyptAssyria,
+        elvesGoblins => l10n.pieceSkinElvesGoblins,
+        horusSeth => l10n.pieceSkinHorusSeth,
+        livingUndead => l10n.pieceSkinLivingUndead,
+        vampiresWerewolves => l10n.pieceSkinVampiresWerewolves,
+        whiteBlackMagic => l10n.pieceSkinWhiteBlackMagic,
       };
 
   /// The name of [color]'s army in this skin.
@@ -102,6 +162,26 @@ enum PieceSkin {
         white ? l10n.pieceSkinSamuraiYokaiWhite : l10n.pieceSkinSamuraiYokaiBlack,
       hussitesCrusaders =>
         white ? l10n.pieceSkinHussitesCrusadersWhite : l10n.pieceSkinHussitesCrusadersBlack,
+      asgardRagnarok =>
+        white ? l10n.pieceSkinAsgardRagnarokWhite : l10n.pieceSkinAsgardRagnarokBlack,
+      bogatyrsKoschei =>
+        white ? l10n.pieceSkinBogatyrsKoscheiWhite : l10n.pieceSkinBogatyrsKoscheiBlack,
+      camelotMorgana =>
+        white ? l10n.pieceSkinCamelotMorganaWhite : l10n.pieceSkinCamelotMorganaBlack,
+      dwarvesDragons =>
+        white ? l10n.pieceSkinDwarvesDragonsWhite : l10n.pieceSkinDwarvesDragonsBlack,
+      egyptAssyria =>
+        white ? l10n.pieceSkinEgyptAssyriaWhite : l10n.pieceSkinEgyptAssyriaBlack,
+      elvesGoblins =>
+        white ? l10n.pieceSkinElvesGoblinsWhite : l10n.pieceSkinElvesGoblinsBlack,
+      horusSeth =>
+        white ? l10n.pieceSkinHorusSethWhite : l10n.pieceSkinHorusSethBlack,
+      livingUndead =>
+        white ? l10n.pieceSkinLivingUndeadWhite : l10n.pieceSkinLivingUndeadBlack,
+      vampiresWerewolves =>
+        white ? l10n.pieceSkinVampiresWerewolvesWhite : l10n.pieceSkinVampiresWerewolvesBlack,
+      whiteBlackMagic =>
+        white ? l10n.pieceSkinWhiteBlackMagicWhite : l10n.pieceSkinWhiteBlackMagicBlack,
     };
   }
 }

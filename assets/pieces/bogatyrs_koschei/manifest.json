@@ -1,0 +1,75 @@
+{
+ "id": "bogatyrs_koschei",
+ "name_cs": "Bohatýři × Kostěj",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#EBE2CF",
+  "dark": "#80919F"
+ },
+ "sides": [
+  {
+   "id": "bogatyrs",
+   "color": "white",
+   "name_cs": "Bohatýři",
+   "pieces": {
+    "king": {
+     "name_cs": "Kníže Rudé slunko",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Vasilisa Přemoudrá",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Srubová věž kremlu",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Volchv s holí",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Ilja Muromec na koni",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Družiník",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "koschei",
+   "color": "black",
+   "name_cs": "Kostěj",
+   "pieces": {
+    "king": {
+     "name_cs": "Kostěj Nesmrtelný",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Baba Jaga v moždíři",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Chaloupka na kuří nožce",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Lešij",
+     "candidate": 0
+    },
+    "knight": {
+     "name_cs": "Zmej Gorynyč",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Kikimora",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

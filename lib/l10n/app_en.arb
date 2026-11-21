@@ -406,6 +406,126 @@
   "@pieceSkinHussitesCrusadersBlack": {
     "description": "Black side of the Hussites × Crusaders piece pack"
   },
+  "pieceSkinAsgardRagnarok": "Asgard × Ragnarök",
+  "@pieceSkinAsgardRagnarok": {
+    "description": "Name of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinAsgardRagnarokWhite": "Asgard",
+  "@pieceSkinAsgardRagnarokWhite": {
+    "description": "White side of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinAsgardRagnarokBlack": "Ragnarök",
+  "@pieceSkinAsgardRagnarokBlack": {
+    "description": "Black side of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinBogatyrsKoschei": "Bogatyrs × Koschei",
+  "@pieceSkinBogatyrsKoschei": {
+    "description": "Name of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinBogatyrsKoscheiWhite": "Bogatyrs",
+  "@pieceSkinBogatyrsKoscheiWhite": {
+    "description": "White side of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinBogatyrsKoscheiBlack": "Koschei",
+  "@pieceSkinBogatyrsKoscheiBlack": {
+    "description": "Black side of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinCamelotMorgana": "Round Table × Morgana",
+  "@pieceSkinCamelotMorgana": {
+    "description": "Name of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinCamelotMorganaWhite": "Round Table",
+  "@pieceSkinCamelotMorganaWhite": {
+    "description": "White side of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinCamelotMorganaBlack": "Morgana",
+  "@pieceSkinCamelotMorganaBlack": {
+    "description": "Black side of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinDwarvesDragons": "Dwarves × Dragons",
+  "@pieceSkinDwarvesDragons": {
+    "description": "Name of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinDwarvesDragonsWhite": "Dwarves",
+  "@pieceSkinDwarvesDragonsWhite": {
+    "description": "White side of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinDwarvesDragonsBlack": "Dragons",
+  "@pieceSkinDwarvesDragonsBlack": {
+    "description": "Black side of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinEgyptAssyria": "Egypt × Assyria",
+  "@pieceSkinEgyptAssyria": {
+    "description": "Name of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinEgyptAssyriaWhite": "Egypt",
+  "@pieceSkinEgyptAssyriaWhite": {
+    "description": "White side of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinEgyptAssyriaBlack": "Assyria",
+  "@pieceSkinEgyptAssyriaBlack": {
+    "description": "Black side of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinElvesGoblins": "Elves × Goblins",
+  "@pieceSkinElvesGoblins": {
+    "description": "Name of the Elves × Goblins piece pack"
+  },
+  "pieceSkinElvesGoblinsWhite": "Elves",
+  "@pieceSkinElvesGoblinsWhite": {
+    "description": "White side of the Elves × Goblins piece pack"
+  },
+  "pieceSkinElvesGoblinsBlack": "Goblins",
+  "@pieceSkinElvesGoblinsBlack": {
+    "description": "Black side of the Elves × Goblins piece pack"
+  },
+  "pieceSkinHorusSeth": "Horus × Seth",
+  "@pieceSkinHorusSeth": {
+    "description": "Name of the Horus × Seth piece pack"
+  },
+  "pieceSkinHorusSethWhite": "Horus",
+  "@pieceSkinHorusSethWhite": {
+    "description": "White side of the Horus × Seth piece pack"
+  },
+  "pieceSkinHorusSethBlack": "Seth",
+  "@pieceSkinHorusSethBlack": {
+    "description": "Black side of the Horus × Seth piece pack"
+  },
+  "pieceSkinLivingUndead": "Living × Undead",
+  "@pieceSkinLivingUndead": {
+    "description": "Name of the Living × Undead piece pack"
+  },
+  "pieceSkinLivingUndeadWhite": "Living",
+  "@pieceSkinLivingUndeadWhite": {
+    "description": "White side of the Living × Undead piece pack"
+  },
+  "pieceSkinLivingUndeadBlack": "Undead",
+  "@pieceSkinLivingUndeadBlack": {
+    "description": "Black side of the Living × Undead piece pack"
+  },
+  "pieceSkinVampiresWerewolves": "Vampires × Werewolves",
+  "@pieceSkinVampiresWerewolves": {
+    "description": "Name of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinVampiresWerewolvesWhite": "Vampires",
+  "@pieceSkinVampiresWerewolvesWhite": {
+    "description": "White side of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinVampiresWerewolvesBlack": "Werewolves",
+  "@pieceSkinVampiresWerewolvesBlack": {
+    "description": "Black side of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinWhiteBlackMagic": "White Magic × Black Magic",
+  "@pieceSkinWhiteBlackMagic": {
+    "description": "Name of the White Magic × Black Magic piece pack"
+  },
+  "pieceSkinWhiteBlackMagicWhite": "White Magic",
+  "@pieceSkinWhiteBlackMagicWhite": {
+    "description": "White side of the White Magic × Black Magic piece pack"
+  },
+  "pieceSkinWhiteBlackMagicBlack": "Black Magic",
+  "@pieceSkinWhiteBlackMagicBlack": {
+    "description": "Black side of the White Magic × Black Magic piece pack"
+  },
   "creditsAmount": "{credits} cr",
   "@creditsAmount": {
     "description": "An amount of credits",

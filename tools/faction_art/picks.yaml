@@ -48,3 +48,43 @@ fruit_veggies:
   qwen:
     fruit: {king: 0, queen: 0, rook: 0, bishop: 2, knight: 2, pawn: 2}
     veggies: {king: 3, queen: 1, rook: 1, bishop: 3, knight: 1, pawn: 1}
+asgard_ragnarok:
+  qwen:
+    asgard: {king: 1, queen: 1, rook: 2, bishop: 2, knight: 1, pawn: 1}
+    ragnarok: {king: 1, queen: 2, rook: 0, bishop: 3, knight: 2, pawn: 2}
+bogatyrs_koschei:
+  qwen:
+    bogatyrs: {king: 1, queen: 1, rook: 1, bishop: 1, knight: 1, pawn: 2}
+    koschei: {king: 2, queen: 1, rook: 2, bishop: 0, knight: 0, pawn: 2}
+camelot_morgana:
+  qwen:
+    camelot: {king: 2, queen: 1, rook: 0, bishop: 2, knight: 1, pawn: 3}
+    morgana: {king: 0, queen: 2, rook: 3, bishop: 0, knight: 0, pawn: 2}
+dwarves_dragons:
+  qwen:
+    dwarves: {king: 1, queen: 1, rook: 3, bishop: 2, knight: 2, pawn: 1}
+    dragons: {king: 0, queen: 1, rook: 2, bishop: 1, knight: 2, pawn: 1}
+egypt_assyria:
+  qwen:
+    egypt: {king: 0, queen: 2, rook: 1, bishop: 2, knight: 1, pawn: 2}
+    assyria: {king: 0, queen: 1, rook: 1, bishop: 1, knight: 2, pawn: 1}
+elves_goblins:
+  qwen:
+    elves: {king: 3, queen: 0, rook: 1, bishop: 2, knight: 1, pawn: 1}
+    goblins: {king: 1, queen: 2, rook: 0, bishop: 2, knight: 1, pawn: 0}
+horus_seth:
+  qwen:
+    horus: {king: 0, queen: 2, rook: 1, bishop: 1, knight: 1, pawn: 3}
+    seth: {king: 1, queen: 2, rook: 2, bishop: 0, knight: 1, pawn: 0}
+living_undead:
+  qwen:
+    living: {king: 1, queen: 2, rook: 2, bishop: 2, knight: 1, pawn: 1}
+    undead: {king: 2, queen: 2, rook: 2, bishop: 3, knight: 2, pawn: 2}
+vampires_werewolves:
+  qwen:
+    vampires: {king: 1, queen: 1, rook: 1, bishop: 2, knight: 2, pawn: 2}
+    werewolves: {king: 3, queen: 2, rook: 3, bishop: 3, knight: 3, pawn: 2}
+white_black_magic:
+  qwen:
+    white_magic: {king: 1, queen: 0, rook: 1, bishop: 3, knight: 2, pawn: 2}
+    black_magic: {king: 0, queen: 1, rook: 1, bishop: 1, knight: 0, pawn: 1}

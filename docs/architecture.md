@@ -67,7 +67,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 
 ## Telemetry and onboarding
 
-- `Telemetry.event(name, props)` never throws. `SupabaseTelemetry` inserts into `app_events` (insert-only RLS) and adds a Sentry breadcrumb; tests use `NoTelemetry` / `RecordingTelemetry`. Events: `app_opened`, `game_started`, `game_finished`, `store_opened`, `store_item_viewed`, `purchase_started`, `purchase`, `restore`.
+- `Telemetry.event(name, props)` never throws. `SupabaseTelemetry` inserts into `app_events` (insert-only RLS) once the install is signed in, i.e. has played online; before that events are only Sentry breadcrumbs and adds a Sentry breadcrumb; tests use `NoTelemetry` / `RecordingTelemetry`. Events: `app_opened`, `game_started`, `game_finished`, `store_opened`, `store_item_viewed`, `purchase_started`, `purchase`, `restore`.
 - Sentry starts only with `SENTRY_DSN`; no PII, no tracing.
 - `OnboardingStore` (`onboardingStoreProvider`, everything seen by default): `HowToPlayScreen` on first launch, `_ControlsHint` over the arena until the first touch.
 
@@ -76,7 +76,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 - **Realtime Broadcast** — move sync between players (~20-50ms)
 - **Presence** — detect opponent disconnect
 - **DB** — lobby/session management
-- **Auth** — every install signs in anonymously (`GameRepository.ensureSignedIn`). RLS: open games visible to signed-in players, a game otherwise only to its `white_uid`/`black_uid`; the black seat only through `join_game()`. `pg_cron` deletes stale games. `GameRepository.protocol` must be bumped when a `GameEvent` changes incompatibly.
+- **Auth** — an install signs in anonymously on its first online action (`GameRepository.ensureSignedIn`, called by every repository method); telemetry never signs in. RLS: open games visible to signed-in players, a game otherwise only to its `white_uid`/`black_uid`; the black seat only through `join_game()`. `pg_cron` deletes stale games. `GameRepository.protocol` must be bumped when a `GameEvent` changes incompatibly.
 
 Config: `lib/core/constants/supabase_constants.dart` reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` from `--dart-define`, with built-in defaults.
 Release keys: `release.example.json`, built with `--dart-define-from-file=release.json`.

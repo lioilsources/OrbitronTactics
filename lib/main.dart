@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/release_constants.dart';
 import 'core/constants/supabase_constants.dart';
-import 'features/game/data/game_repository.dart';
 import 'features/game/presentation/providers/piece_skin_provider.dart';
 import 'features/game/presentation/screens/lobby_screen.dart';
 import 'features/onboarding/data/onboarding_store.dart';
@@ -37,7 +36,6 @@ Future<void> main() async {
   final telemetry = SupabaseTelemetry(
     client,
     appVersion: '${info.version}+${info.buildNumber}',
-    ensureSignedIn: GameRepository(client).ensureSignedIn,
   );
 
   final container = ProviderContainer(

@@ -44,6 +44,10 @@
   "lobbyJoinWifi": "Join WiFi",
   "lobbyOpenGames": "Open Games",
   "lobbyNoOpenGames": "No open games.\nCreate one to start!",
+  "lobbyShowOpenGames": "Show open games",
+  "@lobbyShowOpenGames": {
+    "description": "Lobby button that connects to the online service and lists games waiting for a second player"
+  },
   "lobbyJustNow": "just now",
   "lobbyMinutesAgo": "{minutes}m ago",
   "@lobbyMinutesAgo": {

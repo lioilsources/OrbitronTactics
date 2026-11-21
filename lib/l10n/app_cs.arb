@@ -30,6 +30,7 @@
   "lobbyJoinWifi": "Připojit přes WiFi",
   "lobbyOpenGames": "Otevřené hry",
   "lobbyNoOpenGames": "Žádné otevřené hry.\nZaložte novou!",
+  "lobbyShowOpenGames": "Zobrazit otevřené hry",
   "lobbyJustNow": "právě teď",
   "lobbyMinutesAgo": "před {minutes} min",
   "lobbyCannotConnect": "Nelze se připojit k serveru",

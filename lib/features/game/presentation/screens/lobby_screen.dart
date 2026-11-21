@@ -106,6 +106,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       final gameId = await repo.createGame(playerName: playerName);
 
       if (!mounted) return;
+      // Signed in now: the lobby may list open games from here on.
+      ref.read(onlineLobbyProvider.notifier).state = true;
 
       // Navigate to waiting screen, then start game when opponent joins
       await Navigator.of(context).push(
@@ -277,7 +279,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final waitingGames = ref.watch(waitingGamesProvider);
+    final online = ref.watch(onlineLobbyProvider);
+    final waitingGames = online ? ref.watch(waitingGamesProvider) : null;
     final l10n = context.l10n;
 
     return Scaffold(
@@ -420,7 +423,21 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               const SizedBox(height: 8),
 
               Expanded(
-                child: waitingGames.when(
+                child: waitingGames == null
+                    ? Center(
+                        child: OutlinedButton.icon(
+                          onPressed: () => ref
+                              .read(onlineLobbyProvider.notifier)
+                              .state = true,
+                          icon: const Icon(Icons.public),
+                          label: Text(l10n.lobbyShowOpenGames),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white70,
+                            side: BorderSide(color: Colors.grey.shade700),
+                          ),
+                        ),
+                      )
+                    : waitingGames.when(
                   data: (games) {
                     if (games.isEmpty) {
                       return Center(

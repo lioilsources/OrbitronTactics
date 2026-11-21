@@ -103,6 +103,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get lobbyNoOpenGames => 'Žádné otevřené hry.\nZaložte novou!';
 
   @override
+  String get lobbyShowOpenGames => 'Zobrazit otevřené hry';
+
+  @override
   String get lobbyJustNow => 'právě teď';
 
   @override

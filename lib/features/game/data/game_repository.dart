@@ -15,6 +15,10 @@ class GameRepository {
   /// by the same protocol.
   static const protocol = 1;
 
+  /// Whether this install already has its anonymous player, i.e. has
+  /// played online before.
+  bool get isSignedIn => _client.auth.currentSession != null;
+
   /// Signs this install in anonymously unless it already has a session. The
   /// session is kept on the device, so one install stays one player.
   Future<void> ensureSignedIn() async {

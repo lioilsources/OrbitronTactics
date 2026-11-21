@@ -12,6 +12,12 @@ final gameRepositoryProvider = Provider<GameRepository>((ref) {
   return GameRepository(ref.watch(supabaseClientProvider));
 });
 
+/// Whether the lobby lists open games. Watching them signs the install in,
+/// so a player who never asked for online play stays without an account;
+/// one who has played online before sees them right away.
+final onlineLobbyProvider = StateProvider<bool>(
+    (ref) => ref.watch(gameRepositoryProvider).isSignedIn);
+
 /// Stream of waiting games.
 final waitingGamesProvider = StreamProvider<List<GameLobbyEntry>>((ref) {
   final repo = ref.watch(gameRepositoryProvider);

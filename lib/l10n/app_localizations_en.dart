@@ -400,14 +400,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Every premium fleet, maneuver pack and music pack, and everything added to the store later.';
 
   @override
-  String get itemFleetsTitle => 'Fleet Collection';
-
-  @override
-  String itemFleetsDescription(int count) {
-    return 'All $count premium fleets, and every fleet added later.';
-  }
-
-  @override
   String get itemFleetDescription =>
       'Ship art for all six units, white and black. Looks only: it flies like any other fleet.';
 

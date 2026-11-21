@@ -60,7 +60,6 @@ extension ContentL10n on AppLocalizations {
 
   String storeTitle(StoreItem item) => switch (item.kind) {
         StoreItemKind.commander => itemCommanderTitle,
-        StoreItemKind.fleetBundle => itemFleetsTitle,
         StoreItemKind.fleet => item.fleet!.displayName,
         StoreItemKind.maneuverPack => packName(item.pack!),
         StoreItemKind.music => itemMusicTitle(musicName(item.music!)),
@@ -68,8 +67,6 @@ extension ContentL10n on AppLocalizations {
 
   String storeDescription(StoreItem item) => switch (item.kind) {
         StoreItemKind.commander => itemCommanderDescription,
-        StoreItemKind.fleetBundle =>
-          itemFleetsDescription(StoreCatalog.premiumFleets.length),
         StoreItemKind.fleet => itemFleetDescription,
         StoreItemKind.maneuverPack => content(item.pack!.description),
         StoreItemKind.music => itemMusicDescription,

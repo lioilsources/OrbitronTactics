@@ -109,8 +109,6 @@
   "purchasePending": "Čeká se na platbu; {item} dorazí, jakmile projde",
   "itemCommanderTitle": "Edice Velitel",
   "itemCommanderDescription": "Všechny prémiové flotily, balíčky manévrů i hudby a vše, co do obchodu přibude.",
-  "itemFleetsTitle": "Sbírka flotil",
-  "itemFleetsDescription": "Všech {count} prémiových flotil a každá další, která přibude.",
   "itemFleetDescription": "Vzhled lodí všech šesti jednotek, bílých i černých. Jen vzhled: létá jako každá jiná flotila.",
   "itemMusicTitle": "Hudba {name}",
   "itemMusicDescription": "Všechna bitevní témata znovu jako 8bitový chiptune, od pěšcovy rychlé syntezátorové linky po královský pochod.",

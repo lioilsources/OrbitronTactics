@@ -37,6 +37,7 @@ import 'package:orbitron_tactics/features/onboarding/presentation/how_to_play_sc
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
 import 'package:orbitron_tactics/features/store/data/purchase_service.dart';
+import 'package:orbitron_tactics/features/store/data/store_catalog.dart';
 import 'package:orbitron_tactics/features/store/presentation/providers/store_providers.dart';
 import 'package:orbitron_tactics/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,9 +73,12 @@ class _ShopWindow extends PurchaseService {
           id: _price(id),
       };
 
-  // Every product costs USD 0.99; the Czech price stays in dollars because
-  // the store's own conversion to crowns is not known here.
-  String _price(String id) => czech ? '0,99 US\$' : '\$0.99';
+  // USD 0.99 a product, 4.99 the Commander Edition; the Czech price stays in
+  // dollars because the store's own conversion to crowns is not known here.
+  String _price(String id) {
+    final usd = id == StoreCatalog.commanderId ? '4.99' : '0.99';
+    return czech ? '${usd.replaceAll('.', ',')} US\$' : '\$$usd';
+  }
 
   @override
   Future<Set<String>> owned() async => {};

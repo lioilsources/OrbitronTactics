@@ -56,15 +56,6 @@ void main() {
       expect(one.ownsFleet(solar), isTrue);
       expect(one.ownsFleet(neon), isFalse);
       expect(one.owns(StoreCatalog.forFleet(solar)), isTrue);
-      expect(one.owns(StoreCatalog.byId(StoreCatalog.fleetBundleId)!),
-          isFalse);
-    });
-
-    test('the fleet collection unlocks every fleet, not the packs', () {
-      const bundle = Entitlements(products: {StoreCatalog.fleetBundleId});
-      expect(StoreCatalog.premiumFleets.every(bundle.ownsFleet), isTrue);
-      expect(bundle.ownsPack('ace'), isFalse);
-      expect(bundle.ownedPacks, isEmpty);
     });
 
     test('the commander edition unlocks everything', () {
@@ -86,7 +77,7 @@ void main() {
               .ownsMusic(BattleMusic.retro),
           isTrue);
       expect(
-          const Entitlements(products: {StoreCatalog.fleetBundleId})
+          Entitlements(products: {StoreCatalog.fleetId(FleetSkin.solarCrusade)})
               .ownsMusic(BattleMusic.retro),
           isFalse);
     });

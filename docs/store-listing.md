@@ -90,22 +90,21 @@ ne to, kdo vyhraje.
 
 Product ids are the same on Google Play and in App Store Connect.
 
-Price: **USD 0.99 each** (App Store price point USD 0.99; other currencies by the store's automatic conversion, the same on Google Play).
+Price: **USD 0.99** for each single product, **USD 4.99** for the Commander Edition (everything); store price points in USD, other currencies by the store's automatic conversion, the same on Google Play.
 
-| Product id | Name |
-|---|---|
-| `com.ol1n.orbitrontactics.pack.commander` | Commander Edition |
-| `com.ol1n.orbitrontactics.pack.fleets` | Fleet Collection |
-| `com.ol1n.orbitrontactics.pack.fleet_solar_crusade` | Solar Crusade |
-| `com.ol1n.orbitrontactics.pack.fleet_neon_runners` | Neon Runners |
-| `com.ol1n.orbitrontactics.pack.fleet_crystal_choir` | Crystal Choir |
-| `com.ol1n.orbitrontactics.pack.fleet_ronin_blades` | Ronin Blades |
-| `com.ol1n.orbitrontactics.pack.fleet_atomic_age` | Atomic Age |
-| `com.ol1n.orbitrontactics.pack.fleet_abyssal_tide` | Abyssal Tide |
-| `com.ol1n.orbitrontactics.pack.ace` | Ace pack |
-| `com.ol1n.orbitrontactics.pack.phantom` | Phantom pack |
-| `com.ol1n.orbitrontactics.pack.striker` | Striker pack |
-| `com.ol1n.orbitrontactics.pack.music_retro` | Retro Arcade music |
+| Product id | Name | USD |
+|---|---|---|
+| `com.ol1n.orbitrontactics.pack.commander` | Commander Edition | 4.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_solar_crusade` | Solar Crusade | 0.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_neon_runners` | Neon Runners | 0.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_crystal_choir` | Crystal Choir | 0.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_ronin_blades` | Ronin Blades | 0.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_atomic_age` | Atomic Age | 0.99 |
+| `com.ol1n.orbitrontactics.pack.fleet_abyssal_tide` | Abyssal Tide | 0.99 |
+| `com.ol1n.orbitrontactics.pack.ace` | Ace pack | 0.99 |
+| `com.ol1n.orbitrontactics.pack.phantom` | Phantom pack | 0.99 |
+| `com.ol1n.orbitrontactics.pack.striker` | Striker pack | 0.99 |
+| `com.ol1n.orbitrontactics.pack.music_retro` | Retro Arcade music | 0.99 |
 
 The ids come from `StoreCatalog` in the app; a product the app does not
 know is ignored, and an item the store does not list shows "Not in the

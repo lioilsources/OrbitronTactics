@@ -402,14 +402,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Všechny prémiové flotily, balíčky manévrů i hudby a vše, co do obchodu přibude.';
 
   @override
-  String get itemFleetsTitle => 'Sbírka flotil';
-
-  @override
-  String itemFleetsDescription(int count) {
-    return 'Všech $count prémiových flotil a každá další, která přibude.';
-  }
-
-  @override
   String get itemFleetDescription =>
       'Vzhled lodí všech šesti jednotek, bílých i černých. Jen vzhled: létá jako každá jiná flotila.';
 

@@ -28,7 +28,6 @@ class StoreItemPreview extends StatelessWidget {
           ],
           size: size,
         );
-      case StoreItemKind.fleetBundle:
       case StoreItemKind.commander:
         return _Ships(
           assets: [

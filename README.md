@@ -58,12 +58,11 @@ The attacker's unit type picks the battle music, and every element has its own s
 ## Store
 
 The whole game is free. The Comcenter's Store tab sells looks and sidegrades,
-all one-time purchases:
+all one-time purchases at USD 0.99 each, the Commander Edition at USD 4.99:
 
 | Product | Contents |
 |---------|----------|
 | Commander Edition | Everything below, and everything added later |
-| Fleet Collection | All six premium fleets, and fleets added later |
 | A premium fleet | Solar Crusade, Neon Runners, Crystal Choir, Ronin Blades, Atomic Age or Abyssal Tide |
 | Ace, Phantom and Striker packs | The corkscrew, the cloaked Phantom and the two-pass Strafing Run for every ship |
 | Retro Arcade music | Every battle theme again as 8-bit chiptune |

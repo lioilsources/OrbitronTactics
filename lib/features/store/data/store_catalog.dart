@@ -4,7 +4,7 @@ import '../../battle/data/battle_music.dart';
 import '../../battle/data/fleet_skin.dart';
 
 /// What a store item hands over.
-enum StoreItemKind { commander, fleetBundle, fleet, maneuverPack, music }
+enum StoreItemKind { commander, fleet, maneuverPack, music }
 
 /// One product in the store. [id] is the product id in Google Play and App
 /// Store Connect, the same on both.
@@ -44,7 +44,6 @@ class StoreCatalog {
   static const _prefix = 'com.ol1n.orbitrontactics.pack.';
 
   static const commanderId = '${_prefix}commander';
-  static const fleetBundleId = '${_prefix}fleets';
 
   static String fleetId(FleetSkin skin) => '${_prefix}fleet_${skin.slug}';
   static String packId(String pack) => '$_prefix$pack';
@@ -63,13 +62,6 @@ class StoreCatalog {
       title: 'Commander Edition',
       description: 'Every premium fleet, maneuver pack and music pack, and '
           'everything added to the store later.',
-    ),
-    StoreItem._(
-      id: fleetBundleId,
-      kind: StoreItemKind.fleetBundle,
-      title: 'Fleet Collection',
-      description: 'All ${premiumFleets.length} premium fleets, and every '
-          'fleet added later.',
     ),
     for (final skin in premiumFleets)
       StoreItem._(

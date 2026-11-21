@@ -17,12 +17,10 @@ class Entitlements {
 
   bool get commander => products.contains(StoreCatalog.commanderId);
 
-  bool get allFleets =>
-      commander || products.contains(StoreCatalog.fleetBundleId);
 
   bool ownsFleet(FleetSkin skin) =>
       !skin.premium ||
-      allFleets ||
+      commander ||
       products.contains(StoreCatalog.fleetId(skin)) ||
       legacyFleets.contains(skin.slug);
 
@@ -37,7 +35,6 @@ class Entitlements {
   /// Whether everything [item] hands over is already here.
   bool owns(StoreItem item) => switch (item.kind) {
         StoreItemKind.commander => commander,
-        StoreItemKind.fleetBundle => allFleets,
         StoreItemKind.fleet => ownsFleet(item.fleet!),
         StoreItemKind.maneuverPack => ownsPack(item.pack!.id),
         StoreItemKind.music => ownsMusic(item.music!),

@@ -752,18 +752,6 @@ abstract class AppLocalizations {
   /// **'Every premium fleet, maneuver pack and music pack, and everything added to the store later.'**
   String get itemCommanderDescription;
 
-  /// No description provided for @itemFleetsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Fleet Collection'**
-  String get itemFleetsTitle;
-
-  /// No description provided for @itemFleetsDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'All {count} premium fleets, and every fleet added later.'**
-  String itemFleetsDescription(int count);
-
   /// No description provided for @itemFleetDescription.
   ///
   /// In en, this message translates to:

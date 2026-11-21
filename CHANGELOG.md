@@ -2,7 +2,7 @@
 
 ## [20/11/2026]
 - Your own pieces are at the bottom of the board
-- Every store product costs USD 0.99; product ids follow com.ol1n.orbitrontactics.pack.*
+- Every store product costs USD 0.99 and the Commander Edition USD 4.99; the Fleet Collection is gone; product ids follow com.ol1n.orbitrontactics.pack.*
 - A payment that completes later is applied at once; a refunded maneuver pack's maneuvers lock again
 - A finished online game is marked finished right away
 - Privacy policy, support and landing pages on GitHub Pages; App Store screenshots for iPhone 6.9" and iPad 13"

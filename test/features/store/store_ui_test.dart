@@ -79,6 +79,8 @@ void main() {
             .descendant(
                 of: find.byType(StoreTab), matching: find.byType(Scrollable))
             .first);
+    await tester.ensureVisible(find.text('RESTORE PURCHASES'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('RESTORE PURCHASES'));
     await tester.pumpAndSettle();
 

@@ -268,15 +268,6 @@
   },
   "itemCommanderTitle": "Commander Edition",
   "itemCommanderDescription": "Every premium fleet, maneuver pack and music pack, and everything added to the store later.",
-  "itemFleetsTitle": "Fleet Collection",
-  "itemFleetsDescription": "All {count} premium fleets, and every fleet added later.",
-  "@itemFleetsDescription": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "itemFleetDescription": "Ship art for all six units, white and black. Looks only: it flies like any other fleet.",
   "itemMusicTitle": "{name} music",
   "@itemMusicTitle": {

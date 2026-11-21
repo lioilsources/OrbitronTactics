@@ -48,10 +48,10 @@
   <h2>What the game sends</h2>
   <div class="table-wrap"><table>
     <tr><th>Data</th><th>When</th><th>Why</th><th>Kept</th></tr>
-    <tr><td>A random player id (anonymous sign-in, no email, phone or password)</td><td>When the game starts</td><td>Lets two players own an online game; ties product events together</td><td>Until you ask for deletion</td></tr>
+    <tr><td>A random player id (anonymous sign-in, no email, phone or password)</td><td>When you first play online</td><td>Lets two players own an online game; ties product events together</td><td>Until you ask for deletion</td></tr>
     <tr><td>The nickname you type in the lobby</td><td>When you open or join an online game</td><td>Shown to your opponent</td><td>Deleted with the game, at most one day later</td></tr>
     <tr><td>Moves and battle events</td><td>During an online game</td><td>Sent to your opponent in real time</td><td>Not stored</td></tr>
-    <tr><td>Product events: game opened, game started or finished (mode, difficulty, result), store opened, item viewed, purchase started and how it ended, restore; with app version and platform</td><td>While you play</td><td>To see which modes are played and whether the store works</td><td>One year</td></tr>
+    <tr><td>Product events: game opened, game started or finished (mode, difficulty, result), store opened, item viewed, purchase started and how it ended, restore; with app version and platform</td><td>While you play, only once you have played online</td><td>To see which modes are played and whether the store works</td><td>One year</td></tr>
     <tr><td>Crash reports: the error, stack trace, device model, OS and app version, the last product events</td><td>When the game crashes or hits an error</td><td>To fix bugs</td><td>Deleted automatically by the crash-reporting service, at most 90 days</td></tr>
     <tr><td>Purchase records: product id, store transaction, an anonymous app user id</td><td>When you buy or restore</td><td>To check purchases and give you what you bought</td><td>As long as the purchase is valid</td></tr>
   </table></div>
@@ -116,10 +116,10 @@
 
     <h2>Co hra odesílá</h2>
     <ul>
-      <li><strong>Náhodné id hráče</strong> (anonymní přihlášení bez e-mailu, telefonu a hesla) při startu hry: online hra patří dvěma hráčům a události se dají spojit. Do žádosti o smazání.</li>
+      <li><strong>Náhodné id hráče</strong> (anonymní přihlášení bez e-mailu, telefonu a hesla) při první online hře: online hra patří dvěma hráčům a události se dají spojit. Do žádosti o smazání.</li>
       <li><strong>Přezdívka z lobby</strong> při založení nebo připojení online hry: uvidí ji soupeř. Smaže se s hrou, nejpozději za den.</li>
       <li><strong>Tahy a dění v bitvě</strong> během online hry: jdou soupeři v reálném čase, neukládají se.</li>
-      <li><strong>Události</strong> (spuštění, začátek a konec hry s režimem, obtížností a výsledkem, otevření obchodu, zobrazení položky, nákup a jak dopadl, obnovení nákupů; verze a platforma): kvůli tomu, které režimy se hrají a jestli obchod funguje. Jeden rok.</li>
+      <li><strong>Události</strong> (spuštění, začátek a konec hry s režimem, obtížností a výsledkem, otevření obchodu, zobrazení položky, nákup a jak dopadl, obnovení nákupů; verze a platforma), jen pokud už jsi hrál online: kvůli tomu, které režimy se hrají a jestli obchod funguje. Jeden rok.</li>
       <li><strong>Hlášení pádů</strong> (chyba, výpis zásobníku, model zařízení, verze systému a hry, poslední události): kvůli opravám. Služba je smaže sama, nejpozději za 90 dní.</li>
       <li><strong>Záznamy o nákupu</strong> (id produktu, transakce obchodu, anonymní id uživatele): kontrola nákupu a předání obsahu. Po dobu platnosti nákupu.</li>
     </ul>

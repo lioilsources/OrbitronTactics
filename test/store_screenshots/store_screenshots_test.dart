@@ -200,6 +200,7 @@ Future<ProviderContainer> _container(Locale locale) async {
     fleetProgressStoreProvider.overrideWithValue(FleetProgressStore(prefs)),
     purchaseServiceProvider
         .overrideWithValue(_ShopWindow(locale.languageCode == 'cs')),
+    onlineLobbyProvider.overrideWith((ref) => true),
     waitingGamesProvider.overrideWith((ref) => Stream.value([
           GameLobbyEntry(
               gameId: 'a',

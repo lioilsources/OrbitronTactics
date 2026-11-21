@@ -1,5 +1,8 @@
 # Changelog
 
+## [21/11/2026]
+- The game signs in to the online service only when you first play online; until then it sends no product events, and the lobby lists open games after a tap
+
 ## [20/11/2026]
 - Your own pieces are at the bottom of the board
 - Every store product costs USD 0.99 and the Commander Edition USD 4.99; the Fleet Collection is gone; product ids follow com.ol1n.orbitrontactics.pack.*

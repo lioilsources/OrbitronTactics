@@ -103,6 +103,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lobbyNoOpenGames => 'No open games.\nCreate one to start!';
 
   @override
+  String get lobbyShowOpenGames => 'Show open games';
+
+  @override
   String get lobbyJustNow => 'just now';
 
   @override

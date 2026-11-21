@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'No open games.\nCreate one to start!'**
   String get lobbyNoOpenGames;
 
+  /// Lobby button that connects to the online service and lists games waiting for a second player
+  ///
+  /// In en, this message translates to:
+  /// **'Show open games'**
+  String get lobbyShowOpenGames;
+
   /// No description provided for @lobbyJustNow.
   ///
   /// In en, this message translates to:

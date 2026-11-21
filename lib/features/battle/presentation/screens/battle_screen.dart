@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
+import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
@@ -525,6 +526,19 @@ class _BattleHeader extends StatelessWidget {
                 maneuver!.toUpperCase(),
                 style: TextStyle(
                   color: maneuverColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+          if (BattleEngine.isSuddenDeath(battleState.elapsedMs))
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Text(
+                context.l10n.battleSuddenDeath,
+                style: const TextStyle(
+                  color: Colors.redAccent,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,

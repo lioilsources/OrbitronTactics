@@ -212,6 +212,7 @@
   "sideWins": "{side} vítězí!",
   "victoryPowerFieldDomination": "Ovládnutí silových polí!",
   "victoryRoyalElimination": "Vyřazení královského páru!",
+  "battleSuddenDeath": "NÁHLÁ SMRT",
   "battleElapsed": "{seconds} s",
   "sideShield": "ŠTÍT: {side}",
   "unitSurvives": "Přežívá jednotka: {side}",

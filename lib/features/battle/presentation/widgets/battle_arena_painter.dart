@@ -136,7 +136,7 @@ class BattleArenaPainter extends CustomPainter {
         element: BattleElement.of(shooter.piece.type),
         headingDown: toY > fromY,
         onTarget: (p.altitude - target.altitude).abs() <=
-            BattleEngine.hitHalfAltitude,
+            BattleEngine.hitHalfAltitudeAt(battleState.elapsedMs),
       );
     }
 

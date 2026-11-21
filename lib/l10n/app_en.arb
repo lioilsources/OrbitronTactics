@@ -631,6 +631,10 @@
   "@victoryRoyalElimination": {
     "description": "Victory by capturing both royals"
   },
+  "battleSuddenDeath": "SUDDEN DEATH",
+  "@battleSuddenDeath": {
+    "description": "Battle header once the battle runs long: shots can no longer be dodged"
+  },
   "battleElapsed": "{seconds}s",
   "@battleElapsed": {
     "description": "Battle time in seconds, already formatted",

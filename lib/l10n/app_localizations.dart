@@ -1370,6 +1370,12 @@ abstract class AppLocalizations {
   /// **'Royal Elimination!'**
   String get victoryRoyalElimination;
 
+  /// Battle header once the battle runs long: shots can no longer be dodged
+  ///
+  /// In en, this message translates to:
+  /// **'SUDDEN DEATH'**
+  String get battleSuddenDeath;
+
   /// Battle time in seconds, already formatted
   ///
   /// In en, this message translates to:

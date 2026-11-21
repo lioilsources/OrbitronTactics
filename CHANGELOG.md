@@ -1,5 +1,8 @@
 # Changelog
 
+## [21/11/2026]
+- Sudden death: after 45 s of battle the hit zone grows, and 15 s later shots can no longer be dodged, so two careful pilots cannot stall a game
+
 ## [20/11/2026]
 - Your own pieces are at the bottom of the board
 - Every store product costs USD 0.99 and the Commander Edition USD 4.99; the Fleet Collection is gone; product ids follow com.ol1n.orbitrontactics.pack.*

@@ -1,0 +1,75 @@
+{
+ "id": "horus_seth",
+ "name_cs": "Hórus × Seth",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#EFE3C8",
+  "dark": "#8A97A8"
+ },
+ "sides": [
+  {
+   "id": "horus",
+   "color": "white",
+   "name_cs": "Hórus",
+   "pieces": {
+    "king": {
+     "name_cs": "Hórus se sokolí hlavou",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Isis s rozepjatými křídly",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Obelisk s pylonem",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Thovt s ibisí hlavou",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Kráčející sfinga",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Strážce s ankhem",
+     "candidate": 3
+    }
+   }
+  },
+  {
+   "id": "seth",
+   "color": "black",
+   "name_cs": "Seth",
+   "pieces": {
+    "king": {
+     "name_cs": "Seth, pán pouště",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Sachmet se lví hlavou",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Písečný kolos",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Apop, had chaosu",
+     "candidate": 0
+    },
+    "knight": {
+     "name_cs": "Nilský krokodýl",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Mumie",
+     "candidate": 0
+    }
+   }
+  }
+ ]
+}

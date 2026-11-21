@@ -1,0 +1,75 @@
+{
+ "id": "vampires_werewolves",
+ "name_cs": "Upíři × Vlkodlaci",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E8E0D2",
+  "dark": "#7E8AA3"
+ },
+ "sides": [
+  {
+   "id": "vampires",
+   "color": "white",
+   "name_cs": "Upíři",
+   "pieces": {
+    "king": {
+     "name_cs": "Hrabě",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Hraběnka",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Gotický hrad",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Komorník se svícnem",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Obří netopýr",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Upíří páže",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "werewolves",
+   "color": "black",
+   "name_cs": "Vlkodlaci",
+   "pieces": {
+    "king": {
+     "name_cs": "Alfa",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Měsíční vlčice",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Prastarý dub",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Šamanka s jelení lebkou",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Vlk ve skoku",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Vlče",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

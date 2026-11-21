@@ -88,6 +88,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pieceSkinHussitesCrusadersBlack => 'Crusaders';
 
   @override
+  String get pieceSkinAsgardRagnarok => 'Asgard × Ragnarök';
+
+  @override
+  String get pieceSkinAsgardRagnarokWhite => 'Asgard';
+
+  @override
+  String get pieceSkinAsgardRagnarokBlack => 'Ragnarök';
+
+  @override
+  String get pieceSkinBogatyrsKoschei => 'Bogatyrs × Koschei';
+
+  @override
+  String get pieceSkinBogatyrsKoscheiWhite => 'Bogatyrs';
+
+  @override
+  String get pieceSkinBogatyrsKoscheiBlack => 'Koschei';
+
+  @override
+  String get pieceSkinCamelotMorgana => 'Round Table × Morgana';
+
+  @override
+  String get pieceSkinCamelotMorganaWhite => 'Round Table';
+
+  @override
+  String get pieceSkinCamelotMorganaBlack => 'Morgana';
+
+  @override
+  String get pieceSkinDwarvesDragons => 'Dwarves × Dragons';
+
+  @override
+  String get pieceSkinDwarvesDragonsWhite => 'Dwarves';
+
+  @override
+  String get pieceSkinDwarvesDragonsBlack => 'Dragons';
+
+  @override
+  String get pieceSkinEgyptAssyria => 'Egypt × Assyria';
+
+  @override
+  String get pieceSkinEgyptAssyriaWhite => 'Egypt';
+
+  @override
+  String get pieceSkinEgyptAssyriaBlack => 'Assyria';
+
+  @override
+  String get pieceSkinElvesGoblins => 'Elves × Goblins';
+
+  @override
+  String get pieceSkinElvesGoblinsWhite => 'Elves';
+
+  @override
+  String get pieceSkinElvesGoblinsBlack => 'Goblins';
+
+  @override
+  String get pieceSkinHorusSeth => 'Horus × Seth';
+
+  @override
+  String get pieceSkinHorusSethWhite => 'Horus';
+
+  @override
+  String get pieceSkinHorusSethBlack => 'Seth';
+
+  @override
+  String get pieceSkinLivingUndead => 'Living × Undead';
+
+  @override
+  String get pieceSkinLivingUndeadWhite => 'Living';
+
+  @override
+  String get pieceSkinLivingUndeadBlack => 'Undead';
+
+  @override
+  String get pieceSkinVampiresWerewolves => 'Vampires × Werewolves';
+
+  @override
+  String get pieceSkinVampiresWerewolvesWhite => 'Vampires';
+
+  @override
+  String get pieceSkinVampiresWerewolvesBlack => 'Werewolves';
+
+  @override
+  String get pieceSkinWhiteBlackMagic => 'White Magic × Black Magic';
+
+  @override
+  String get pieceSkinWhiteBlackMagicWhite => 'White Magic';
+
+  @override
+  String get pieceSkinWhiteBlackMagicBlack => 'Black Magic';
+
+  @override
   String get appTitle => 'OrbitronTactics';
 
   @override

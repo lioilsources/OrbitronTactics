@@ -59,6 +59,16 @@ flutter:
     - assets/pieces/olympus_titans/
     - assets/pieces/samurai_yokai/
     - assets/pieces/hussites_crusaders/
+    - assets/pieces/asgard_ragnarok/
+    - assets/pieces/bogatyrs_koschei/
+    - assets/pieces/camelot_morgana/
+    - assets/pieces/dwarves_dragons/
+    - assets/pieces/egypt_assyria/
+    - assets/pieces/elves_goblins/
+    - assets/pieces/horus_seth/
+    - assets/pieces/living_undead/
+    - assets/pieces/vampires_werewolves/
+    - assets/pieces/white_black_magic/
 
 flutter_launcher_icons:
   android: "ic_launcher"

@@ -1,0 +1,75 @@
+{
+ "id": "dwarves_dragons",
+ "name_cs": "Trpaslíci × Draci",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E9E0CE",
+  "dark": "#7C8BA0"
+ },
+ "sides": [
+  {
+   "id": "dwarves",
+   "color": "white",
+   "name_cs": "Trpaslíci",
+   "pieces": {
+    "king": {
+     "name_cs": "Horský král",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Runová královna",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Kamenná brána",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Runový kovář",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Jezdec na kozorožci",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Horník",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "dragons",
+   "color": "black",
+   "name_cs": "Draci",
+   "pieces": {
+    "king": {
+     "name_cs": "Starý rudý drak",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Dračí matka",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Drak stočený do věže",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Koboldí šaman",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Wyverna",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Dráče",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

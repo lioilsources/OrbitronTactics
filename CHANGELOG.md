@@ -2,6 +2,7 @@
 
 ## [21/11/2026]
 - The game signs in to the online service only when you first play online; until then it sends no product events, and the lobby lists open games after a tap
+- Sudden death: after 45 s of battle the hit zone grows, and 15 s later shots can no longer be dodged, so two careful pilots cannot stall a game
 
 ## [20/11/2026]
 - Your own pieces are at the bottom of the board

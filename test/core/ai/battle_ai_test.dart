@@ -239,5 +239,17 @@ void main() {
 
       expect(hardWins, greaterThan(40));
     });
+
+    test('two Hard pilots cannot dodge forever: sudden death ends it', () {
+      const limit =
+          BattleEngine.suddenDeathAfterMs + BattleEngine.suddenDeathRampMs;
+      for (var i = 0; i < PieceType.values.length; i++) {
+        final result = fight(PieceType.values[i], pilot(AiProfile.hard, i),
+            pilot(AiProfile.hard, 100 + i));
+        expect(result.isFinished, isTrue, reason: '${PieceType.values[i]}');
+        expect(result.elapsedMs, lessThan(limit + 15000),
+            reason: '${PieceType.values[i]}');
+      }
+    });
   });
 }

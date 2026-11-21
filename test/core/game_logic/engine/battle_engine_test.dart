@@ -411,4 +411,41 @@ void main() {
       expect(battle.attacker.nextAttackMs, lessThanOrEqualTo(200));
     });
   });
+
+  group('BattleEngine - sudden death', () {
+    test('the hit zone grows only once the battle runs long', () {
+      expect(BattleEngine.hitScaleAt(0), 1);
+      expect(BattleEngine.hitScaleAt(BattleEngine.suddenDeathAfterMs - 1), 1);
+      expect(BattleEngine.isSuddenDeath(BattleEngine.suddenDeathAfterMs),
+          isTrue);
+      final full = BattleEngine.suddenDeathAfterMs +
+          BattleEngine.suddenDeathRampMs;
+      expect(BattleEngine.hitHalfWidthAt(full), greaterThanOrEqualTo(1));
+      expect(BattleEngine.hitHalfAltitudeAt(full), greaterThanOrEqualTo(1));
+    });
+
+    test('a shot far off the lane misses early and hits in sudden death', () {
+      BattleState shotAt(int elapsedMs) {
+        final battle = createBattle();
+        return BattleEngine.tick(
+          battle.copyWith(elapsedMs: elapsedMs, projectiles: [
+            Projectile(
+              id: 'shot',
+              positionFraction: 0.99,
+              damage: 20,
+              fromAttacker: true,
+              xFraction: battle.defender.xFraction + 0.4,
+              altitude: battle.defender.altitude,
+            ),
+          ]),
+          16,
+        );
+      }
+
+      expect(shotAt(0).impacts, isEmpty);
+      final late = shotAt(BattleEngine.suddenDeathAfterMs +
+          BattleEngine.suddenDeathRampMs);
+      expect(late.impacts, hasLength(1));
+    });
+  });
 }

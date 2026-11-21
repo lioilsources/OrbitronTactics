@@ -647,6 +647,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get victoryRoyalElimination => 'Royal Elimination!';
 
   @override
+  String get battleSuddenDeath => 'SUDDEN DEATH';
+
+  @override
   String battleElapsed(String seconds) {
     return '${seconds}s';
   }

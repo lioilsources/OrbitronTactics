@@ -649,6 +649,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get victoryRoyalElimination => 'Vyřazení královského páru!';
 
   @override
+  String get battleSuddenDeath => 'NÁHLÁ SMRT';
+
+  @override
   String battleElapsed(String seconds) {
     return '$seconds s';
   }

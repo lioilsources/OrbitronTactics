@@ -7,11 +7,12 @@ Generates the battle's music and sound effects in `assets/audio/`: a theme per a
 | `gen_audio.py` | Prompts, seeds and re-rolls; renders every missing asset into `raw/` with a JSON sidecar |
 | `build_audio.py` | Loops the themes, adds the echo to explosions, encodes Vorbis and writes `assets/audio/` |
 | `make_loop.py` | Cuts a generated track into whole phrases and joins the loop's ends |
+| `chiptune.py` | Synthesizes the Retro Arcade music pack (`assets/audio/music_retro/`) locally, no audio service |
 
 ## Requirements
 
 - Python 3 and ffmpeg on the Mac. Homebrew's ffmpeg has no libvorbis, so the final encoding runs in the `ai-audio` container on SPARK.
-- `ssh spark` and the audio service at `http://192.168.88.66:8093` (`AUDIO_API` overrides it).
+- `ssh spark` and the audio service at `http://$SPARK_HOST:8093` (set `AUDIO_API`; the script has a built-in default).
 
 ## Workflow
 
@@ -22,6 +23,10 @@ python3 build_audio.py    # writes assets/audio/music and assets/audio/sfx
 ```
 
 Listen before committing. To re-roll one asset, bump its count in `REROLLS`, delete `raw/<name>.ogg` and run both scripts again; every other asset keeps its seed. A changed prompt also needs its raw render deleted.
+
+## Retro Arcade pack
+
+`python3 chiptune.py` renders all six retro themes in a few seconds with numpy and ffmpeg (libvorbis). Each keeps its unit's tempo, length and mood: two pulse channels (lead and arpeggio), a 4-bit triangle bass and an LFSR noise channel, like a 1980s console. Pulses are band-limited (PolyBLEP) and the mix goes through the console's output filter (30 Hz high-pass, 9 kHz roll-off), applied in the frequency domain over the whole loop so the seam stays seamless. Melodies are seeded (`Theme.seed`): change a seed to get a new tune. Output is normalized to −16 LUFS like the main themes.
 
 ## Sound design
 

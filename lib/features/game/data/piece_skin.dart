@@ -2,7 +2,7 @@ import 'dart:ui' show Color;
 
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/theme/board_theme.dart';
-import '../../../l10n/generated/app_localizations.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// How the board draws its pieces: the classic symbols, or an image pack
 /// with twelve figures in `assets/pieces/<slug>/` and its own square colors.

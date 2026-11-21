@@ -12,6 +12,7 @@ import '../../../core/game_logic/models/victory_condition.dart';
 import '../../../core/game_logic/validators/move_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'game_event.dart';
+import 'game_repository.dart';
 import 'game_transport.dart';
 import 'local_wifi_game_transport.dart';
 import 'supabase_game_transport.dart';
@@ -391,10 +392,18 @@ class GameSession {
       GameEngine.defaultFormation(PlayerColor.black),
     );
 
-    return GameSession(
+    final session = GameSession(
       localColor: localColor,
       transport: transport,
       initialState: ready,
     );
+    // Mark the row finished at once instead of leaving it 'playing' until
+    // the 24 h cleanup. Both players may do it; a failure only means the
+    // cleanup takes the row later.
+    unawaited(session.stateStream
+        .firstWhere((state) => state.phase == GamePhase.finished)
+        .then<void>((_) => GameRepository(client).finishGame(gameId))
+        .catchError((Object _) {}));
+    return session;
   }
 }

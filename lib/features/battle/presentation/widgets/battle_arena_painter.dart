@@ -338,6 +338,12 @@ class BattleArenaPainter extends CustomPainter {
     if (opacity <= 0) return shipSize;
 
     final run = unit.maneuver;
+    // A cloaked ship all but vanishes while shots pass through it.
+    if (run != null &&
+        run.maneuver.cloaks &&
+        run.untouchableAt(battleState.elapsedMs)) {
+      opacity *= 0.15;
+    }
     final attitude =
         run?.poseAt(battleState.elapsedMs, enemy).attitude ?? Attitude.level;
     final element = BattleElement.of(unit.piece.type);

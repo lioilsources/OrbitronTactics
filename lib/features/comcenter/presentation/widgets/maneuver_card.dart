@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/maneuvers/maneuver.dart';
@@ -23,7 +22,7 @@ class ManeuverCard extends StatelessWidget {
     required this.onUnarm,
     required this.onBuy,
     required this.onTrain,
-    required this.onGrantPack,
+    required this.onGetPack,
   });
 
   final Maneuver maneuver;
@@ -38,7 +37,9 @@ class ManeuverCard extends StatelessWidget {
   final VoidCallback onUnarm;
   final VoidCallback onBuy;
   final VoidCallback onTrain;
-  final VoidCallback onGrantPack;
+
+  /// Opens the store page of the pack this maneuver comes in.
+  final void Function(String pack) onGetPack;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +134,12 @@ class ManeuverCard extends StatelessWidget {
     );
   }
 
+  static String _packName(BuildContext context, String packId) =>
+      context.l10n.packName(ManeuverCatalog.packs.firstWhere(
+          (pack) => pack.id == packId,
+          orElse: () =>
+              ManeuverPack(id: packId, name: 'pack', description: '')));
+
   Widget _wayIn(BuildContext context) {
     final l10n = context.l10n;
     if (armed) {
@@ -151,9 +158,10 @@ class ManeuverCard extends StatelessWidget {
           child: Text(
             switch (maneuver.unlock) {
               WinsUnlock(:final wins) =>
-                l10n.maneuverWinBattles(battleWins, wins),
-              PackUnlock() => l10n.maneuverInAcePack,
-              StarterUnlock() => l10n.maneuverFromStart,
+                context.l10n.unlockWins(battleWins, wins),
+              PackUnlock(:final packId) =>
+                context.l10n.unlockPack(_packName(context, packId)),
+              StarterUnlock() => context.l10n.unlockStarter,
             },
             style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
           ),
@@ -161,11 +169,13 @@ class ManeuverCard extends StatelessWidget {
         if (price != null)
           FilledButton.tonal(
             onPressed: credits >= price ? onBuy : null,
-            child: Text(l10n.maneuverBuy(price)),
+            child: Text(context.l10n.buyCredits(price)),
           )
-        else if (maneuver.unlock is PackUnlock && kDebugMode)
-          TextButton(
-              onPressed: onGrantPack, child: Text(l10n.maneuverUnlockPack)),
+        else if (maneuver.unlock case PackUnlock(:final packId))
+          FilledButton.tonal(
+            onPressed: () => onGetPack(packId),
+            child: Text(context.l10n.getPack),
+          ),
       ],
     );
   }

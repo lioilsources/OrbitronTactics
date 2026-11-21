@@ -186,7 +186,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
   }
 
   /// Convert logical row to visual row (supports board flip).
-  int _visualRow(int logicalRow) => widget.flipBoard ? 7 - logicalRow : logicalRow;
+  int _visualRow(int logicalRow) => widget.flipBoard ? logicalRow : 7 - logicalRow;
 
   /// Convert logical col to visual col (supports board flip).
   int _visualCol(int logicalCol) => widget.flipBoard ? 7 - logicalCol : logicalCol;
@@ -362,7 +362,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
     // Convert visual position to logical position (flip if needed)
     final col = widget.flipBoard ? 7 - rawCol : rawCol;
-    final row = widget.flipBoard ? 7 - rawRow : rawRow;
+    final row = widget.flipBoard ? rawRow : 7 - rawRow;
     final tappedPos = Position(row: row, col: col);
 
     final gameState = ref.read(gameStateProvider);

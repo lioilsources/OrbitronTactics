@@ -13,6 +13,9 @@ import '../providers/lobby_providers.dart';
 import 'game_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../onboarding/presentation/how_to_play_screen.dart';
+import '../../../onboarding/presentation/onboarding_provider.dart';
+import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../../../l10n/l10n.dart';
 import '../providers/piece_skin_provider.dart';
 
@@ -44,10 +47,34 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // The rules are unusual: a new player sees them before the first game.
+    final onboarding = ref.read(onboardingStoreProvider);
+    if (!onboarding.howToPlaySeen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        onboarding.markHowToPlaySeen();
+        _showHowToPlay();
+      });
+    }
+  }
+
+  void _showHowToPlay() => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const HowToPlayScreen()),
+      );
+
+  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
+
+  void _trackGameStarted(GameMode mode, [AiDifficulty? difficulty]) =>
+      ref.read(telemetryProvider).event('game_started', {
+        'mode': mode.name,
+        if (difficulty != null) 'difficulty': difficulty.name,
+      });
 
   Future<void> _startSinglePlayer() async {
     final setup =
@@ -63,6 +90,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           humanColor: setup.color,
           humanName: name.isEmpty ? context.l10n.defaultPlayerName : name,
         );
+    _trackGameStarted(GameMode.singlePlayer, setup.difficulty);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -132,6 +160,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
 
       ref.read(gameStateProvider.notifier).attachSession(session);
+      _trackGameStarted(GameMode.multiplayer);
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
@@ -140,7 +169,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.errorJoiningGame('$e'))),
+          SnackBar(
+            content: Text(
+                e is GameNotOpen
+                    ? context.l10n.gameNotOpen
+                    : context.l10n.errorJoiningGame('$e')),
+          ),
         );
       }
     } finally {
@@ -150,6 +184,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   void _startLocalGame() {
     ref.read(gameStateProvider.notifier).startNewGame();
+    _trackGameStarted(GameMode.hotSeat);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -183,6 +218,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
       Navigator.of(context).pop(); // close dialog
       ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      _trackGameStarted(GameMode.localWifi);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
         (route) => false,
@@ -204,7 +240,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       context: context,
       builder: (_) => const _WifiJoinDialog(),
     );
-    if (ip == null || ip.isEmpty) return;
+    if (ip == null || ip.isEmpty || !mounted) return;
 
     setState(() => _isLoading = true);
     try {
@@ -223,6 +259,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         return;
       }
       ref.read(gameStateProvider.notifier).attachLocalWifiSession(session);
+      _trackGameStarted(GameMode.localWifi);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const GameScreen()),
         (route) => false,
@@ -250,6 +287,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: context.l10n.howToPlayTooltip,
+            onPressed: _showHowToPlay,
+          ),
           IconButton(
             icon: const Icon(Icons.military_tech),
             tooltip: l10n.comcenterTooltip,

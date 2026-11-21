@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/theme/board_theme.dart';
 import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
-import 'package:orbitron_tactics/l10n/generated/app_localizations.dart';
+import 'package:orbitron_tactics/l10n/app_localizations.dart';
 
 Color _hex(String hex) =>
     Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));

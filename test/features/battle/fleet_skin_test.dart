@@ -18,6 +18,15 @@ void main() {
       expect(FleetSkin.fromSlug('no_such_fleet'), FleetSkin.fallback);
     });
 
+    test('the default and every AI fleet are free', () {
+      expect(FleetSkin.fallback.premium, isFalse);
+      for (final difficulty in AiDifficulty.values) {
+        expect(FleetSkin.fromSlug(AiProfile.of(difficulty).fleetSkin).premium,
+            isFalse);
+      }
+      expect(FleetSkin.values.where((skin) => skin.premium), hasLength(6));
+    });
+
     test('every AI difficulty flies a real fleet', () {
       final slugs = FleetSkin.values.map((skin) => skin.slug);
       for (final difficulty in AiDifficulty.values) {

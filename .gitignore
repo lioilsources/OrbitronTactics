@@ -47,6 +47,9 @@ app.*.map.json
 # Environment secrets
 .env
 .env.*
+
+# Release keys for --dart-define-from-file (see release.example.json)
+release.json
 out_compare/
 tools/faction_art/out/
 # devconv:start
@@ -61,3 +64,8 @@ build/
 .flutter-plugins
 lib/**/secrets.dart
 # devconv:end
+
+# Built apps belong in GitHub Releases, not in the repo
+*.apk
+*.aab
+*.ipa

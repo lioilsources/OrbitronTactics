@@ -1,7 +1,7 @@
 name: orbitron_tactics
 description: "OrbitronTactics - Strategic board game for two players"
 publish_to: 'none'
-version: 0.8.0-alpha.1+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.10.7
@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
@@ -19,9 +22,9 @@ dependencies:
   supabase_flutter: ^2.8.0
   shared_preferences: ^2.3.0
   flutter_soloud: ^4.1.7
-  flutter_localizations:
-    sdk: flutter
-  intl: any
+  purchases_flutter: ^11.0.1
+  sentry_flutter: ^9.0.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +54,7 @@ flutter:
     - assets/fleets/star_nomads/
     # Battle music and effects (see BattleSounds), built by tools/battle_audio
     - assets/audio/music/
+    - assets/audio/music_retro/
     - assets/audio/sfx/
     # Board piece skin packs, one folder per pack (see PieceSkin)
     - assets/pieces/heaven_hell/

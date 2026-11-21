@@ -41,9 +41,15 @@ class BattleAiAction {
 /// Acts on the real [BattleState] through the same engine calls as a
 /// player's input. Skill comes entirely from the [AiProfile].
 class BattleAi {
-  BattleAi({required AiProfile profile, required Random random})
-      : _profile = profile,
-        _random = random;
+  /// [maneuvers] fixes what the pilot can fly; by default the profile
+  /// decides.
+  BattleAi({
+    required AiProfile profile,
+    required Random random,
+    List<Maneuver>? maneuvers,
+  })  : _profile = profile,
+        _random = random,
+        _options = maneuvers;
 
   /// Clearance beyond a shot's hit zone when getting out of its way.
   static const double _dodgeClearance = 0.03;
@@ -64,6 +70,7 @@ class BattleAi {
   /// order of preference.
   static const _escapes = [
     ManeuverFamily.roll,
+    ManeuverFamily.phantom,
     ManeuverFamily.loop,
     ManeuverFamily.dash,
     ManeuverFamily.sidestep,
@@ -74,6 +81,7 @@ class BattleAi {
     ManeuverFamily.volley,
     ManeuverFamily.strike,
     ManeuverFamily.shadow,
+    ManeuverFamily.strafe,
     ManeuverFamily.signature,
   };
 

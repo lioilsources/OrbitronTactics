@@ -71,14 +71,48 @@ void main() {
       }
     });
 
-    test('the pack holds what cannot be earned', () {
-      final pack = ManeuverCatalog.inPack('ace');
+    test('each pack holds one family that cannot be earned', () {
+      const families = {
+        'ace': ManeuverFamily.spiral,
+        'phantom': ManeuverFamily.phantom,
+        'striker': ManeuverFamily.strafe,
+      };
+      expect(ManeuverCatalog.packs.map((pack) => pack.id).toSet(),
+          families.keys.toSet());
+      for (final MapEntry(key: id, value: family) in families.entries) {
+        final pack = ManeuverCatalog.inPack(id);
+        expect(pack, isNotEmpty, reason: id);
+        for (final maneuver in pack) {
+          expect(maneuver.family, family);
+          expect(maneuver.unlock, isA<PackUnlock>());
+          expect(maneuver.price, isNull,
+              reason: 'a pack is not sold in credits');
+        }
+      }
+    });
 
-      expect(pack, isNotEmpty);
-      for (final maneuver in pack) {
-        expect(maneuver.family, ManeuverFamily.spiral);
-        expect(maneuver.unlock, isA<PackUnlock>());
-        expect(maneuver.price, isNull, reason: 'a pack is not sold in credits');
+    test('every ship flies the Phantom and Strafing Run packs', () {
+      for (final ship in PieceType.values) {
+        final families =
+            ManeuverCatalog.forShip(ship).map((m) => m.family).toSet();
+        expect(families, contains(ManeuverFamily.phantom), reason: ship.name);
+        expect(families, contains(ManeuverFamily.strafe), reason: ship.name);
+      }
+    });
+
+    test('a phantom hides without firing, a strafing run fires without '
+        'hiding', () {
+      for (final ship in PieceType.values) {
+        final phantom = of(ship, ManeuverFamily.phantom);
+        expect(phantom.cloaks, isTrue);
+        expect(phantom.fire, isEmpty);
+        final (from, to) = phantom.untouchable!;
+        expect(to - from, greaterThanOrEqualTo(0.7));
+
+        final strafe = of(ship, ManeuverFamily.strafe);
+        expect(strafe.cloaks, isFalse);
+        expect(strafe.untouchable, isNull);
+        expect(strafe.fire, hasLength(2));
       }
     });
 
@@ -182,6 +216,28 @@ void main() {
 
       expect(pose.x, closeTo(context.enemyLive.x, 1e-9));
       expect(pose.altitude, closeTo(context.enemyLive.altitude, 1e-9));
+    });
+
+    test('a strafing run passes the enemy at its live altitude', () {
+      final strafe = of(PieceType.queen, ManeuverFamily.strafe);
+
+      final first = strafe.poseAt(0.45, context: context);
+      final second = strafe.poseAt(0.75, context: context);
+
+      expect(first.altitude, closeTo(context.enemyLive.altitude, 1e-9));
+      expect(first.x, closeTo(context.enemyLive.x + 0.25, 1e-9));
+      expect(second.x, closeTo(context.enemyLive.x - 0.25, 1e-9));
+    });
+
+    test('a phantom ends a lane over, a little higher', () {
+      final phantom = of(PieceType.queen, ManeuverFamily.phantom);
+
+      final pose = phantom.poseAt(1, context: context);
+      final mirrored = phantom.poseAt(1, context: context, mirrored: true);
+
+      expect(pose.x, closeTo(context.origin.x + 0.3, 1e-9));
+      expect(mirrored.x, closeTo(context.origin.x - 0.3, 1e-9));
+      expect(pose.altitude, greaterThan(context.origin.altitude));
     });
 
     test('the pose moves on through the maneuver', () {

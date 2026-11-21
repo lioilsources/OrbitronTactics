@@ -22,7 +22,8 @@ class BoardOverlayPainter extends CustomPainter {
     this.flipBoard = false,
   });
 
-  int _vRow(int r) => flipBoard ? 7 - r : r;
+  // White's back row (row 0) is drawn at the bottom; flipped for black.
+  int _vRow(int r) => flipBoard ? r : 7 - r;
   int _vCol(int c) => flipBoard ? 7 - c : c;
 
   @override

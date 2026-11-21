@@ -26,17 +26,24 @@ lib/
 │   ├── constants/           # incl. supabase_constants.dart (--dart-define config)
 │   ├── game_logic/          # Board rules, piece movement, win condition
 │   ├── maneuvers/           # Maneuver catalog, gestures, flight paths (pure Dart)
+│   ├── telemetry/           # Telemetry interface (pure Dart)
 │   └── theme/
 ├── features/
 │   ├── battle/              # Game screen — board rendering, move handling
 │   ├── comcenter/           # Between-game lobby/settings screen
+│   ├── store/               # In-app purchases: catalog, entitlements, RevenueCat
 │   ├── game/                # Game state management
-│   └── progress/            # Fleet progress (credits, upgrades, record) saved on device
+│   ├── onboarding/          # How to play, first-battle hint
+│   ├── progress/            # Fleet progress (credits, upgrades, record) saved on device
+│   └── telemetry/           # Product events to Supabase, Sentry breadcrumbs
 
 assets/fleets/               # Battle ship sprites, one folder per fleet
 assets/audio/                # Battle music and effects (tools/battle_audio)
+lib/l10n/                    # English and Czech (ARB, generated localizations, content_cs.dart)
 supabase/                    # Supabase schema and migrations
 tools/                       # Asset generators: battle_audio, fleet_art, faction_art (see their READMEs)
+docs/                        # Architecture notes, privacy policy, store listing, store/ screenshots
+release.example.json         # --dart-define-from-file keys for release builds
 ```
 
 ## Game Rules
@@ -48,9 +55,9 @@ tools/                       # Asset generators: battle_audio, fleet_art, factio
 
 ## Platforms
 
-iOS, Android, Windows.
+iOS, Android, Windows. Release steps that need accounts: `Prompts/10-RELEASE-checklist.md`.
 
 ## More
 
-- `docs/architecture.md` — dependencies, single player AI, battle arena, maneuvers, fleet ship art, Supabase.
+- `docs/architecture.md` — dependencies, single player AI, battle arena, maneuvers, fleet ship art, store, localization, telemetry, Supabase.
 - `docs/lab/worlds-catalog.md` — world catalog. `Prompts/` — implementation plans.

@@ -22,4 +22,17 @@ void main() {
       }
     });
   }
+
+  for (final profile in [AiProfile.easy, AiProfile.hard]) {
+    test('${profile.difficulty.name} plays only legal moves on hex6', () {
+      final result = playGame(
+        BoardAi.forProfile(profile, random: Random(1)),
+        BoardAi.forProfile(AiProfile.medium, random: Random(2)),
+        Random(3),
+        maxPlies: 40,
+        spec: BoardSpec.hex6,
+      );
+      expect(result.plies, greaterThan(0));
+    });
+  }
 }

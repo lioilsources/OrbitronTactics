@@ -12,6 +12,15 @@ const _q = PieceType.queen;
 const _k = PieceType.king;
 const _p = PieceType.pawn;
 
+/// The hexagon's army, on the 11 columns of its grid: the back row's six
+/// cells (columns 3–8), knights at both ends of the next (2 and 8) and a
+/// pawn on every cell of the third (2–9).
+const _hexLayout = <List<PieceType?>>[
+  [null, null, null, _r, _b, _q, _k, _b, _r, null, null],
+  [null, null, _n, null, null, null, null, null, _n, null, null],
+  [null, null, _p, _p, _p, _p, _p, _p, _p, _p, null],
+];
+
 /// A board variant: its shape, where the armies start and the power
 /// fields. The single source of a board's tunable numbers.
 class BoardSpec {
@@ -140,33 +149,34 @@ class BoardSpec {
     layout: _classicLayout,
   );
 
-  /// Hex 8×8: a slide through a corner stops when both hexes beside the
-  /// corner are taken; the bishop snipes two corner steps forward.
-  static const hex8 = BoardSpec(
-    id: 'hex8',
-    geometry: HexGeometry(rows: 8, cols: 8),
-    layout: _classicLayout,
+  /// Hexagon with six cells a side (91 cells): a slide through a corner
+  /// stops when both hexes beside the corner are taken; the bishop snipes
+  /// two corner steps forward.
+  static const hex6 = BoardSpec(
+    id: 'hex6',
+    geometry: HexGeometry.hexagon(6),
+    layout: _hexLayout,
   );
 
-  /// Hex 8×8, a corner slide stops when either hex beside it is taken.
-  static const hex8Either = BoardSpec(
-    id: 'hex8_either',
-    geometry: HexGeometry(rows: 8, cols: 8, cornerBlock: CornerBlock.either),
-    layout: _classicLayout,
+  /// [hex6], a corner slide stops when either hex beside it is taken.
+  static const hex6Either = BoardSpec(
+    id: 'hex6_either',
+    geometry: HexGeometry.hexagon(6, cornerBlock: CornerBlock.either),
+    layout: _hexLayout,
   );
 
-  /// Hex 8×8 rules v0: nothing blocks a corner slide.
-  static const hex8Open = BoardSpec(
-    id: 'hex8_open',
-    geometry: HexGeometry(rows: 8, cols: 8, cornerBlock: CornerBlock.open),
-    layout: _classicLayout,
+  /// [hex6] with nothing stopping a corner slide (rules v0).
+  static const hex6Open = BoardSpec(
+    id: 'hex6_open',
+    geometry: HexGeometry.hexagon(6, cornerBlock: CornerBlock.open),
+    layout: _hexLayout,
   );
 
-  /// Hex 8×8, the bishop snipes three edge steps diagonally forward.
-  static const hex8EdgeSnipe = BoardSpec(
-    id: 'hex8_edge_snipe',
-    geometry: HexGeometry(rows: 8, cols: 8, snipe: HexSnipe.edgeDiagonal),
-    layout: _classicLayout,
+  /// [hex6], the bishop snipes three edge steps diagonally forward.
+  static const hex6EdgeSnipe = BoardSpec(
+    id: 'hex6_edge_snipe',
+    geometry: HexGeometry.hexagon(6, snipe: HexSnipe.edgeDiagonal),
+    layout: _hexLayout,
   );
 
   static const all = [
@@ -176,10 +186,10 @@ class BoardSpec {
     grand10,
     grand10x20,
     rocks8,
-    hex8,
-    hex8Either,
-    hex8Open,
-    hex8EdgeSnipe,
+    hex6,
+    hex6Either,
+    hex6Open,
+    hex6EdgeSnipe,
   ];
 
   /// The spec called [id]; throws a [FormatException] for an unknown one.

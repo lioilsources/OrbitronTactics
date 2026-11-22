@@ -294,6 +294,11 @@ enum CornerBlock {
 /// coordinates with odd rows shifted half a cell right. That keeps
 /// `grid[row][col]`, the JSON and the AI's bit sets as they are.
 ///
+/// With a [side] the board is a hexagon of that many cells a side, cut
+/// out of a `(2·side − 1)²` grid: rows of side, side + 1, … 2·side − 1, …
+/// side cells, the long middle row across. Without one it is the whole
+/// rectangle (rule tests only).
+///
 /// Compass points are seen from white, north = forward. Edge neighbours
 /// are E, W, NE, NW, SE, SW; corner neighbours N, S and four oblique ones.
 /// A [Direction] here is (row change, axial column change).
@@ -301,13 +306,49 @@ class HexGeometry extends BoardGeometry {
   final HexSnipe snipe;
   final CornerBlock cornerBlock;
 
+  /// Cells along each edge of a hexagonal board; null for a rectangle.
+  final int? side;
+
   const HexGeometry({
     required super.rows,
     required super.cols,
     super.blocked,
     this.snipe = HexSnipe.vertexForward,
     this.cornerBlock = CornerBlock.both,
-  }) : assert(rows % 2 == 0, 'point symmetry needs an even row count');
+  })  : side = null,
+        assert(rows % 2 == 0, 'point symmetry needs an even row count');
+
+  /// A hexagon with [side] cells along each edge.
+  const HexGeometry.hexagon(
+    int this.side, {
+    this.snipe = HexSnipe.vertexForward,
+    this.cornerBlock = CornerBlock.both,
+  }) : super(rows: 2 * side - 1, cols: 2 * side - 1);
+
+  /// Twice the column position of a cell's centre, odd rows' half shift
+  /// included: whole numbers on every row.
+  static int _x2(Position p) => 2 * p.col + (p.row & 1);
+
+  /// Twice the centre's column position: the middle of the long row on a
+  /// hexagon, the middle of the rectangle otherwise.
+  double get _centreX2 => side != null ? 2.0 * side! - 1 : cols - 0.5;
+
+  @override
+  bool contains(Position p) {
+    if (!super.contains(p)) return false;
+    final s = side;
+    if (s == null) return true;
+    final dRow = (p.row - (s - 1)).abs();
+    return (_x2(p) - (2 * s - 1)).abs() <= 2 * (s - 1) - dRow;
+  }
+
+  @override
+  Position mirror(Position p) {
+    if (side == null) return super.mirror(p);
+    final row = rows - 1 - p.row;
+    return Position(
+        row: row, col: (2 * (2 * side! - 1) - _x2(p) - (row & 1)) ~/ 2);
+  }
 
   static const east = Direction(0, 1);
   static const west = Direction(0, -1);
@@ -424,8 +465,7 @@ class HexGeometry extends BoardGeometry {
 
   @override
   double distanceFromCentre(Position p) {
-    final x = p.col + (p.row & 1) / 2;
-    final dx = x - (cols - 0.5) / 2;
+    final dx = (_x2(p) - _centreX2) / 2;
     final dy = (p.row - (rows - 1) / 2) * sqrt(3) / 2;
     return sqrt(dx * dx + dy * dy);
   }

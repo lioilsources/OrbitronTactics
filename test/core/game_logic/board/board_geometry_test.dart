@@ -39,6 +39,18 @@ double hexDistance(Position a, Position b) {
   return sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
 }
 
+/// Hex rules on a plain 8×8 rectangle of hexes, so the cases need not
+/// dodge a hexagon's cut corners.
+BoardSpec hexRect(
+        {CornerBlock cornerBlock = CornerBlock.both,
+        HexSnipe snipe = HexSnipe.vertexForward}) =>
+    BoardSpec(
+      id: 'hex_rect_test',
+      geometry: HexGeometry(
+          rows: 8, cols: 8, cornerBlock: cornerBlock, snipe: snipe),
+      layout: const [<PieceType?>[]],
+    );
+
 void main() {
   const hex = HexGeometry(rows: 8, cols: 8);
 
@@ -81,8 +93,44 @@ void main() {
     });
   });
 
-  group('hex8 rules', () {
-    const spec = BoardSpec.hex8;
+  group('hexagon', () {
+    const hexagon = HexGeometry.hexagon(6);
+
+    test('has 91 cells in rows of 6 to 11 and back', () {
+      expect(hexagon.cells, hasLength(91));
+      final widths = [
+        for (var row = 0; row < hexagon.rows; row++)
+          hexagon.cells.where((c) => c.row == row).length,
+      ];
+      expect(widths, [6, 7, 8, 9, 10, 11, 10, 9, 8, 7, 6]);
+    });
+
+    test('every row is centred on the middle cell', () {
+      final (cx, _) = hexCentre(pos(5, 5));
+      for (var row = 0; row < hexagon.rows; row++) {
+        final xs = [
+          for (final c in hexagon.cells)
+            if (c.row == row) hexCentre(c).$1,
+        ];
+        expect((xs.first + xs.last) / 2, closeTo(cx, 1e-9));
+      }
+    });
+
+    test('the mirror is a point mirror through the middle cell', () {
+      final (cx, cy) = hexCentre(pos(5, 5));
+      for (final cell in hexagon.cells) {
+        final mirrored = hexagon.mirror(cell);
+        expect(hexagon.contains(mirrored), isTrue);
+        final (x, y) = hexCentre(cell);
+        final (mx, my) = hexCentre(mirrored);
+        expect(x + mx, closeTo(2 * cx, 1e-9));
+        expect(y + my, closeTo(2 * cy, 1e-9));
+      }
+    });
+  });
+
+  group('hex rules', () {
+    final spec = hexRect();
 
     test('pawn: E/W and SE/SW without capture, NE/NW with', () {
       final from = pos(3, 3);
@@ -129,26 +177,26 @@ void main() {
               }),
               from);
 
-      test('hex8_either stops when either hex is taken', () {
-        expect(bishopMoves(BoardSpec.hex8Either, []), contains(north));
-        expect(bishopMoves(BoardSpec.hex8Either, [HexGeometry.northEast]),
+      test('either: stops when either hex is taken', () {
+        expect(bishopMoves(hexRect(cornerBlock: CornerBlock.either), []), contains(north));
+        expect(bishopMoves(hexRect(cornerBlock: CornerBlock.either), [HexGeometry.northEast]),
             isNot(contains(north)));
-        expect(bishopMoves(BoardSpec.hex8Either, [HexGeometry.northWest]),
+        expect(bishopMoves(hexRect(cornerBlock: CornerBlock.either), [HexGeometry.northWest]),
             isNot(contains(north)));
       });
 
-      test('hex8 stops only when both are taken', () {
-        expect(bishopMoves(BoardSpec.hex8, [HexGeometry.northEast]),
+      test('both (default): stops only when both are taken', () {
+        expect(bishopMoves(spec, [HexGeometry.northEast]),
             contains(north));
         expect(
-            bishopMoves(BoardSpec.hex8,
+            bishopMoves(spec,
                 [HexGeometry.northEast, HexGeometry.northWest]),
             isNot(contains(north)));
       });
 
-      test('hex8_open never stops (rules v0)', () {
+      test('open: never stops (rules v0)', () {
         expect(
-            bishopMoves(BoardSpec.hex8Open,
+            bishopMoves(hexRect(cornerBlock: CornerBlock.open),
                 [HexGeometry.northEast, HexGeometry.northWest]),
             contains(north));
       });
@@ -158,7 +206,7 @@ void main() {
         // the second corner stop her after the first.
         final mid = hex.step(from, HexGeometry.north);
         final moves = movesOf(
-            specBoard(BoardSpec.hex8, {
+            specBoard(spec, {
               from: whiteQueen,
               hex.step(mid, HexGeometry.northEast): whitePawn,
               hex.step(mid, HexGeometry.northWest): whitePawn,
@@ -212,7 +260,7 @@ void main() {
     });
 
     test('the edge-snipe variant jumps three edges diagonally forward', () {
-      const edge = BoardSpec.hex8EdgeSnipe;
+      final edge = hexRect(snipe: HexSnipe.edgeDiagonal);
       final from = pos(1, 3);
       // Blocked northward, so two corner steps north need a snipe
       final moves = movesOf(
@@ -305,7 +353,7 @@ void main() {
     });
 
     test('a hex board keeps its spec', () {
-      final board = specBoard(BoardSpec.hex8, {pos(1, 1): blackPawn});
+      final board = specBoard(BoardSpec.hex6, {pos(1, 3): blackPawn});
       final json = {
         'grid': [
           for (final row in board.grid) [for (final p in row) p?.toJson()],
@@ -314,7 +362,7 @@ void main() {
         'spec': board.toJson()['spec'],
       };
       final decoded = BoardState.fromJson(json);
-      expect(decoded.spec, BoardSpec.hex8);
+      expect(decoded.spec, BoardSpec.hex6);
       expect(decoded, board);
     });
   });
@@ -338,9 +386,13 @@ void main() {
           final reason = '${spec.id} seed $seed: $fields';
           expect(fields, hasLength(spec.powerFieldCount), reason: reason);
           expect(fields.toSet(), hasLength(fields.length), reason: reason);
+          // The central field pairs with nothing, even where it is its
+          // own mirror (the hexagon's middle cell).
           final unpaired = [
             for (final p in fields)
-              if (!fields.contains(geometry.mirror(p))) p,
+              if (!fields.contains(geometry.mirror(p)) ||
+                  geometry.mirror(p) == p)
+                p,
           ];
           expect(unpaired.length, spec.powerFieldCount.isOdd ? 1 : 0,
               reason: reason);

@@ -7,7 +7,8 @@ import 'piece_validator.dart';
 /// - CANNOT move straight forward
 /// - Can move sideways (left/right) and backward — but CANNOT capture
 /// - Can move AND capture diagonally forward
-class PawnValidator implements PieceValidator {
+/// (hex: E/W and SE/SW without capture, NE/NW with)
+class PawnValidator extends PieceValidator {
   const PawnValidator();
 
   @override
@@ -16,27 +17,24 @@ class PawnValidator implements PieceValidator {
     Position position,
     PlayerColor color,
   ) {
+    final geometry = board.geometry;
     final moves = <Position>[];
-    final dir = color.forwardDir;
 
-    // Sideways movement (no capture)
-    for (final dCol in [-1, 1]) {
-      final target = position.offset(0, dCol);
-      if (target.isOnBoard && board.isEmpty(target)) {
+    // Sideways, then backward movement (no capture)
+    for (final d in [
+      ...geometry.sideways(color),
+      ...geometry.backward(color),
+    ]) {
+      final target = geometry.step(position, d);
+      if (geometry.contains(target) && board.isEmpty(target)) {
         moves.add(target);
       }
     }
 
-    // Backward movement (no capture)
-    final backward = position.offset(-dir, 0);
-    if (backward.isOnBoard && board.isEmpty(backward)) {
-      moves.add(backward);
-    }
-
     // Diagonal forward (move AND capture)
-    for (final dCol in [-1, 1]) {
-      final target = position.offset(dir, dCol);
-      if (target.isOnBoard && !board.isFriendly(target, color)) {
+    for (final d in geometry.forwardCapture(color)) {
+      final target = geometry.step(position, d);
+      if (geometry.contains(target) && !board.isFriendly(target, color)) {
         // Can move to empty square OR capture enemy
         moves.add(target);
       }

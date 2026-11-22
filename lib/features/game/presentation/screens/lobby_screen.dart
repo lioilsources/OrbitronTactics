@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/game_logic/board/board_geometry.dart';
+import '../../../../core/game_logic/board/board_spec.dart';
 import '../../../../core/ai/ai_difficulty.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../data/game_event.dart';
@@ -24,6 +26,11 @@ final _singlePlayerDifficultyProvider =
     StateProvider<AiDifficulty>((ref) => AiDifficulty.medium);
 final _singlePlayerColorProvider =
     StateProvider<PlayerColor>((ref) => PlayerColor.white);
+
+/// The boards the lobby offers for single player and local games.
+const _lobbyBoards = [BoardSpec.classic8, BoardSpec.hex6];
+final _boardSpecProvider =
+    StateProvider<BoardSpec>((ref) => BoardSpec.classic8);
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
@@ -70,10 +77,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.dispose();
   }
 
-  void _trackGameStarted(GameMode mode, [AiDifficulty? difficulty]) =>
+  void _trackGameStarted(GameMode mode,
+          [AiDifficulty? difficulty, BoardSpec? board]) =>
       ref.read(telemetryProvider).event('game_started', {
         'mode': mode.name,
         if (difficulty != null) 'difficulty': difficulty.name,
+        if (board != null) 'board': board.id,
       });
 
   Future<void> _startSinglePlayer() async {
@@ -85,12 +94,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     if (setup == null || !mounted) return;
 
     final name = _nameController.text.trim();
+    final spec = ref.read(_boardSpecProvider);
     ref.read(gameStateProvider.notifier).startSinglePlayerGame(
           profile: AiProfile.of(setup.difficulty),
           humanColor: setup.color,
           humanName: name.isEmpty ? context.l10n.defaultPlayerName : name,
+          spec: spec,
         );
-    _trackGameStarted(GameMode.singlePlayer, setup.difficulty);
+    _trackGameStarted(GameMode.singlePlayer, setup.difficulty, spec);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -185,8 +196,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   void _startLocalGame() {
-    ref.read(gameStateProvider.notifier).startNewGame();
-    _trackGameStarted(GameMode.hotSeat);
+    final spec = ref.read(_boardSpecProvider);
+    ref.read(gameStateProvider.notifier).startNewGame(spec: spec);
+    _trackGameStarted(GameMode.hotSeat, null, spec);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const GameScreen()),
     );
@@ -328,6 +340,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              const _BoardPicker(),
+              const SizedBox(height: 12),
 
               // Single player against the AI
               ElevatedButton.icon(
@@ -656,6 +671,47 @@ class _FleetRow extends ConsumerWidget {
           Text(l10n.fleetRecord(fleet.wins, fleet.losses), style: style),
         ],
       ),
+    );
+  }
+}
+
+/// Classic or hex board for the next single player or local game.
+class _BoardPicker extends ConsumerWidget {
+  const _BoardPicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final spec = ref.watch(_boardSpecProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _DialogLabel(l10n.lobbyBoard),
+        SegmentedButton<BoardSpec>(
+          segments: [
+            for (final option in _lobbyBoards)
+              ButtonSegment(
+                value: option,
+                icon: Icon(option.geometry is HexGeometry
+                    ? Icons.hexagon_outlined
+                    : Icons.grid_on),
+                label: Text(option.geometry is HexGeometry
+                    ? l10n.lobbyBoardHex
+                    : l10n.lobbyBoardClassic),
+              ),
+          ],
+          selected: {spec},
+          showSelectedIcon: false,
+          onSelectionChanged: (selection) =>
+              ref.read(_boardSpecProvider.notifier).state = selection.first,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.lobbyBoardHint,
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

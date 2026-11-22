@@ -1,5 +1,3 @@
-import 'dart:ui' show lerpDouble;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/game_logic/models/game_phase.dart';
@@ -12,6 +10,7 @@ import '../../providers/board_interaction_provider.dart';
 import '../../providers/game_state_provider.dart';
 import '../../providers/piece_skin_provider.dart';
 import 'board_background_painter.dart';
+import 'board_layout.dart';
 import 'board_overlay_painter.dart';
 import 'piece_renderer.dart';
 
@@ -178,18 +177,14 @@ class _GameBoardState extends ConsumerState<GameBoard>
     }
   }
 
-  /// Whether the piece at [row],[col] should be hidden because
-  /// it's the destination of the current move animation.
-  bool _isAnimatingTo(int row, int col) {
-    if (_currentMoveAnim == null) return false;
-    return _currentMoveAnim!.to.row == row && _currentMoveAnim!.to.col == col;
-  }
+  /// Whether the piece at [p] should be hidden because it's the
+  /// destination of the current move animation.
+  bool _isAnimatingTo(Position p) => _currentMoveAnim?.to == p;
 
-  /// Convert logical row to visual row (supports board flip).
-  int _visualRow(int logicalRow) => widget.flipBoard ? logicalRow : 7 - logicalRow;
-
-  /// Convert logical col to visual col (supports board flip).
-  int _visualCol(int logicalCol) => widget.flipBoard ? 7 - logicalCol : logicalCol;
+  /// Top left of the piece drawn on [p].
+  Offset _pieceOrigin(BoardLayout layout, Position p) =>
+      layout.pieceBox(p).topLeft +
+      Offset(layout.cellSize * 0.075, layout.cellSize * 0.075);
 
   @override
   Widget build(BuildContext context) {
@@ -215,24 +210,27 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final boardSize = constraints.maxWidth;
-        final squareSize = boardSize / 8;
+        final layout = BoardLayout.within(
+          gameState.board.geometry,
+          constraints.biggest,
+          flipped: widget.flipBoard,
+        );
+        final boardSize = layout.size;
+        final squareSize = layout.cellSize;
 
-        return GestureDetector(
-          onTapUp: (details) => _handleTap(
-            details.localPosition,
-            squareSize,
-          ),
+        return Center(
+          child: GestureDetector(
+          onTapUp: (details) => _handleTap(details.localPosition, layout),
           child: SizedBox(
-            width: boardSize,
-            height: boardSize,
+            width: boardSize.width,
+            height: boardSize.height,
             child: Stack(
               children: [
                 // Layer 1: Board background (squares + power fields with glow)
                 AnimatedBuilder(
                   animation: _powerFieldGlowController,
                   builder: (context, _) => CustomPaint(
-                    size: Size(boardSize, boardSize),
+                    size: boardSize,
                     painter: BoardBackgroundPainter(
                       powerFields: gameState.board.powerFields,
                       board: gameState.board,
@@ -246,7 +244,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
                 // Layer 2: Overlay (highlights, valid moves)
                 CustomPaint(
-                  size: Size(boardSize, boardSize),
+                  size: boardSize,
                   painter: BoardOverlayPainter(
                     selectedPosition: interaction.selectedPosition,
                     validMoves: interaction.validMoves,
@@ -258,19 +256,16 @@ class _GameBoardState extends ConsumerState<GameBoard>
                 ),
 
                 // Layer 3: Static pieces (skip piece being animated to destination)
-                for (int row = 0; row < 8; row++)
-                  for (int col = 0; col < 8; col++)
-                    if (gameState.board.grid[row][col] != null)
-                      if (!_isAnimatingTo(row, col))
-                        Positioned(
-                          left: _visualCol(col) * squareSize + squareSize * 0.075,
-                          top: _visualRow(row) * squareSize + squareSize * 0.075,
-                          child: PieceRenderer.build(
-                            gameState.board.grid[row][col]!,
-                            squareSize,
-                            isThreatened: threatenedPositions.contains(
-                              Position(row: row, col: col),
-                            ),
+                for (final cell in gameState.board.geometry.cells)
+                  if (gameState.board.pieceAt(cell) != null)
+                    if (!_isAnimatingTo(cell))
+                      Positioned(
+                        left: _pieceOrigin(layout, cell).dx,
+                        top: _pieceOrigin(layout, cell).dy,
+                        child: PieceRenderer.build(
+                          gameState.board.pieceAt(cell)!,
+                          squareSize,
+                          isThreatened: threatenedPositions.contains(cell),
                             skin: look.skin,
                             classicMarks: look.classicMarks,
                           ),
@@ -283,8 +278,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                     builder: (context, _) {
                       final pos = _currentCaptureAnim!.position;
                       return Positioned(
-                        left: _visualCol(pos.col) * squareSize + squareSize * 0.075,
-                        top: _visualRow(pos.row) * squareSize + squareSize * 0.075,
+                        left: _pieceOrigin(layout, pos).dx,
+                        top: _pieceOrigin(layout, pos).dy,
                         child: Opacity(
                           opacity: _captureOpacity.value,
                           child: Transform.scale(
@@ -309,19 +304,14 @@ class _GameBoardState extends ConsumerState<GameBoard>
                       final from = _currentMoveAnim!.from;
                       final to = _currentMoveAnim!.to;
                       final t = _moveAnimation.value;
-                      final left = lerpDouble(
-                        _visualCol(from.col) * squareSize + squareSize * 0.075,
-                        _visualCol(to.col) * squareSize + squareSize * 0.075,
-                        t,
-                      )!;
-                      final top = lerpDouble(
-                        _visualRow(from.row) * squareSize + squareSize * 0.075,
-                        _visualRow(to.row) * squareSize + squareSize * 0.075,
+                      final origin = Offset.lerp(
+                        _pieceOrigin(layout, from),
+                        _pieceOrigin(layout, to),
                         t,
                       )!;
                       return Positioned(
-                        left: left,
-                        top: top,
+                        left: origin.dx,
+                        top: origin.dy,
                         child: PieceRenderer.build(
                           _currentMoveAnim!.piece,
                           squareSize,
@@ -333,6 +323,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
                   ),
               ],
             ),
+          ),
           ),
         );
       },
@@ -353,17 +344,12 @@ class _GameBoardState extends ConsumerState<GameBoard>
     return piece.color == ref.read(gameStateProvider).currentTurn;
   }
 
-  void _handleTap(Offset localPosition, double squareSize) {
+  void _handleTap(Offset localPosition, BoardLayout layout) {
     // Block input during animation
     if (_moveController.isAnimating) return;
 
-    final rawCol = (localPosition.dx / squareSize).floor().clamp(0, 7);
-    final rawRow = (localPosition.dy / squareSize).floor().clamp(0, 7);
-
-    // Convert visual position to logical position (flip if needed)
-    final col = widget.flipBoard ? 7 - rawCol : rawCol;
-    final row = widget.flipBoard ? rawRow : 7 - rawRow;
-    final tappedPos = Position(row: row, col: col);
+    final tappedPos = layout.positionAt(localPosition);
+    if (tappedPos == null) return;
 
     final gameState = ref.read(gameStateProvider);
     final interaction = ref.read(boardInteractionProvider);

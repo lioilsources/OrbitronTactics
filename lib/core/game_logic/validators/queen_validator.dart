@@ -5,9 +5,8 @@ import 'path_checker.dart';
 import 'piece_validator.dart';
 
 /// Queen movement rules:
-/// - Up to 4 squares diagonally (sliding)
-/// - Up to 2 squares in straight lines (sliding)
-class QueenValidator implements PieceValidator {
+/// - Up to 4 squares diagonally, 2 straight (sliding; hex: 2 and 2)
+class QueenValidator extends PieceValidator {
   const QueenValidator();
 
   @override
@@ -16,32 +15,13 @@ class QueenValidator implements PieceValidator {
     Position position,
     PlayerColor color,
   ) {
-    final moves = <Position>[];
-
-    // Diagonal: up to 4 squares
-    for (final dRow in [-1, 1]) {
-      for (final dCol in [-1, 1]) {
-        moves.addAll(
-          PathChecker.getReachableSquares(
-              board, position, dRow, dCol, 4, color),
-        );
-      }
-    }
-
-    // Straight: up to 2 squares
-    const straightDirs = [
-      (0, 1),
-      (0, -1),
-      (1, 0),
-      (-1, 0),
+    final geometry = board.geometry;
+    final reach = geometry.reach(PieceType.queen);
+    return [
+      ...PathChecker.slide(
+          board, position, geometry.diagonal, reach.diagonal, color),
+      ...PathChecker.slide(
+          board, position, geometry.straight, reach.straight, color),
     ];
-    for (final (dRow, dCol) in straightDirs) {
-      moves.addAll(
-        PathChecker.getReachableSquares(
-            board, position, dRow, dCol, 2, color),
-      );
-    }
-
-    return moves;
   }
 }

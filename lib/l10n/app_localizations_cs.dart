@@ -85,6 +85,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get lobbySinglePlayer => 'Hra proti AI';
 
   @override
+  String get lobbyBoard => 'Deska';
+
+  @override
+  String get lobbyBoardClassic => 'Klasická';
+
+  @override
+  String get lobbyBoardHex => 'Hexagonální';
+
+  @override
+  String get lobbyBoardHint => 'Pro hru proti AI a na jednom zařízení';
+
+  @override
   String get lobbyCreateGame => 'Založit hru';
 
   @override

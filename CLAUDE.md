@@ -14,6 +14,7 @@ flutter build ios
 flutter analyze
 flutter test --exclude-tags slow   # what CI runs
 flutter test --tags slow           # AI self-play: Hard vs Medium, ~1 min
+dart run tools/variant_lab.dart [games] [ids]  # Medium vs Medium per board variant
 ```
 
 ## Architecture
@@ -24,7 +25,7 @@ lib/
 ├── core/                    # App-wide utilities, theme, router
 │   ├── ai/                  # Single-player AI: board search, battle pilot, fleet spending (pure Dart)
 │   ├── constants/           # incl. supabase_constants.dart (--dart-define config)
-│   ├── game_logic/          # Board rules, piece movement, win condition
+│   ├── game_logic/          # Board rules, piece movement, win condition; board/ = BoardGeometry, BoardSpec
 │   ├── maneuvers/           # Maneuver catalog, gestures, flight paths (pure Dart)
 │   ├── telemetry/           # Telemetry interface (pure Dart)
 │   └── theme/
@@ -48,7 +49,7 @@ release.example.json         # --dart-define-from-file keys for release builds
 
 ## Game Rules
 
-- 8×8 board, custom piece types and movement
+- 8×8 board (`BoardSpec.classic8`, the default) or a hexagon of side 6 (`BoardSpec.hex6`, single player and local games); other variants exist only in the core and `variant_lab`. Custom piece types and movement
 - 5 power fields — control all five at the end of your turn to win (`VictoryChecker`)
 - Threat indicators: red badge on pieces in danger
 - Local hot-seat mode: two players, one device

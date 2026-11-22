@@ -9,6 +9,7 @@ import '../game_logic/models/upgrade_profile.dart';
 import 'ai_difficulty.dart';
 import 'battle_odds.dart';
 import 'board_evaluator.dart';
+import 'cell_set.dart';
 import 'move_generator.dart';
 
 /// Picks board moves for an AI-controlled color.
@@ -170,7 +171,8 @@ class SearchAi implements BoardAi {
       List.generate(8, (_) => List<Move?>.filled(2, null));
 
   late PlayerColor _color;
-  var _fieldMask = 0;
+  final _fields = CellSet();
+  int Function(Position) _indexOf = (_) => 0;
   var _nodes = 0;
   var _timed = false;
 
@@ -180,9 +182,10 @@ class SearchAi implements BoardAi {
     _color = color;
     // Nothing below reads the history; don't copy it for every node.
     final root = state.copyWith(moveHistory: const []);
-    _fieldMask = 0;
+    _indexOf = root.board.geometry.indexOf;
+    _fields.clear();
     for (final field in root.board.powerFields) {
-      _fieldMask |= _bit(field.position);
+      _fields.add(_indexOf(field.position));
     }
     for (final slots in _killers) {
       slots.fillRange(0, slots.length, null);
@@ -342,7 +345,7 @@ class SearchAi implements BoardAi {
       }
       final killer = killers.indexOf(move);
       if (killer >= 0) return 3 - killer * 0.5;
-      return _fieldMask & _bit(move.to) != 0 ? 1 : 0;
+      return _fields.contains(_indexOf(move.to)) ? 1 : 0;
     }
 
     final prioritized = [for (final move in moves) (move, priority(move))]
@@ -399,8 +402,6 @@ const double _tieTolerance = 1e-9;
 EvalWeights _weightsFor(AiProfile profile) => profile.useThreatTerm
     ? EvalWeights.standard
     : EvalWeights.standard.copyWith(threat: 0);
-
-int _bit(Position position) => 1 << (position.row * 8 + position.col);
 
 /// The positions after [capture]'s battle: (attacker won, attacker lost).
 (GameState, GameState) _battleOutcomes(GameState state, Move capture) {

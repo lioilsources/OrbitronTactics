@@ -66,6 +66,12 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 
 `STORE_SCREENSHOTS=1 flutter test test/store_screenshots` renders `docs/store/` (skipped otherwise). It loads Roboto and Material Icons from the Flutter SDK and DejaVu Sans for chess symbols from this machine, fakes store prices, and picks a battle frame from simulated duels. `OrbitronTacticsApp` takes `home`, `locale` and `theme` for it.
 
+## Board shapes
+
+- `BoardSpec` (`lib/core/game_logic/board/`) names a board: its `BoardGeometry` (`SquareGeometry` or `HexGeometry`), layout and power fields. `BoardState.spec` travels in the JSON; a missing one is `classic8`.
+- Hex (`hex6`): a hexagon with six cells a side (91 cells, rows of 6 to 11) cut out of an 11×11 grid by `HexGeometry.hexagon`; pointy-top hexes in horizontal rows, offset coordinates with odd rows shifted half a cell right. A slide through a corner stops when both hexes beside the corner are taken (`CornerBlock.both`); `docs/lab/variant-lab.md` has the numbers behind that choice.
+- `BoardLayout` (`features/game/presentation/widgets/board/`) places every cell on screen for both painters, the piece layer and taps (nearest cell centre). The lobby's board picker applies to single player and local games; online and WiFi games stay on `classic8`.
+
 ## Telemetry and onboarding
 
 - `Telemetry.event(name, props)` never throws. `SupabaseTelemetry` inserts into `app_events` (insert-only RLS) once the install is signed in, i.e. has played online; before that events are only Sentry breadcrumbs and adds a Sentry breadcrumb; tests use `NoTelemetry` / `RecordingTelemetry`. Events: `app_opened`, `game_started`, `game_finished`, `store_opened`, `store_item_viewed`, `purchase_started`, `purchase`, `restore`.

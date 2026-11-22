@@ -85,6 +85,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lobbySinglePlayer => 'Single Player';
 
   @override
+  String get lobbyBoard => 'Board';
+
+  @override
+  String get lobbyBoardClassic => 'Classic';
+
+  @override
+  String get lobbyBoardHex => 'Hex';
+
+  @override
+  String get lobbyBoardHint => 'For single player and local games';
+
+  @override
   String get lobbyCreateGame => 'Create Game';
 
   @override

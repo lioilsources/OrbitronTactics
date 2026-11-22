@@ -5,9 +5,8 @@ import 'path_checker.dart';
 import 'piece_validator.dart';
 
 /// King movement rules:
-/// - Up to 4 squares in straight lines (sliding)
-/// - Up to 2 squares diagonally (sliding)
-class KingValidator implements PieceValidator {
+/// - Up to 4 squares straight, 2 diagonally (sliding; hex: 3 and 1)
+class KingValidator extends PieceValidator {
   const KingValidator();
 
   @override
@@ -16,32 +15,13 @@ class KingValidator implements PieceValidator {
     Position position,
     PlayerColor color,
   ) {
-    final moves = <Position>[];
-
-    // Straight: up to 4 squares
-    const straightDirs = [
-      (0, 1),
-      (0, -1),
-      (1, 0),
-      (-1, 0),
+    final geometry = board.geometry;
+    final reach = geometry.reach(PieceType.king);
+    return [
+      ...PathChecker.slide(
+          board, position, geometry.straight, reach.straight, color),
+      ...PathChecker.slide(
+          board, position, geometry.diagonal, reach.diagonal, color),
     ];
-    for (final (dRow, dCol) in straightDirs) {
-      moves.addAll(
-        PathChecker.getReachableSquares(
-            board, position, dRow, dCol, 4, color),
-      );
-    }
-
-    // Diagonal: up to 2 squares
-    for (final dRow in [-1, 1]) {
-      for (final dCol in [-1, 1]) {
-        moves.addAll(
-          PathChecker.getReachableSquares(
-              board, position, dRow, dCol, 2, color),
-        );
-      }
-    }
-
-    return moves;
   }
 }

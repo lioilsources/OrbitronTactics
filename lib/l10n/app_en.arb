@@ -38,6 +38,22 @@
   "unitKing": "King",
   "lobbyYourName": "Your name",
   "lobbySinglePlayer": "Single Player",
+  "lobbyBoard": "Board",
+  "@lobbyBoard": {
+    "description": "Label of the board shape picker in the lobby; applies to single player and local games"
+  },
+  "lobbyBoardClassic": "Classic",
+  "@lobbyBoardClassic": {
+    "description": "The square 8×8 board"
+  },
+  "lobbyBoardHex": "Hex",
+  "@lobbyBoardHex": {
+    "description": "The hexagonal board"
+  },
+  "lobbyBoardHint": "For single player and local games",
+  "@lobbyBoardHint": {
+    "description": "Under the board picker: online and WiFi games stay on the classic board"
+  },
   "lobbyCreateGame": "Create Game",
   "lobbyLocalGame": "Local Game",
   "lobbyHostWifi": "Host WiFi",

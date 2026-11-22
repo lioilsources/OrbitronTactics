@@ -242,6 +242,30 @@ abstract class AppLocalizations {
   /// **'Single Player'**
   String get lobbySinglePlayer;
 
+  /// Label of the board shape picker in the lobby; applies to single player and local games
+  ///
+  /// In en, this message translates to:
+  /// **'Board'**
+  String get lobbyBoard;
+
+  /// The square 8×8 board
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get lobbyBoardClassic;
+
+  /// The hexagonal board
+  ///
+  /// In en, this message translates to:
+  /// **'Hex'**
+  String get lobbyBoardHex;
+
+  /// Under the board picker: online and WiFi games stay on the classic board
+  ///
+  /// In en, this message translates to:
+  /// **'For single player and local games'**
+  String get lobbyBoardHint;
+
   /// No description provided for @lobbyCreateGame.
   ///
   /// In en, this message translates to:

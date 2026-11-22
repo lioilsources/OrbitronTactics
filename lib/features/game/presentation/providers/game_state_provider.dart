@@ -1,3 +1,4 @@
+import '../../../../core/game_logic/board/board_spec.dart';
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/ai/ai_difficulty.dart';
@@ -236,16 +237,21 @@ class GameStateNotifier extends StateNotifier<GameState> {
     return MoveValidator.getLegalMoves(state, position);
   }
 
-  /// Start a new local hot-seat game with default formations.
-  void startNewGame() {
+  /// The board of the last local or single-player game, for a restart.
+  BoardSpec _spec = BoardSpec.classic8;
+
+  /// Start a new local hot-seat game with default formations on [spec].
+  void startNewGame({BoardSpec spec = BoardSpec.classic8}) {
     _detachSession();
     _mode = GameMode.hotSeat;
     _localColor = null;
+    _spec = spec;
 
     state = _buildDefaultGame(
       gameId: 'local-${DateTime.now().millisecondsSinceEpoch}',
       white: _localWhite,
       black: _localBlack,
+      spec: spec,
     );
   }
 
@@ -255,9 +261,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
     required AiProfile profile,
     PlayerColor humanColor = PlayerColor.white,
     String humanName = 'Player',
+    BoardSpec spec = BoardSpec.classic8,
   }) {
     _detachSession();
     _mode = GameMode.singlePlayer;
+    _spec = spec;
     _localColor = humanColor;
     _aiColor = humanColor.opposite;
     _aiProfile = profile;
@@ -277,6 +285,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       gameId: 'single-${DateTime.now().millisecondsSinceEpoch}-${_gameSeq++}',
       white: humanColor == PlayerColor.white ? human : ai,
       black: humanColor == PlayerColor.white ? ai : human,
+      spec: spec,
     );
   }
 
@@ -292,9 +301,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
         profile: profile,
         humanColor: humanColor,
         humanName: _humanName,
+        spec: _spec,
       );
     } else {
-      startNewGame();
+      startNewGame(spec: _mode == GameMode.hotSeat ? _spec : BoardSpec.classic8);
     }
   }
 
@@ -349,21 +359,23 @@ GameState _buildDefaultGame({
   required String gameId,
   required Player white,
   required Player black,
+  BoardSpec spec = BoardSpec.classic8,
 }) {
   final created = GameEngine.createGame(
     gameId: gameId,
     playerWhite: white,
     playerBlack: black,
+    spec: spec,
   );
   final withWhite = GameEngine.applyFormation(
     created,
     PlayerColor.white,
-    GameEngine.defaultFormation(PlayerColor.white),
+    GameEngine.defaultFormation(PlayerColor.white, spec: spec),
   );
   return GameEngine.applyFormation(
     withWhite,
     PlayerColor.black,
-    GameEngine.defaultFormation(PlayerColor.black),
+    GameEngine.defaultFormation(PlayerColor.black, spec: spec),
   );
 }
 

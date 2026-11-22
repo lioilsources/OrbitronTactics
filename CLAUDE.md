@@ -49,7 +49,7 @@ release.example.json         # --dart-define-from-file keys for release builds
 
 ## Game Rules
 
-- 8×8 board (`BoardSpec.classic8`, the default; other variants incl. hex exist only in the core and `variant_lab`, no UI), custom piece types and movement
+- 8×8 board (`BoardSpec.classic8`, the default) or a hexagon of side 6 (`BoardSpec.hex6`, single player and local games); other variants exist only in the core and `variant_lab`. Custom piece types and movement
 - 5 power fields — control all five at the end of your turn to win (`VictoryChecker`)
 - Threat indicators: red badge on pieces in danger
 - Local hot-seat mode: two players, one device

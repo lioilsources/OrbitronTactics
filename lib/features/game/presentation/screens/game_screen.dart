@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/ai/battle_ai.dart';
+import '../../../../core/game_logic/board/board_geometry.dart';
 import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/game_phase.dart';
 import '../../../../core/game_logic/models/move.dart';
@@ -15,6 +16,7 @@ import '../../../../core/maneuvers/maneuver.dart';
 import '../../data/game_event.dart';
 import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
+import '../widgets/board/board_layout.dart';
 import '../widgets/board/game_board.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../battle/presentation/providers/battle_state_provider.dart';
@@ -231,7 +233,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 Expanded(
                   child: Center(
                     child: AspectRatio(
-                      aspectRatio: 1,
+                      aspectRatio: _boardAspectRatio(gameState.board.geometry),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
@@ -816,4 +818,10 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
       ),
     );
   }
+}
+
+/// Width over height of the board itself; the frame's padding is ignored.
+double _boardAspectRatio(BoardGeometry geometry) {
+  final size = BoardLayout.fit(geometry, 1).size;
+  return size.width / size.height;
 }

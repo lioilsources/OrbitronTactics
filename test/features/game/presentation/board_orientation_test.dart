@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/ai/ai_difficulty.dart';
+import 'package:orbitron_tactics/core/game_logic/board/board_spec.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/position.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/board_interaction_provider.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/game_state_provider.dart';
 import 'package:orbitron_tactics/features/game/presentation/screens/game_screen.dart';
+import 'package:orbitron_tactics/features/game/presentation/widgets/board/board_layout.dart';
 import 'package:orbitron_tactics/features/game/presentation/widgets/board/game_board.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
@@ -63,5 +65,34 @@ void main() {
     await tester.pump();
 
     expect(container.read(boardInteractionProvider).selectedPosition, king);
+  });
+
+  testWidgets('on the hex board a tap on a white pawn selects it',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(500, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    container.read(gameStateProvider.notifier).startSinglePlayerGame(
+          profile: AiProfile.easy,
+          humanColor: PlayerColor.white,
+          humanName: 'Ada',
+          spec: BoardSpec.hex6,
+        );
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(home: GameScreen()),
+    ));
+
+    final board = container.read(gameStateProvider).board;
+    const pawn = Position(row: 2, col: 4);
+    expect(board.pieceAt(pawn)?.type, PieceType.pawn);
+
+    final rect = tester.getRect(find.byType(GameBoard));
+    final layout = BoardLayout.within(board.geometry, rect.size);
+    await tester.tapAt(rect.topLeft + layout.centreOf(pawn));
+    await tester.pump();
+
+    final interaction = container.read(boardInteractionProvider);
+    expect(interaction.selectedPosition, pawn);
+    expect(interaction.validMoves, isNotEmpty);
   });
 }

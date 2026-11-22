@@ -36,6 +36,35 @@ class BattleEngine {
   /// …and the ship flies within this altitude of the projectile's.
   static const double hitHalfAltitude = 0.12;
 
+  /// A battle this old enters sudden death: the hit zone starts to grow…
+  static const int suddenDeathAfterMs = 45000;
+
+  /// …and after this long it covers the whole arena, so no ship can dodge.
+  static const int suddenDeathRampMs = 15000;
+
+  /// The hit zone's growth at the end of the ramp: both half-sizes then
+  /// exceed the arena.
+  static const double _suddenDeathMaxScale = 15;
+
+  /// Whether a battle at [elapsedMs] is in sudden death.
+  static bool isSuddenDeath(int elapsedMs) => elapsedMs >= suddenDeathAfterMs;
+
+  /// How much the hit zone has grown at [elapsedMs]: 1 before sudden death.
+  static double hitScaleAt(int elapsedMs) {
+    if (!isSuddenDeath(elapsedMs)) return 1;
+    final ramp = ((elapsedMs - suddenDeathAfterMs) / suddenDeathRampMs)
+        .clamp(0.0, 1.0);
+    return 1 + (_suddenDeathMaxScale - 1) * ramp;
+  }
+
+  /// [hitHalfWidth] at [elapsedMs], grown by sudden death.
+  static double hitHalfWidthAt(int elapsedMs) =>
+      hitHalfWidth * hitScaleAt(elapsedMs);
+
+  /// [hitHalfAltitude] at [elapsedMs], grown by sudden death.
+  static double hitHalfAltitudeAt(int elapsedMs) =>
+      hitHalfAltitude * hitScaleAt(elapsedMs);
+
   /// Ships cannot move closer to the arena edge than this fraction.
   static const double shipEdgeMargin = 0.06;
 
@@ -303,8 +332,8 @@ class BattleEngine {
 
   static bool _isHit(BattleUnit target, Projectile p, int elapsedMs) =>
       !(target.maneuver?.untouchableAt(elapsedMs) ?? false) &&
-      (target.xFraction - p.xFraction).abs() <= hitHalfWidth &&
-      (target.altitude - p.altitude).abs() <= hitHalfAltitude;
+      (target.xFraction - p.xFraction).abs() <= hitHalfWidthAt(elapsedMs) &&
+      (target.altitude - p.altitude).abs() <= hitHalfAltitudeAt(elapsedMs);
 
   /// Move a ship to [xFraction] (clamped to the arena, minus edge margin)
   /// and, when given, to [altitude] (clamped to 0–1).

@@ -1,0 +1,75 @@
+{
+ "id": "hussites_crusaders",
+ "name_cs": "Husité × Křižáci",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E8DEC9",
+  "dark": "#8496A6"
+ },
+ "sides": [
+  {
+   "id": "hussites",
+   "color": "white",
+   "name_cs": "Husité",
+   "pieces": {
+    "king": {
+     "name_cs": "Jan Žižka s palcátem",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Praporečnice s kalichem na korouhvi",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Bojový vůz vozové hradby",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Kazatel s kalichem",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Jízdní zeman s kuší",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Cepník",
+     "candidate": 3
+    }
+   }
+  },
+  {
+   "id": "crusaders",
+   "color": "black",
+   "name_cs": "Křižáci",
+   "pieces": {
+    "king": {
+     "name_cs": "Císař Zikmund",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Královna Barbora Celjská",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Kamenný hrad",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Kardinál-legát",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Těžký rytíř na koni",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Žoldnéř s halapartnou",
+     "candidate": 3
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "id": "asgard_ragnarok",
+ "name_cs": "Ásgard × Ragnarök",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E6E1D3",
+  "dark": "#7D8DA3"
+ },
+ "sides": [
+  {
+   "id": "asgard",
+   "color": "white",
+   "name_cs": "Ásgard",
+   "pieces": {
+    "king": {
+     "name_cs": "Ódin s kopím a havrany",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Freya v sokolím plášti",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Thor jako kolos s kladivem",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Valkýra s kopím",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Sleipnir",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Einherjar se štítem",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "ragnarok",
+   "color": "black",
+   "name_cs": "Ragnarök",
+   "pieces": {
+    "king": {
+     "name_cs": "Thrym, král ledových obrů",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Hel",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Ledový obr",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Loki s hadí holí",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Vlk Fenrir",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Draugr",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

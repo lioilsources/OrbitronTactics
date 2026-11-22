@@ -1,5 +1,31 @@
 # Changelog
 
+## [21/11/2026]
+- The game signs in to the online service only when you first play online; until then it sends no product events, and the lobby lists open games after a tap
+- Sudden death: after 45 s of battle the hit zone grows, and 15 s later shots can no longer be dodged, so two careful pilots cannot stall a game
+
+## [20/11/2026]
+- Your own pieces are at the bottom of the board
+- Every store product costs USD 0.99 and the Commander Edition USD 4.99; the Fleet Collection is gone; product ids follow com.ol1n.orbitrontactics.pack.*
+- A payment that completes later is applied at once; a refunded maneuver pack's maneuvers lock again
+- A finished online game is marked finished right away
+- Privacy policy, support and landing pages on GitHub Pages; App Store screenshots for iPhone 6.9" and iPad 13"
+- Release builds get the store and crash-report keys; the iOS build in CI works again
+
+## [09/11/2026]
+- The app speaks Czech on a Czech device and English everywhere else; maneuver names and descriptions are translated too
+- Two more maneuver packs: Phantom (fades from sight and slips aside, no shots) and Strafing Run (two passes over the enemy, no cover); a balance test keeps them sidegrades
+- Retro Arcade music pack: every battle theme as 8-bit chiptune, picked in the Store tab, with a ten-second preview
+- Store screenshots and feature graphics in English and Czech, rendered from the real screens
+
+## [08/11/2026]
+- Store in the Comcenter: Commander Edition, Fleet Collection, six premium fleets and the Ace pack, all one-time purchases through Google Play and the App Store; Restore purchases
+- Vanguard and the three AI fleets stay free; a premium fleet flown before the store is kept
+- How to play on first launch and from the lobby; the first battle spells out the controls
+- Online games belong to their two players: anonymous sign-in, row level security, stale games cleaned up, and the lobby lists only games of the same network protocol
+- Crash reports (Sentry) and anonymous product events
+- Release builds sign with the upload key from android/key.properties
+
 ## [13/09/2026]
 - Maneuvers: draw a gesture on the 3×3 pad and the ship flies it on its own — sidesteps, loops, barrel rolls, slaloms, dashes and a signature move for every unit type, firing from the maneuver's own plan
 - Every ship has twelve shared maneuver families in its own variant plus a signature of its own; the mirrored gesture flies the mirrored maneuver

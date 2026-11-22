@@ -1,0 +1,75 @@
+{
+ "id": "living_undead",
+ "name_cs": "Živí × Nemrtví",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#ECE3CF",
+  "dark": "#7F8FA0"
+ },
+ "sides": [
+  {
+   "id": "living",
+   "color": "white",
+   "name_cs": "Živí",
+   "pieces": {
+    "king": {
+     "name_cs": "Paladin-král",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Kněžka slunce",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Zvonice",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Lovec nemrtvých",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Paladin na bílém koni",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Vesničan s pochodní",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "undead",
+   "color": "black",
+   "name_cs": "Nemrtví",
+   "pieces": {
+    "king": {
+     "name_cs": "Lich",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Banshee",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Mauzoleum",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Nekromant",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Kostlivý jezdec",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Kostlivec",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

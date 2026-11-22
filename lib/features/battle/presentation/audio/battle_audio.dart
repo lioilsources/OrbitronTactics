@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../data/battle_element.dart';
 import '../../data/battle_sounds.dart';
+import '../../data/battle_music.dart';
 import 'battle_sound_cues.dart';
 
 /// Plays a battle's sound with SoLoud: the attacker's theme on a loop, a
@@ -66,10 +67,12 @@ class BattleAudio {
         }
       }();
 
-  /// Starts [attacker]'s theme and loads the effects of [elements].
+  /// Starts [attacker]'s theme from [music] and loads the effects of
+  /// [elements].
   Future<void> start({
     required PieceType attacker,
     required Set<BattleElement> elements,
+    BattleMusic music = BattleMusic.standard,
   }) async {
     final generation = ++_generation;
     if (!await _init()) return;
@@ -79,21 +82,40 @@ class BattleAudio {
         await _load(BattleSounds.shot(element));
         await _load(BattleSounds.explosion(element));
       }
-      final music = await _soloud.loadAsset(
-        BattleSounds.music(attacker),
-        mode: LoadMode.disk,
-      );
-      if (generation != _generation) {
-        await _soloud.disposeSource(music);
-        return;
-      }
-      _music = music;
-      final handle = _soloud.play(music, volume: 0, looping: true);
-      _musicHandle = handle;
-      _soloud.fadeVolume(handle, _musicVolume, _musicFadeIn);
+      await _playTheme(BattleSounds.music(attacker, music), generation);
     } catch (error) {
       _log('start', error);
     }
+  }
+
+  /// Plays [attacker]'s theme from [music] for a few seconds: the store's
+  /// preview. A battle starting meanwhile takes over.
+  Future<void> preview(BattleMusic music,
+      {PieceType attacker = PieceType.knight}) async {
+    final generation = ++_generation;
+    if (!await _init()) return;
+    await _stopMusic(fade: Duration.zero);
+    try {
+      await _playTheme(BattleSounds.music(attacker, music), generation);
+      await Future<void>.delayed(_previewLength);
+      if (generation == _generation) await _stopMusic(fade: _musicFadeOut);
+    } catch (error) {
+      _log('preview', error);
+    }
+  }
+
+  static const _previewLength = Duration(seconds: 10);
+
+  Future<void> _playTheme(String asset, int generation) async {
+    final music = await _soloud.loadAsset(asset, mode: LoadMode.disk);
+    if (generation != _generation) {
+      await _soloud.disposeSource(music);
+      return;
+    }
+    _music = music;
+    final handle = _soloud.play(music, volume: 0, looping: true);
+    _musicHandle = handle;
+    _soloud.fadeVolume(handle, _musicVolume, _musicFadeIn);
   }
 
   /// Plays what happened between two battle states.

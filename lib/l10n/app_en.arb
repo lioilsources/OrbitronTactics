@@ -1,0 +1,763 @@
+{
+  "@@locale": "en",
+  "appTitle": "OrbitronTactics",
+  "defaultPlayerName": "Player",
+  "defaultHostName": "Host",
+  "defaultGuestName": "Guest",
+  "defaultOpponentName": "Opponent",
+  "cancel": "Cancel",
+  "leave": "Leave",
+  "back": "Back",
+  "newGame": "New Game",
+  "start": "Start",
+  "join": "Join",
+  "connect": "Connect",
+  "howToPlayTooltip": "How to play",
+  "comcenterTooltip": "Comcenter",
+  "credits": "{credits} cr",
+  "@credits": {
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsReward": "+{credits} cr",
+  "@creditsReward": {
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPawn": "Pawn",
+  "unitRook": "Rook",
+  "unitKnight": "Knight",
+  "unitBishop": "Bishop",
+  "unitQueen": "Queen",
+  "unitKing": "King",
+  "lobbyYourName": "Your name",
+  "lobbySinglePlayer": "Single Player",
+  "lobbyCreateGame": "Create Game",
+  "lobbyLocalGame": "Local Game",
+  "lobbyHostWifi": "Host WiFi",
+  "lobbyJoinWifi": "Join WiFi",
+  "lobbyOpenGames": "Open Games",
+  "lobbyNoOpenGames": "No open games.\nCreate one to start!",
+  "lobbyShowOpenGames": "Show open games",
+  "@lobbyShowOpenGames": {
+    "description": "Lobby button that connects to the online service and lists games waiting for a second player"
+  },
+  "lobbyJustNow": "just now",
+  "lobbyMinutesAgo": "{minutes}m ago",
+  "@lobbyMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lobbyCannotConnect": "Cannot connect to server",
+  "errorCreatingGame": "Error creating game: {error}",
+  "@errorCreatingGame": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorJoiningGame": "Error joining game: {error}",
+  "@errorJoiningGame": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "gameNotOpen": "That game is no longer open",
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+  "fleetRecord": "{wins}W / {losses}L",
+  "@fleetRecord": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      }
+    }
+  },
+  "wifiHostTitle": "WiFi Host",
+  "wifiShareAddress": "Share this address with your opponent:",
+  "wifiJoinTitle": "Join WiFi Game",
+  "waitingForPlayer": "Waiting for another player to join...",
+  "leaveGameTooltip": "Leave Game",
+  "leaveGameTitle": "Leave Game?",
+  "leaveGameBody": "Your opponent will be able to claim victory.",
+  "powerFieldsLabel": "Power Fields:",
+  "powerFieldsNeed": "(need {total})",
+  "@powerFieldsNeed": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "opponentDisconnected": "Opponent Disconnected",
+  "opponentLeftBody": "Your opponent has left the game.",
+  "claimVictory": "Claim Victory",
+  "victoryInfiltration": "Pawn Infiltration!",
+  "victoryAbandonment": "Opponent Abandoned!",
+  "yourShield": "YOUR SHIELD",
+  "battleTitle": "BATTLE",
+  "soundOn": "Sound on",
+  "soundOff": "Sound off",
+  "battleVictory": "VICTORY!",
+  "battleDefeated": "DEFEATED",
+  "newManeuvers": "{count, plural, =1{NEW MANEUVER} other{NEW MANEUVERS}}",
+  "@newManeuvers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToContinue": "Tap to continue",
+  "controlsHint": "Drag across your half to dodge, forward to climb, back to dive. Hit the enemy at its own altitude. Draw a gesture on the pad to fly a maneuver.",
+  "comcenterTitle": "COMCENTER",
+  "tabStore": "STORE",
+  "yourFleet": "Your fleet: {name}",
+  "@yourFleet": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "upgradeHint": "Upgrade your units to gain advantage in battle",
+  "armedCount": "ARMED {armed}/{slots}",
+  "@armedCount": {
+    "placeholders": {
+      "armed": {
+        "type": "int"
+      },
+      "slots": {
+        "type": "int"
+      }
+    }
+  },
+  "battlesWon": "{count, plural, =1{1 battle won} other{{count} battles won}}",
+  "@battlesWon": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statHp": "HP",
+  "statDamage": "DMG",
+  "upgradeMax": "MAX",
+  "upgradeCost": "{cost}cr",
+  "@upgradeCost": {
+    "placeholders": {
+      "cost": {
+        "type": "int"
+      }
+    }
+  },
+  "maxLevel": "MAX LEVEL",
+  "maneuverStats": "{energy} energy · {seconds} s",
+  "@maneuverStats": {
+    "placeholders": {
+      "energy": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "maneuverMirrors": "mirrors",
+  "trainPrice": "TRAIN {price}",
+  "@trainPrice": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "tierStarter": "START",
+  "tierBasic": "BASIC",
+  "tierAdvanced": "ADVANCED",
+  "tierSignature": "SIGNATURE",
+  "tierPack": "PACK",
+  "maneuverArmed": "ARMED",
+  "maneuverArm": "ARM",
+  "maneuverPadFull": "PAD FULL",
+  "unlockWins": "Win {won}/{needed} battles",
+  "@unlockWins": {
+    "placeholders": {
+      "won": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "unlockPack": "In the {pack}",
+  "@unlockPack": {
+    "placeholders": {
+      "pack": {
+        "type": "String"
+      }
+    }
+  },
+  "unlockStarter": "From the start",
+  "buyCredits": "BUY {price}",
+  "@buyCredits": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "getPack": "GET PACK",
+  "storeIntro": "The whole game is free. These change how it looks, not who wins.",
+  "storeUnavailable": "The store is not available on this build.",
+  "storeUnavailableShort": "The store is not available on this build",
+  "restorePurchases": "RESTORE PURCHASES",
+  "restoring": "RESTORING…",
+  "restoreFailed": "The store could not be reached",
+  "restoreNone": "No earlier purchases on this account",
+  "restoredCount": "{count, plural, =1{Restored 1 purchase} other{Restored {count} purchases}}",
+  "@restoredCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "battleMusic": "BATTLE MUSIC",
+  "musicStandard": "Standard",
+  "listen": "LISTEN",
+  "owned": "OWNED",
+  "storeNotAvailableButton": "STORE NOT AVAILABLE",
+  "notInStoreYet": "NOT IN THE STORE YET",
+  "buyPrice": "BUY {price}",
+  "@buyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseDone": "{item} is yours",
+  "@purchaseDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "purchasePending": "Waiting for the payment; {item} arrives once it clears",
+  "@purchasePending": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCommanderTitle": "Commander Edition",
+  "itemCommanderDescription": "Every premium fleet, maneuver pack and music pack, and everything added to the store later.",
+  "itemFleetDescription": "Ship art for all six units, white and black. Looks only: it flies like any other fleet.",
+  "itemMusicTitle": "{name} music",
+  "@itemMusicTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemMusicDescription": "Every battle theme again as 8-bit chiptune, from the pawn's quick synth line to the king's march.",
+  "howToPlayTitle": "HOW TO PLAY",
+  "skip": "SKIP",
+  "next": "NEXT",
+  "letsPlay": "LET'S PLAY",
+  "rulesWinTitle": "Three ways to win",
+  "rulesWin1": "Hold all five power fields at the end of your turn.",
+  "rulesWin2": "Capture both the enemy's King and Queen.",
+  "rulesWin3": "Get a Pawn to the enemy's back rank.",
+  "rulesWin4": "Lose your King or Queen and the other becomes the Last Warrior: it moves one square in any direction.",
+  "rulesPiecesTitle": "Pieces move their own way",
+  "rulesPieces1": "Pawn: sideways and back to move, diagonally forward to move or capture. Never straight ahead.",
+  "rulesPieces2": "Rook: up to 4 squares straight. Bishop: up to 3 diagonally, or snipe 3 squares straight ahead over anything.",
+  "rulesPieces3": "Knight: an L forward or sideways, only a low L back, blocked by a Rook right in front.",
+  "rulesPieces4": "Queen: 4 diagonally, 2 straight. King: 4 straight, 2 diagonally.",
+  "rulesPieces5": "Tap a piece to see where it can go. A red ! means it can be taken.",
+  "rulesBattleTitle": "Every capture is a battle",
+  "rulesBattle1": "The two pieces become ships and fight it out in the arena. The winner keeps the square.",
+  "rulesBattle2": "Drag across your half to dodge, forward to climb, back to dive.",
+  "rulesBattle3": "A shot only hits a ship at about its own altitude, so to hit the enemy you have to fly where it can hit you.",
+  "rulesBattle4": "Raise the shield when fire is coming and you cannot get away.",
+  "rulesFleetTitle": "Maneuvers and your fleet",
+  "rulesFleet1": "Draw a gesture on the pad and the ship flies a maneuver on its own. Each costs energy, which recharges during the battle.",
+  "rulesFleet2": "Single player battles earn credits. Spend them in the Comcenter on upgrades and new maneuvers.",
+  "rulesFleet3": "The whole game is free. The store only sells new looks and maneuver packs.",
+  "boardTab": "BOARD",
+  "@boardTab": {
+    "description": "Comcenter tab with the board piece skin picker"
+  },
+  "pieceSkinTitle": "Board pieces",
+  "@pieceSkinTitle": {
+    "description": "Heading above the piece skin packs"
+  },
+  "pieceSkinHint": "Pick the armies drawn on the board in every game mode.",
+  "@pieceSkinHint": {
+    "description": "Explains what the piece skin picker changes"
+  },
+  "classicMarks": "Classic marks",
+  "@classicMarks": {
+    "description": "Toggle that draws a small chess glyph on every image piece"
+  },
+  "classicMarksHint": "Show a small chess symbol on each figure.",
+  "@classicMarksHint": {
+    "description": "Subtitle of the classic marks toggle"
+  },
+  "pieceSkinClassic": "Classic",
+  "@pieceSkinClassic": {
+    "description": "Name of the default symbol pieces"
+  },
+  "pieceSkinClassicWhite": "White",
+  "@pieceSkinClassicWhite": {
+    "description": "White side of the classic pieces"
+  },
+  "pieceSkinClassicBlack": "Black",
+  "@pieceSkinClassicBlack": {
+    "description": "Black side of the classic pieces"
+  },
+  "pieceSkinHeavenHell": "Heaven × Hell",
+  "@pieceSkinHeavenHell": {
+    "description": "Name of the Heaven against Hell piece pack"
+  },
+  "pieceSkinHeavenHellWhite": "Heaven",
+  "@pieceSkinHeavenHellWhite": {
+    "description": "White side of the Heaven against Hell pack"
+  },
+  "pieceSkinHeavenHellBlack": "Hell",
+  "@pieceSkinHeavenHellBlack": {
+    "description": "Black side of the Heaven against Hell pack"
+  },
+  "pieceSkinRomeCarthage": "Rome × Carthage",
+  "@pieceSkinRomeCarthage": {
+    "description": "Name of the Rome × Carthage piece pack"
+  },
+  "pieceSkinRomeCarthageWhite": "Rome",
+  "@pieceSkinRomeCarthageWhite": {
+    "description": "White side of the Rome × Carthage piece pack"
+  },
+  "pieceSkinRomeCarthageBlack": "Carthage",
+  "@pieceSkinRomeCarthageBlack": {
+    "description": "Black side of the Rome × Carthage piece pack"
+  },
+  "pieceSkinKnightsOrcs": "Knights × Orcs",
+  "@pieceSkinKnightsOrcs": {
+    "description": "Name of the Knights × Orcs piece pack"
+  },
+  "pieceSkinKnightsOrcsWhite": "Knights",
+  "@pieceSkinKnightsOrcsWhite": {
+    "description": "White side of the Knights × Orcs piece pack"
+  },
+  "pieceSkinKnightsOrcsBlack": "Orcs",
+  "@pieceSkinKnightsOrcsBlack": {
+    "description": "Black side of the Knights × Orcs piece pack"
+  },
+  "pieceSkinOlympusTitans": "Olympus × Titans",
+  "@pieceSkinOlympusTitans": {
+    "description": "Name of the Olympus × Titans piece pack"
+  },
+  "pieceSkinOlympusTitansWhite": "Olympus",
+  "@pieceSkinOlympusTitansWhite": {
+    "description": "White side of the Olympus × Titans piece pack"
+  },
+  "pieceSkinOlympusTitansBlack": "Titans",
+  "@pieceSkinOlympusTitansBlack": {
+    "description": "Black side of the Olympus × Titans piece pack"
+  },
+  "pieceSkinSamuraiYokai": "Samurai × Yōkai",
+  "@pieceSkinSamuraiYokai": {
+    "description": "Name of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinSamuraiYokaiWhite": "Samurai",
+  "@pieceSkinSamuraiYokaiWhite": {
+    "description": "White side of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinSamuraiYokaiBlack": "Yōkai",
+  "@pieceSkinSamuraiYokaiBlack": {
+    "description": "Black side of the Samurai × Yōkai piece pack"
+  },
+  "pieceSkinHussitesCrusaders": "Hussites × Crusaders",
+  "@pieceSkinHussitesCrusaders": {
+    "description": "Name of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinHussitesCrusadersWhite": "Hussites",
+  "@pieceSkinHussitesCrusadersWhite": {
+    "description": "White side of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinHussitesCrusadersBlack": "Crusaders",
+  "@pieceSkinHussitesCrusadersBlack": {
+    "description": "Black side of the Hussites × Crusaders piece pack"
+  },
+  "pieceSkinAsgardRagnarok": "Asgard × Ragnarök",
+  "@pieceSkinAsgardRagnarok": {
+    "description": "Name of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinAsgardRagnarokWhite": "Asgard",
+  "@pieceSkinAsgardRagnarokWhite": {
+    "description": "White side of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinAsgardRagnarokBlack": "Ragnarök",
+  "@pieceSkinAsgardRagnarokBlack": {
+    "description": "Black side of the Asgard × Ragnarök piece pack"
+  },
+  "pieceSkinBogatyrsKoschei": "Bogatyrs × Koschei",
+  "@pieceSkinBogatyrsKoschei": {
+    "description": "Name of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinBogatyrsKoscheiWhite": "Bogatyrs",
+  "@pieceSkinBogatyrsKoscheiWhite": {
+    "description": "White side of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinBogatyrsKoscheiBlack": "Koschei",
+  "@pieceSkinBogatyrsKoscheiBlack": {
+    "description": "Black side of the Bogatyrs × Koschei piece pack"
+  },
+  "pieceSkinCamelotMorgana": "Round Table × Morgana",
+  "@pieceSkinCamelotMorgana": {
+    "description": "Name of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinCamelotMorganaWhite": "Round Table",
+  "@pieceSkinCamelotMorganaWhite": {
+    "description": "White side of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinCamelotMorganaBlack": "Morgana",
+  "@pieceSkinCamelotMorganaBlack": {
+    "description": "Black side of the Round Table × Morgana piece pack"
+  },
+  "pieceSkinDwarvesDragons": "Dwarves × Dragons",
+  "@pieceSkinDwarvesDragons": {
+    "description": "Name of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinDwarvesDragonsWhite": "Dwarves",
+  "@pieceSkinDwarvesDragonsWhite": {
+    "description": "White side of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinDwarvesDragonsBlack": "Dragons",
+  "@pieceSkinDwarvesDragonsBlack": {
+    "description": "Black side of the Dwarves × Dragons piece pack"
+  },
+  "pieceSkinEgyptAssyria": "Egypt × Assyria",
+  "@pieceSkinEgyptAssyria": {
+    "description": "Name of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinEgyptAssyriaWhite": "Egypt",
+  "@pieceSkinEgyptAssyriaWhite": {
+    "description": "White side of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinEgyptAssyriaBlack": "Assyria",
+  "@pieceSkinEgyptAssyriaBlack": {
+    "description": "Black side of the Egypt × Assyria piece pack"
+  },
+  "pieceSkinElvesGoblins": "Elves × Goblins",
+  "@pieceSkinElvesGoblins": {
+    "description": "Name of the Elves × Goblins piece pack"
+  },
+  "pieceSkinElvesGoblinsWhite": "Elves",
+  "@pieceSkinElvesGoblinsWhite": {
+    "description": "White side of the Elves × Goblins piece pack"
+  },
+  "pieceSkinElvesGoblinsBlack": "Goblins",
+  "@pieceSkinElvesGoblinsBlack": {
+    "description": "Black side of the Elves × Goblins piece pack"
+  },
+  "pieceSkinHorusSeth": "Horus × Seth",
+  "@pieceSkinHorusSeth": {
+    "description": "Name of the Horus × Seth piece pack"
+  },
+  "pieceSkinHorusSethWhite": "Horus",
+  "@pieceSkinHorusSethWhite": {
+    "description": "White side of the Horus × Seth piece pack"
+  },
+  "pieceSkinHorusSethBlack": "Seth",
+  "@pieceSkinHorusSethBlack": {
+    "description": "Black side of the Horus × Seth piece pack"
+  },
+  "pieceSkinLivingUndead": "Living × Undead",
+  "@pieceSkinLivingUndead": {
+    "description": "Name of the Living × Undead piece pack"
+  },
+  "pieceSkinLivingUndeadWhite": "Living",
+  "@pieceSkinLivingUndeadWhite": {
+    "description": "White side of the Living × Undead piece pack"
+  },
+  "pieceSkinLivingUndeadBlack": "Undead",
+  "@pieceSkinLivingUndeadBlack": {
+    "description": "Black side of the Living × Undead piece pack"
+  },
+  "pieceSkinVampiresWerewolves": "Vampires × Werewolves",
+  "@pieceSkinVampiresWerewolves": {
+    "description": "Name of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinVampiresWerewolvesWhite": "Vampires",
+  "@pieceSkinVampiresWerewolvesWhite": {
+    "description": "White side of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinVampiresWerewolvesBlack": "Werewolves",
+  "@pieceSkinVampiresWerewolvesBlack": {
+    "description": "Black side of the Vampires × Werewolves piece pack"
+  },
+  "pieceSkinWhiteBlackMagic": "White Magic × Black Magic",
+  "@pieceSkinWhiteBlackMagic": {
+    "description": "Name of the White Magic × Black Magic piece pack"
+  },
+  "pieceSkinWhiteBlackMagicWhite": "White Magic",
+  "@pieceSkinWhiteBlackMagicWhite": {
+    "description": "White side of the White Magic × Black Magic piece pack"
+  },
+  "pieceSkinWhiteBlackMagicBlack": "Black Magic",
+  "@pieceSkinWhiteBlackMagicBlack": {
+    "description": "Black side of the White Magic × Black Magic piece pack"
+  },
+  "creditsAmount": "{credits} cr",
+  "@creditsAmount": {
+    "description": "An amount of credits",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "lobbyWifiHint": "WiFi mode includes realtime battle arena",
+  "@lobbyWifiHint": {
+    "description": "Hint under the WiFi buttons"
+  },
+  "lobbyJoin": "Join",
+  "@lobbyJoin": {
+    "description": "Joins an open online game"
+  },
+  "errorWifiHost": "WiFi host error: {error}",
+  "@errorWifiHost": {
+    "description": "Snackbar when hosting a WiFi game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorWifiJoin": "WiFi join error: {error}",
+  "@errorWifiJoin": {
+    "description": "Snackbar when joining a WiFi game fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "singlePlayerDifficulty": "Difficulty",
+  "@singlePlayerDifficulty": {
+    "description": "Label of the AI difficulty picker"
+  },
+  "singlePlayerAiFleets": "AI fleets",
+  "@singlePlayerAiFleets": {
+    "description": "Label of the AI fleets' progress list"
+  },
+  "singlePlayerYourSide": "Your side",
+  "@singlePlayerYourSide": {
+    "description": "Label of the side picker; the options are the active piece skin's side names"
+  },
+  "singlePlayerYouMoveFirst": "You move first",
+  "@singlePlayerYouMoveFirst": {
+    "description": "Shown when the player picks the side that moves first"
+  },
+  "singlePlayerAiMovesFirst": "The AI moves first",
+  "@singlePlayerAiMovesFirst": {
+    "description": "Shown when the AI gets the side that moves first"
+  },
+  "aiPlayerName": "Orbitron AI · {difficulty}",
+  "@aiPlayerName": {
+    "description": "Name of the AI opponent, with its difficulty",
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiWaitingForGuest": "Waiting for guest to connect...",
+  "@wifiWaitingForGuest": {
+    "description": "Shown while the WiFi host waits"
+  },
+  "wifiEnterHostAddress": "Enter the host's IP address:",
+  "@wifiEnterHostAddress": {
+    "description": "Above the host address field"
+  },
+  "waitingTitle": "Waiting for opponent",
+  "@waitingTitle": {
+    "description": "Title of the screen waiting for an online opponent"
+  },
+  "waitingGameId": "Game ID:",
+  "@waitingGameId": {
+    "description": "Label above the online game's id"
+  },
+  "turnBadge": "TURN",
+  "@turnBadge": {
+    "description": "Badge on the player whose turn it is"
+  },
+  "thinkingBadge": "THINKING…",
+  "@thinkingBadge": {
+    "description": "Badge on the AI while it picks a move"
+  },
+  "sideWins": "{side} Wins!",
+  "@sideWins": {
+    "description": "Game over title; side is the winning side's name from the piece skin",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "victoryPowerFieldDomination": "Power Field Domination!",
+  "@victoryPowerFieldDomination": {
+    "description": "Victory by holding the power fields"
+  },
+  "victoryRoyalElimination": "Royal Elimination!",
+  "@victoryRoyalElimination": {
+    "description": "Victory by capturing both royals"
+  },
+  "battleSuddenDeath": "SUDDEN DEATH",
+  "@battleSuddenDeath": {
+    "description": "Battle header once the battle runs long: shots can no longer be dodged"
+  },
+  "battleElapsed": "{seconds}s",
+  "@battleElapsed": {
+    "description": "Battle time in seconds, already formatted",
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "sideShield": "{side} SHIELD",
+  "@sideShield": {
+    "description": "Shield button in hot-seat; side is the side's name in capitals",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "unitSurvives": "{side} unit survives",
+  "@unitSurvives": {
+    "description": "Battle result; side is the winning side's name",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "unitsTab": "UNITS",
+  "@unitsTab": {
+    "description": "Comcenter tab with unit upgrades"
+  },
+  "maneuversTab": "MANEUVERS",
+  "@maneuversTab": {
+    "description": "Comcenter tab with maneuvers"
+  },
+  "upgradeMaxLevel": "MAX LEVEL",
+  "@upgradeMaxLevel": {
+    "description": "Badge on a fully upgraded unit"
+  },
+  "maneuverLevel": "L{level}",
+  "@maneuverLevel": {
+    "description": "Badge with a maneuver's trained level",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "maneuverTrain": "TRAIN {price}",
+  "@maneuverTrain": {
+    "description": "Button that trains a maneuver to the next level",
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "pieceTypePawn": "Pawn",
+  "@pieceTypePawn": {
+    "description": "Unit type"
+  },
+  "pieceTypeRook": "Rook",
+  "@pieceTypeRook": {
+    "description": "Unit type"
+  },
+  "pieceTypeKnight": "Knight",
+  "@pieceTypeKnight": {
+    "description": "Unit type"
+  },
+  "pieceTypeBishop": "Bishop",
+  "@pieceTypeBishop": {
+    "description": "Unit type"
+  },
+  "pieceTypeQueen": "Queen",
+  "@pieceTypeQueen": {
+    "description": "Unit type"
+  },
+  "pieceTypeKing": "King",
+  "@pieceTypeKing": {
+    "description": "Unit type"
+  },
+  "fleetVanguard": "Orbitron Vanguard",
+  "@fleetVanguard": {
+    "description": "Fleet name"
+  },
+  "fleetSolarCrusade": "Solar Crusade",
+  "@fleetSolarCrusade": {
+    "description": "Fleet name"
+  },
+  "fleetVoidHive": "Void Hive",
+  "@fleetVoidHive": {
+    "description": "Fleet name"
+  },
+  "fleetNeonRunners": "Neon Runners",
+  "@fleetNeonRunners": {
+    "description": "Fleet name"
+  },
+  "fleetIronArmada": "Iron Armada",
+  "@fleetIronArmada": {
+    "description": "Fleet name"
+  },
+  "fleetCrystalChoir": "Crystal Choir",
+  "@fleetCrystalChoir": {
+    "description": "Fleet name"
+  },
+  "fleetRoninBlades": "Ronin Blades",
+  "@fleetRoninBlades": {
+    "description": "Fleet name"
+  },
+  "fleetAtomicAge": "Atomic Age",
+  "@fleetAtomicAge": {
+    "description": "Fleet name"
+  },
+  "fleetAbyssalTide": "Abyssal Tide",
+  "@fleetAbyssalTide": {
+    "description": "Fleet name"
+  },
+  "fleetStarNomads": "Star Nomads",
+  "@fleetStarNomads": {
+    "description": "Fleet name"
+  }
+}

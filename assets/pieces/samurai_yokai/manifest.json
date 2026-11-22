@@ -1,0 +1,75 @@
+{
+ "id": "samurai_yokai",
+ "name_cs": "Samurajové × Yōkai",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#EADCC8",
+  "dark": "#7C86A6"
+ },
+ "sides": [
+  {
+   "id": "samurai",
+   "color": "white",
+   "name_cs": "Samurajové",
+   "pieces": {
+    "king": {
+     "name_cs": "Daimjó s válečným vějířem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Onna-bugeiša s naginatou",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Hradní věž tenšu",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Lučištník s dlouhým lukem",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Jízdní samuraj",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Ašigaru s kopím",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "yokai",
+   "color": "black",
+   "name_cs": "Yōkai",
+   "pieces": {
+    "king": {
+     "name_cs": "Oni s okovaným kyjem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Kicune, devítiocasá liška",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Nurikabe, živá zeď",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Tengu s dlouhým nosem",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Raidžú, hromová šelma",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Karakasa, jednooký deštník",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

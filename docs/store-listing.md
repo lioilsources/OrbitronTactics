@@ -8,7 +8,7 @@ test/store_screenshots`; regenerate after any UI change.
 | File | Use |
 |---|---|
 | `docs/store/screenshots/{en,cs}/01_lobby.png` … `07_how_to_play.png` | Phone screenshots, 1080 x 1920, in this order |
-| `docs/store/screenshots_ios/{en,cs}/…` | App Store iPhone 6.9", 1290 x 2796, same order |
+| `docs/store/screenshots_ios/{en,cs}/…` | App Store iPhone 6.9", 1320 x 2868, same order |
 | `docs/store/screenshots_ipad/{en,cs}/…` | App Store iPad 13", 2064 x 2752, same order |
 | `docs/store/feature_graphic_{en,cs}.png` | Play feature graphic, 1024 x 500, per language |
 
@@ -138,3 +138,11 @@ Stylized ship explosions, no blood, no chat, no user-generated content
 beyond a nickname shown to one opponent, no gambling. Expected: PEGI 3 /
 Everyone / Apple 4+. Target audience in Play Console: 13+, so the Families
 policy does not apply.
+
+## App Store Connect
+
+Store texts for en-GB, en-US and cs live in `fastlane/metadata/ios/<locale>/`
+(Play texts in `fastlane/metadata/android/{en-US,cs-CZ}/`). Upload the
+iPhone and iPad screenshots, replacing what is there:
+
+    APP_STORE_CONNECT_API_KEY_PATH=<api key json> python3 tools/store/upload_app_store_screenshots.py

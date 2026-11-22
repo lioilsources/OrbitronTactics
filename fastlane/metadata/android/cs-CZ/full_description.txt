@@ -1,0 +1,24 @@
+Orbitron Tactics je strategická hra pro dva, která se hraje jako šachy a bojuje se v ní jako v arkádové střílečce.
+
+TŘI CESTY K VÍTĚZSTVÍ
+• Na konci tahu drž všech pět silových polí
+• Vezmi soupeři krále i královnu
+• Protlač pěšce až na soupeřovu zadní řadu
+
+FIGURKY S VLASTNÍMI PRAVIDLY
+Pěšci útočí šikmo a nikdy nejdou rovně vpřed. Střelci odstřelují přes frontu. Jezdce zastaví věž těsně před ním. Přijdeš o krále nebo královnu a ten, kdo zbyl, se stane Posledním bojovníkem.
+
+KAŽDÉ BRANÍ JE BITVA
+Obě figurky se promění v lodě a utkají se v aréně v reálném čase. Uhýbej, stoupej a klesej; střela zasáhne jen loď ve své výšce. Zvedni štít, utrať energii a gesty kresli manévry: looping, výkrut, průlet i podpisový manévr každé lodi. Po 45 sekundách přichází náhlá smrt, takže se žádný souboj nevleče.
+
+HRAJ PO SVÉM
+• Sám proti AI v zařízení na Easy, Medium nebo Hard
+• Dva hráči na jednom zařízení
+• Online a přes místní WiFi
+
+VYBUDUJ SI FLOTILU
+Vyhrané bitvy přinášejí kredity na vylepšení jednotek a nové manévry. V Comcentru si vybereš flotilu a jednu z mnoha sad figurek. Krátký návod při prvním spuštění vysvětlí pravidla.
+
+Celá hra je zdarma, bez reklam a bez účtu. Volitelné jednorázové nákupy přidávají prémiové flotily, balíčky manévrů a retro chiptune hudbu. Obnovení nákupů najdeš v záložce Obchod.
+
+Hra je v češtině a angličtině.

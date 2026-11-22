@@ -37,6 +37,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 - `BattleAi` reaches for one on its own 700 ms clock — cornered, or with the enemy in its hit zone. Tying it to the steering decision had the best pilots flying one almost without a break.
 - Pack families (`ManeuverTier.pack`, `PackUnlock`): `spiral` (Ace pack), `phantom` (Phantom pack: `Maneuver.cloaks`, no shots, longest untouchable window, the painter fades the ship) and `strafe` (Striker pack: two passes over the enemy). `maneuver_pack_balance_test` (slow) keeps a pack maneuver at or under 58 % against its closest earnable one; both land at 44 %. `BattleAi` takes a fixed `maneuvers` loadout for it.
 - Progress: `FleetProgress.maneuvers` (`ShipManeuvers`: owned, four armed, trained levels) and `battleWins` per ship. `FleetProgressNotifier.recordBattleWin` unlocks what the wins are worth, `buyManeuver`/`upgradeManeuver`/`armManeuvers`/`grantPack` do the rest. Single player only, like credits and skins.
+- `dart run tools/dump_maneuvers.dart <dir>` writes the whole catalog out as a TSV plus flight paths sampled through `Maneuver.poseAt`. The olin.now store gallery animates them (`make import-fleets` there); sampling here rather than re-deriving the easing in JavaScript is what keeps the two from drifting.
 
 ## Fleet Ship Art
 

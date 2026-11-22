@@ -140,10 +140,25 @@ class BoardSpec {
     layout: _classicLayout,
   );
 
-  /// Hex 8×8 (rules v0), the bishop snipes two corner steps forward.
+  /// Hex 8×8: a slide through a corner stops when both hexes beside the
+  /// corner are taken; the bishop snipes two corner steps forward.
   static const hex8 = BoardSpec(
     id: 'hex8',
     geometry: HexGeometry(rows: 8, cols: 8),
+    layout: _classicLayout,
+  );
+
+  /// Hex 8×8, a corner slide stops when either hex beside it is taken.
+  static const hex8Either = BoardSpec(
+    id: 'hex8_either',
+    geometry: HexGeometry(rows: 8, cols: 8, cornerBlock: CornerBlock.either),
+    layout: _classicLayout,
+  );
+
+  /// Hex 8×8 rules v0: nothing blocks a corner slide.
+  static const hex8Open = BoardSpec(
+    id: 'hex8_open',
+    geometry: HexGeometry(rows: 8, cols: 8, cornerBlock: CornerBlock.open),
     layout: _classicLayout,
   );
 
@@ -162,6 +177,8 @@ class BoardSpec {
     grand10x20,
     rocks8,
     hex8,
+    hex8Either,
+    hex8Open,
     hex8EdgeSnipe,
   ];
 

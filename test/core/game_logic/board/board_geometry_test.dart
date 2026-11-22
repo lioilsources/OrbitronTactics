@@ -117,15 +117,56 @@ void main() {
       expect(queen, isNot(contains(hex.step(pos(3, 3), HexGeometry.east, 3))));
     });
 
-    test('a corner slide is not blocked by the two cells it passes between',
-        () {
+    group('a corner slide between two hexes', () {
       final from = pos(2, 3);
-      final board = specBoard(spec, {
-        from: whiteBishop,
-        hex.step(from, HexGeometry.northEast): whitePawn,
-        hex.step(from, HexGeometry.northWest): whitePawn,
+      final north = hex.step(from, HexGeometry.north);
+
+      List<Position> bishopMoves(BoardSpec spec, List<Direction> taken) =>
+          movesOf(
+              specBoard(spec, {
+                from: whiteBishop,
+                for (final d in taken) hex.step(from, d): whitePawn,
+              }),
+              from);
+
+      test('hex8_either stops when either hex is taken', () {
+        expect(bishopMoves(BoardSpec.hex8Either, []), contains(north));
+        expect(bishopMoves(BoardSpec.hex8Either, [HexGeometry.northEast]),
+            isNot(contains(north)));
+        expect(bishopMoves(BoardSpec.hex8Either, [HexGeometry.northWest]),
+            isNot(contains(north)));
       });
-      expect(movesOf(board, from), contains(hex.step(from, HexGeometry.north)));
+
+      test('hex8 stops only when both are taken', () {
+        expect(bishopMoves(BoardSpec.hex8, [HexGeometry.northEast]),
+            contains(north));
+        expect(
+            bishopMoves(BoardSpec.hex8,
+                [HexGeometry.northEast, HexGeometry.northWest]),
+            isNot(contains(north)));
+      });
+
+      test('hex8_open never stops (rules v0)', () {
+        expect(
+            bishopMoves(BoardSpec.hex8Open,
+                [HexGeometry.northEast, HexGeometry.northWest]),
+            contains(north));
+      });
+
+      test('a blocked first step also blocks the second', () {
+        // The queen reaches two corner steps; pawns on both hexes beside
+        // the second corner stop her after the first.
+        final mid = hex.step(from, HexGeometry.north);
+        final moves = movesOf(
+            specBoard(BoardSpec.hex8, {
+              from: whiteQueen,
+              hex.step(mid, HexGeometry.northEast): whitePawn,
+              hex.step(mid, HexGeometry.northWest): whitePawn,
+            }),
+            from);
+        expect(moves, contains(mid));
+        expect(moves, isNot(contains(hex.step(mid, HexGeometry.north))));
+      });
     });
 
     test('knight: six jumps forward, two back by one row', () {

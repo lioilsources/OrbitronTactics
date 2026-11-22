@@ -85,6 +85,14 @@ abstract class BoardGeometry {
   /// The Last Warrior's single steps.
   List<Direction> get adjacent;
 
+  /// The edge steps whose squares a slide in corner direction [d] passes
+  /// between, when they can block it. Empty when nothing blocks a corner
+  /// step (the square board).
+  List<Direction> cornerFlanks(Direction d) => const [];
+
+  /// How many of [cornerFlanks]' squares must be taken to block the step.
+  int get cornerBlockThreshold => 0;
+
   /// [from] moved [times] steps in [d]. May be off the board.
   Position step(Position from, Direction d, [int times = 1]);
 
@@ -269,6 +277,19 @@ enum HexSnipe {
   edgeDiagonal,
 }
 
+/// What stops a hex slide through a corner, which passes between the two
+/// hexes that share that corner.
+enum CornerBlock {
+  /// Nothing: only the landing hex counts (rules v0).
+  open,
+
+  /// Both hexes taken.
+  both,
+
+  /// Either hex taken.
+  either,
+}
+
 /// A hex board: pointy-top hexes in horizontal rows, stored in offset
 /// coordinates with odd rows shifted half a cell right. That keeps
 /// `grid[row][col]`, the JSON and the AI's bit sets as they are.
@@ -278,12 +299,14 @@ enum HexSnipe {
 /// A [Direction] here is (row change, axial column change).
 class HexGeometry extends BoardGeometry {
   final HexSnipe snipe;
+  final CornerBlock cornerBlock;
 
   const HexGeometry({
     required super.rows,
     required super.cols,
     super.blocked,
     this.snipe = HexSnipe.vertexForward,
+    this.cornerBlock = CornerBlock.both,
   }) : assert(rows % 2 == 0, 'point symmetry needs an even row count');
 
   static const east = Direction(0, 1);
@@ -326,6 +349,24 @@ class HexGeometry extends BoardGeometry {
 
   @override
   List<Direction> get adjacent => _straight;
+
+  @override
+  List<Direction> cornerFlanks(Direction d) {
+    if (cornerBlock == CornerBlock.open) return const [];
+    for (var i = 0; i < _straight.length; i++) {
+      for (var j = i + 1; j < _straight.length; j++) {
+        if (_straight[i] + _straight[j] == d) return [_straight[i], _straight[j]];
+      }
+    }
+    return const [];
+  }
+
+  @override
+  int get cornerBlockThreshold => switch (cornerBlock) {
+        CornerBlock.open => 0,
+        CornerBlock.both => 2,
+        CornerBlock.either => 1,
+      };
 
   @override
   Position step(Position from, Direction d, [int times = 1]) {

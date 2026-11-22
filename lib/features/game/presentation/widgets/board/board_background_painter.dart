@@ -11,14 +11,21 @@ class BoardBackgroundPainter extends CustomPainter {
   final double glowOpacity;
   final bool flipBoard;
 
+  /// Square colors; a piece skin pack brings its own.
+  final Color lightSquare;
+  final Color darkSquare;
+
   const BoardBackgroundPainter({
     required this.powerFields,
     required this.board,
     required this.glowOpacity,
     this.flipBoard = false,
+    this.lightSquare = BoardTheme.lightSquare,
+    this.darkSquare = BoardTheme.darkSquare,
   });
 
-  int _vRow(int r) => flipBoard ? 7 - r : r;
+  // White's back row (row 0) is drawn at the bottom; flipped for black.
+  int _vRow(int r) => flipBoard ? r : 7 - r;
   int _vCol(int c) => flipBoard ? 7 - c : c;
 
   @override
@@ -30,7 +37,7 @@ class BoardBackgroundPainter extends CustomPainter {
       for (int col = 0; col < 8; col++) {
         final isLight = (row + col) % 2 == 0;
         final paint = Paint()
-          ..color = isLight ? BoardTheme.lightSquare : BoardTheme.darkSquare;
+          ..color = isLight ? lightSquare : darkSquare;
 
         final rect = Rect.fromLTWH(
           col * squareSize,
@@ -100,6 +107,8 @@ class BoardBackgroundPainter extends CustomPainter {
     return powerFields != oldDelegate.powerFields ||
         board != oldDelegate.board ||
         glowOpacity != oldDelegate.glowOpacity ||
-        flipBoard != oldDelegate.flipBoard;
+        flipBoard != oldDelegate.flipBoard ||
+        lightSquare != oldDelegate.lightSquare ||
+        darkSquare != oldDelegate.darkSquare;
   }
 }

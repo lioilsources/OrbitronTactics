@@ -41,9 +41,15 @@ class BattleAiAction {
 /// Acts on the real [BattleState] through the same engine calls as a
 /// player's input. Skill comes entirely from the [AiProfile].
 class BattleAi {
-  BattleAi({required AiProfile profile, required Random random})
-      : _profile = profile,
-        _random = random;
+  /// [maneuvers] fixes what the pilot can fly; by default the profile
+  /// decides.
+  BattleAi({
+    required AiProfile profile,
+    required Random random,
+    List<Maneuver>? maneuvers,
+  })  : _profile = profile,
+        _random = random,
+        _options = maneuvers;
 
   /// Clearance beyond a shot's hit zone when getting out of its way.
   static const double _dodgeClearance = 0.03;
@@ -64,6 +70,7 @@ class BattleAi {
   /// order of preference.
   static const _escapes = [
     ManeuverFamily.roll,
+    ManeuverFamily.phantom,
     ManeuverFamily.loop,
     ManeuverFamily.dash,
     ManeuverFamily.sidestep,
@@ -74,6 +81,7 @@ class BattleAi {
     ManeuverFamily.volley,
     ManeuverFamily.strike,
     ManeuverFamily.shadow,
+    ManeuverFamily.strafe,
     ManeuverFamily.signature,
   };
 
@@ -91,12 +99,18 @@ class BattleAi {
   /// Shots the shield was already considered against — one roll per shot.
   final Set<String> _shieldRolled = {};
 
+  /// The hit zone this tick; sudden death grows it.
+  double _hitHalfWidth = BattleEngine.hitHalfWidth;
+  double _hitHalfAltitude = BattleEngine.hitHalfAltitude;
+
   BattleAiAction decide(
     BattleState state, {
     required bool isAttacker,
     required int deltaMs,
   }) {
     if (state.isFinished) return const BattleAiAction();
+    _hitHalfWidth = BattleEngine.hitHalfWidthAt(state.elapsedMs);
+    _hitHalfAltitude = BattleEngine.hitHalfAltitudeAt(state.elapsedMs);
     final me = isAttacker ? state.attacker : state.defender;
     final enemy = isAttacker ? state.defender : state.attacker;
 
@@ -198,8 +212,8 @@ class BattleAi {
   /// above or below its altitude — preferring the side of [aim] with fewer
   /// shots. Null when every way out is covered.
   Spot? _dodge(Spot aim, List<Projectile> dangerous) {
-    final clearX = BattleEngine.hitHalfWidth + _dodgeClearance;
-    final clearAltitude = BattleEngine.hitHalfAltitude + _dodgeClearance;
+    final clearX = _hitHalfWidth + _dodgeClearance;
+    final clearAltitude = _hitHalfAltitude + _dodgeClearance;
     final spots = <Spot>[
       for (final shot in dangerous) ...[
         (x: shot.xFraction - clearX, altitude: aim.altitude),
@@ -284,8 +298,8 @@ class BattleAi {
   }
 
   bool _inSights(BattleUnit me, BattleUnit enemy) =>
-      (me.xFraction - enemy.xFraction).abs() <= BattleEngine.hitHalfWidth &&
-      (me.altitude - enemy.altitude).abs() <= BattleEngine.hitHalfAltitude;
+      (me.xFraction - enemy.xFraction).abs() <= _hitHalfWidth &&
+      (me.altitude - enemy.altitude).abs() <= _hitHalfAltitude;
 
   bool _shouldShield(
     BattleUnit me,
@@ -323,10 +337,9 @@ class BattleAi {
         altitude: from.altitude + (to.altitude - from.altitude).clamp(-step, step),
       );
 
-  static bool _isHitBy(Iterable<Projectile> shots, Spot spot) =>
-      shots.any((shot) =>
-          (shot.xFraction - spot.x).abs() <= BattleEngine.hitHalfWidth &&
-          (shot.altitude - spot.altitude).abs() <= BattleEngine.hitHalfAltitude);
+  bool _isHitBy(Iterable<Projectile> shots, Spot spot) => shots.any((shot) =>
+      (shot.xFraction - spot.x).abs() <= _hitHalfWidth &&
+      (shot.altitude - spot.altitude).abs() <= _hitHalfAltitude);
 
   static Spot _clamp(Spot spot) => (
         x: spot.x

@@ -1,0 +1,75 @@
+{
+ "id": "olympus_titans",
+ "name_cs": "Olymp × Titáni",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E7E0CF",
+  "dark": "#7F95A3"
+ },
+ "sides": [
+  {
+   "id": "olympus",
+   "color": "white",
+   "name_cs": "Olymp",
+   "pieces": {
+    "king": {
+     "name_cs": "Zeus s bleskem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Héra s pávím vějířem",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Chrám se sloupy",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Apollón s lukem",
+     "candidate": 0
+    },
+    "knight": {
+     "name_cs": "Kentaur Cheirón",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Hoplít se štítem",
+     "candidate": 0
+    }
+   }
+  },
+  {
+   "id": "titans",
+   "color": "black",
+   "name_cs": "Titáni",
+   "pieces": {
+    "king": {
+     "name_cs": "Kronos se srpem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Rheia se lvy",
+     "candidate": 3
+    },
+    "rook": {
+     "name_cs": "Atlas nesoucí nebeskou klenbu",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Prométheus s pochodní",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Chiméra",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Malý kyklop s balvanem",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "id": "egypt_assyria",
+ "name_cs": "Egypt × Asýrie",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#EEE4CC",
+  "dark": "#7E93A6"
+ },
+ "sides": [
+  {
+   "id": "egypt",
+   "color": "white",
+   "name_cs": "Egypt",
+   "pieces": {
+    "king": {
+     "name_cs": "Faraon s dvojitou korunou",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Královna s modrou korunou",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Chrámový pylon",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Velekněz s holí",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Válečný vůz",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Kopiník s proutěným štítem",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "assyria",
+   "color": "black",
+   "name_cs": "Asýrie",
+   "pieces": {
+    "king": {
+     "name_cs": "Asyrský král s tiárou",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Šammuramat",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Lamassu",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Věštec-hvězdář",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Jízdní lukostřelec",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Prakovník s kónickou přilbou",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

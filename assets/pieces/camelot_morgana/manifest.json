@@ -1,0 +1,75 @@
+{
+ "id": "camelot_morgana",
+ "name_cs": "Kulatý stůl × Morgana",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E7E2D2",
+  "dark": "#7D8E9E"
+ },
+ "sides": [
+  {
+   "id": "camelot",
+   "color": "white",
+   "name_cs": "Kulatý stůl",
+   "pieces": {
+    "king": {
+     "name_cs": "Artuš s Excaliburem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Guinevera",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Věž Kamelotu",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Merlin",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Lancelot na koni",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Panoš se štítem",
+     "candidate": 3
+    }
+   }
+  },
+  {
+   "id": "morgana",
+   "color": "black",
+   "name_cs": "Morgana",
+   "pieces": {
+    "king": {
+     "name_cs": "Mordred",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Morgana le Fay",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Menhir v mlze",
+     "candidate": 3
+    },
+    "bishop": {
+     "name_cs": "Čarodějnice z mokřad",
+     "candidate": 0
+    },
+    "knight": {
+     "name_cs": "Zelený rytíř",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Žoldnéř se sekerou",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

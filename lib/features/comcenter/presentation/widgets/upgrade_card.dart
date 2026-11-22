@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/game_logic/engine/unit_base_stats.dart';
 import '../../../../core/game_logic/engine/upgrade_engine.dart';
 import '../../../../core/game_logic/models/piece.dart';
+import '../../../../l10n/l10n.dart';
 
 const Map<PieceType, String> _symbols = {
   PieceType.pawn: '♙',
@@ -10,15 +11,6 @@ const Map<PieceType, String> _symbols = {
   PieceType.bishop: '♗',
   PieceType.queen: '♕',
   PieceType.king: '♔',
-};
-
-const Map<PieceType, String> _names = {
-  PieceType.pawn: 'Pawn',
-  PieceType.rook: 'Rook',
-  PieceType.knight: 'Knight',
-  PieceType.bishop: 'Bishop',
-  PieceType.queen: 'Queen',
-  PieceType.king: 'King',
 };
 
 class UpgradeCard extends StatelessWidget {
@@ -41,6 +33,7 @@ class UpgradeCard extends StatelessWidget {
     final canUpgrade = level < 3 && credits >= cost && onUpgrade != null;
     final base = unitBaseStats[pieceType]!;
     final upgraded = UpgradeEngine.applyUpgrades(base, level);
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -73,7 +66,7 @@ class UpgradeCard extends StatelessWidget {
             const SizedBox(height: 4),
             // Name
             Text(
-              _names[pieceType] ?? '',
+              l10n.pieceTypeName(pieceType),
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 12,
@@ -94,8 +87,8 @@ class UpgradeCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             // Stats
-            _StatRow('HP', base.maxHp, upgraded.maxHp),
-            _StatRow('DMG', base.damage, upgraded.damage),
+            _StatRow(l10n.statHp, base.maxHp, upgraded.maxHp),
+            _StatRow(l10n.statDamage, base.damage, upgraded.damage),
             const SizedBox(height: 8),
             // Upgrade button
             if (level < 3)
@@ -113,7 +106,7 @@ class UpgradeCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    cost < 0 ? 'MAX' : '${cost}cr',
+                    cost < 0 ? l10n.upgradeMax : l10n.creditsAmount(cost),
                     style: const TextStyle(fontSize: 11),
                   ),
                 ),
@@ -126,9 +119,9 @@ class UpgradeCard extends StatelessWidget {
                   color: Colors.amber.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  'MAX LEVEL',
-                  style: TextStyle(
+                child: Text(
+                  l10n.upgradeMaxLevel,
+                  style: const TextStyle(
                     color: Colors.amber,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,

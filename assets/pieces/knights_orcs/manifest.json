@@ -1,0 +1,75 @@
+{
+ "id": "knights_orcs",
+ "name_cs": "Rytíři × Orkové",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E6DECB",
+  "dark": "#7E8F9E"
+ },
+ "sides": [
+  {
+   "id": "knights",
+   "color": "white",
+   "name_cs": "Rytíři",
+   "pieces": {
+    "king": {
+     "name_cs": "Král v plné zbroji",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Královna-válečnice",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Hradní bašta",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Klerik s palcátem",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Rytíř na obrněném koni",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Zbrojnoš s kopím",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "orcs",
+   "color": "black",
+   "name_cs": "Orkové",
+   "pieces": {
+    "king": {
+     "name_cs": "Náčelník s kostěnou korunou",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Šamanka, matka kmene",
+     "candidate": 3
+    },
+    "rook": {
+     "name_cs": "Jeskynní troll s balvanem",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Šaman s lebkovou holí",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Kančí jezdec",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Goblin se šavlí",
+     "candidate": 0
+    }
+   }
+  }
+ ]
+}

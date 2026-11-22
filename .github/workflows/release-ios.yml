@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-ios:
     name: Build & Release iOS
-    runs-on: macos-26
+    runs-on: xcode-27
 
     steps:
       - name: Checkout
@@ -21,6 +21,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.50.x'
           channel: stable
           cache: true
 
@@ -39,7 +40,8 @@ jobs:
 
       - name: Install CocoaPods dependencies
         working-directory: ./ios
-        run: pod install
+        # The runner's spec repo can predate a pod the lock pins.
+        run: pod install --repo-update
 
       - name: Import signing certificate
         env:
@@ -88,7 +90,8 @@ jobs:
 
       - name: Build Flutter iOS (no codesign)
         working-directory: .
-        run: flutter build ios --release --no-codesign
+        # Store and crash-report keys; an empty secret leaves the service off.
+        run: flutter build ios --release --no-codesign --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} --dart-define=REVENUECAT_GOOGLE_KEY=${{ secrets.REVENUECAT_GOOGLE_KEY }} --dart-define=REVENUECAT_APPLE_KEY=${{ secrets.REVENUECAT_APPLE_KEY }}
 
       - name: Archive with manual signing
         env:

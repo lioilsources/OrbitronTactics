@@ -1,0 +1,75 @@
+{
+ "id": "elves_goblins",
+ "name_cs": "Elfové × Skřeti",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E5E3D0",
+  "dark": "#7F9A8E"
+ },
+ "sides": [
+  {
+   "id": "elves",
+   "color": "white",
+   "name_cs": "Elfové",
+   "pieces": {
+    "king": {
+     "name_cs": "Král lesa s parožím",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Paní hvězd",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Stromový strážce",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Elfí mudrc s holí",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Jezdec na jelenu",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Hraničář",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "goblins",
+   "color": "black",
+   "name_cs": "Skřeti",
+   "pieces": {
+    "king": {
+     "name_cs": "Skřetí král",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Bažinná ježibaba",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Katapult ze šrotu",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Alchymista",
+     "candidate": 2
+    },
+    "knight": {
+     "name_cs": "Jezdec na obří kryse",
+     "candidate": 1
+    },
+    "pawn": {
+     "name_cs": "Skřetík s pokličkou",
+     "candidate": 0
+    }
+   }
+  }
+ ]
+}

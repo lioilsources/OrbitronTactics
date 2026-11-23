@@ -46,7 +46,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 - `unitArt(world, fleet, type, color)` (`features/battle/data/unit_art.dart`) says what a unit fights as: the fleet's ship in Space, the board figure — plinth and all, black mirrored — elsewhere. No plinth-less battle variant ships with the app. `sideFleetProvider` (single player via `AiOpponentController.skinFor`, else `FleetSkin.fallback`) and `sideUnitArtProvider` are the one place `game_screen.dart` takes both sides' art from when it opens `BattleScreen(attackerArt:, defenderArt:)`.
 - `BattleArenaPainter` draws a standing unit upright at one size for all six types (`_figureWidthFraction`; ranks are in the pictures), on a contact shadow, without bank or altitude scaling: altitude only moves it forward (`ArenaLayout`). The top figure is turned around only in hot-seat (`drawsUpsideDown`). Maneuver attitudes: roll spins it about its upright axis, flip is a jump, pitch a lean, boost kicks up dust; no engine flames. The hit zone stays readable through the shots: one off its target's altitude is dimmed, one on it carries a ring.
 - Shots, elements, sounds and battle rules are the same in every world for now: figures still shoot (melee is plan 14, step 5).
-- `PieceSkin.free` is the one list of free worlds (Space, Rome × Carthage, Knights × Orcs, Heaven × Hell, awaiting Olin's confirmation); `premium` is everything else.
+- `PieceSkin.free` is the one list of free worlds (Space, Rome × Carthage, Knights × Orcs, Heaven × Hell); `premium` is everything else.
 - Comcenter tabs: WORLD (`PieceSkinPicker` with `FleetPicker` while in Space, the classic marks toggle in a figure world), UNITS, MANEUVERS, STORE. The lobby's `_WorldRow` opens the Comcenter.
 
 ## Fleet Ship Art

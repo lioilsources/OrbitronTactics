@@ -124,7 +124,7 @@ Price: **USD 0.99** for each single product, **USD 4.99** for the Commander Edit
 | `com.ol1n.orbitrontactics.pack.music_retro` | Retro Arcade music | 0.99 |
 
 Free worlds: Space, Rome × Carthage, Knights × Orcs and Heaven × Hell
-(`PieceSkin.free`; the choice awaits Olin's confirmation). Every other
+(`PieceSkin.free`). Every other
 world is sold and is in the Commander Edition. Fleets show only in the
 Space world, which their store text says. A Google Play product can only
 be created once an AAB that knows it has been uploaded; then import it

@@ -1,0 +1,1 @@
+chess,strategy,board game,tactics,space,spaceship,battle,shooter,AI,multiplayer,arcade,duel,fleet

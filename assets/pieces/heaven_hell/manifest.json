@@ -1,0 +1,75 @@
+{
+ "id": "heaven_hell",
+ "name_cs": "Nebe × Peklo",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E8DCC4",
+  "dark": "#7C8FA8"
+ },
+ "sides": [
+  {
+   "id": "heaven",
+   "color": "white",
+   "name_cs": "Nebe",
+   "pieces": {
+    "king": {
+     "name_cs": "Archanděl s plamenným mečem",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Šestikřídlý seraf",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Nebeská brána na oblaku",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Anděl-zvěstovatel s trubkou",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Pegas",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Cherubín se štítkem",
+     "candidate": 0
+    }
+   }
+  },
+  {
+   "id": "hell",
+   "color": "black",
+   "name_cs": "Peklo",
+   "pieces": {
+    "king": {
+     "name_cs": "Pán pekel s trojzubcem",
+     "candidate": 2
+    },
+    "queen": {
+     "name_cs": "Ďáblice s netopýřími křídly",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Sopečná bašta s lávou",
+     "candidate": 2
+    },
+    "bishop": {
+     "name_cs": "Pokušitel v kápi",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Ohnivý hřebec",
+     "candidate": 3
+    },
+    "pawn": {
+     "name_cs": "Čertík s vidlemi",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

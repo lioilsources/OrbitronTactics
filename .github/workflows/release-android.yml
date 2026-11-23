@@ -27,6 +27,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.50.x'
           channel: stable
           cache: true
 
@@ -54,11 +55,13 @@ jobs:
 
       - name: Build release AAB
         working-directory: .
-        run: flutter build appbundle --release
+        # Store and crash-report keys; an empty secret leaves the service off.
+        run: flutter build appbundle --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} --dart-define=REVENUECAT_GOOGLE_KEY=${{ secrets.REVENUECAT_GOOGLE_KEY }} --dart-define=REVENUECAT_APPLE_KEY=${{ secrets.REVENUECAT_APPLE_KEY }}
 
       - name: Build release APK
         working-directory: .
-        run: flutter build apk --release
+        # Store and crash-report keys; an empty secret leaves the service off.
+        run: flutter build apk --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} --dart-define=REVENUECAT_GOOGLE_KEY=${{ secrets.REVENUECAT_GOOGLE_KEY }} --dart-define=REVENUECAT_APPLE_KEY=${{ secrets.REVENUECAT_APPLE_KEY }}
 
       - name: Verify APK signing certificate
         run: |
@@ -74,10 +77,10 @@ jobs:
           files: |
             ./build/app/outputs/bundle/release/app-release.aab
             ./build/app/outputs/flutter-apk/app-release.apk
-          name: OrbitronTactics ${{ github.ref_name }}
+          name: Archion ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           draft: false
-          prerelease: true
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -85,5 +88,5 @@ jobs:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           groups: Alfa
-          releaseNotes: "OrbitronTactics ${{ github.ref_name }} (build ${{ github.run_number }})"
+          releaseNotes: "Archion ${{ github.ref_name }} (build ${{ github.run_number }})"
           file: ./build/app/outputs/flutter-apk/app-release.apk

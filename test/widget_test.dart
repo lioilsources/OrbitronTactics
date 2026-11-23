@@ -10,6 +10,6 @@ void main() {
         child: MaterialApp(home: GameScreen()),
       ),
     );
-    expect(find.text('OrbitronTactics'), findsOneWidget);
+    expect(find.text('Archion'), findsOneWidget);
   });
 }

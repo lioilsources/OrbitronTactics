@@ -1,0 +1,45 @@
+# Prompt blocks from Prompts/13-PLAN-frakce.md, chapters 1.1 and 5.
+# Copied verbatim: paraphrasing them breaks the shared look of a set.
+# Olin's changes after the PoC (15. 11. 2026): no pedestal ("Bez podstavce"),
+# the rook is a "building" in the frame, the bishop holds no bow.
+
+styles:
+  KIDS: "Cute chibi collectible vinyl toy figurine with a big head and a small body, rounded chunky shapes, smooth matte surface, bright saturated colors and a friendly expression."
+  EPIC: "Stylized hand-painted tabletop game miniature with heroic chunky proportions, bold simple shapes, clean edge highlights and a matte finish."
+  FLAT: "Flat vector game piece icon with a thick uniform dark outline, three or four flat colors and simple geometric shapes."
+  STORY: "Hand-painted gouache storybook illustration with soft paper texture, gentle outlines and warm colors."
+
+# Per-piece style variants. Olin (16. 11. 2026): the KIDS rook drops
+# "big head and a small body", which made Qwen add a chibi character to it.
+style_overrides:
+  KIDS:
+    rook: "Cute collectible vinyl toy figurine, rounded chunky shapes, smooth matte surface, bright saturated colors and a friendly expression."
+
+silhouettes:
+  king: "The tallest and most massive figure of the set, with a large distinctive crown or headpiece and a scepter or sword held upright."
+  queen: "Tall and elegant, with a wide fan-shaped silhouette."
+  bishop: "Tall and slender with a pointed top, holding a long staff diagonally."
+  knight: "Shown in side profile, rearing, with a strongly curved neck."
+  rook: "A squat, wide, blocky shape with a flat crenellated top, as wide as it is tall."
+  pawn: "The smallest and simplest figure of the set, short and round, with one small prop."
+
+frame: "Single {kind}, fully visible from top to bottom, three-quarter front view facing slightly to the right, centered with empty margin on all sides. Plain seamless light grey studio backdrop, soft even lighting, bright {rim} rim light along the edges."
+
+# What the frame calls the subject: the rook is a building, not a figure.
+kinds:
+  rook: building
+  default: figure
+
+piece: "{style} {subject}. {silhouette} {dna}. {frame}"
+
+lineup: "{style} A lineup of six different game figurines of the {faction} army standing side by side on a neutral grey surface, ordered from the smallest to the tallest: {pawn}, {rook}, {knight}, {bishop}, {queen}, {king}. They share one palette: {dna}. Plain seamless light grey studio backdrop, soft even lighting."
+
+# Target heights as a share of the king (chapter 1.1); applied in postprocess,
+# never in the prompt.
+heights:
+  king: 1.00
+  queen: 0.92
+  bishop: 0.84
+  knight: 0.78
+  rook: 0.72
+  pawn: 0.58

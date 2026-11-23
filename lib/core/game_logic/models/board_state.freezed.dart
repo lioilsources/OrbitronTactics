@@ -21,9 +21,13 @@ BoardState _$BoardStateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BoardState {
-  /// 8x8 grid indexed as grid[row][col]. Null = empty square.
+  /// rows × cols grid indexed as grid[row][col]. Null = empty square.
   List<List<Piece?>> get grid => throw _privateConstructorUsedError;
   List<PowerField> get powerFields => throw _privateConstructorUsedError;
+
+  /// The board variant. Missing in JSON from before variants: classic8.
+  @BoardSpecConverter()
+  BoardSpec get spec => throw _privateConstructorUsedError;
 
   /// Serializes this BoardState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,7 +46,11 @@ abstract class $BoardStateCopyWith<$Res> {
     $Res Function(BoardState) then,
   ) = _$BoardStateCopyWithImpl<$Res, BoardState>;
   @useResult
-  $Res call({List<List<Piece?>> grid, List<PowerField> powerFields});
+  $Res call({
+    List<List<Piece?>> grid,
+    List<PowerField> powerFields,
+    @BoardSpecConverter() BoardSpec spec,
+  });
 }
 
 /// @nodoc
@@ -59,7 +67,11 @@ class _$BoardStateCopyWithImpl<$Res, $Val extends BoardState>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? grid = null, Object? powerFields = null}) {
+  $Res call({
+    Object? grid = null,
+    Object? powerFields = null,
+    Object? spec = null,
+  }) {
     return _then(
       _value.copyWith(
             grid: null == grid
@@ -70,6 +82,10 @@ class _$BoardStateCopyWithImpl<$Res, $Val extends BoardState>
                 ? _value.powerFields
                 : powerFields // ignore: cast_nullable_to_non_nullable
                       as List<PowerField>,
+            spec: null == spec
+                ? _value.spec
+                : spec // ignore: cast_nullable_to_non_nullable
+                      as BoardSpec,
           )
           as $Val,
     );
@@ -85,7 +101,11 @@ abstract class _$$BoardStateImplCopyWith<$Res>
   ) = __$$BoardStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<List<Piece?>> grid, List<PowerField> powerFields});
+  $Res call({
+    List<List<Piece?>> grid,
+    List<PowerField> powerFields,
+    @BoardSpecConverter() BoardSpec spec,
+  });
 }
 
 /// @nodoc
@@ -101,7 +121,11 @@ class __$$BoardStateImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? grid = null, Object? powerFields = null}) {
+  $Res call({
+    Object? grid = null,
+    Object? powerFields = null,
+    Object? spec = null,
+  }) {
     return _then(
       _$BoardStateImpl(
         grid: null == grid
@@ -112,6 +136,10 @@ class __$$BoardStateImplCopyWithImpl<$Res>
             ? _value._powerFields
             : powerFields // ignore: cast_nullable_to_non_nullable
                   as List<PowerField>,
+        spec: null == spec
+            ? _value.spec
+            : spec // ignore: cast_nullable_to_non_nullable
+                  as BoardSpec,
       ),
     );
   }
@@ -123,6 +151,7 @@ class _$BoardStateImpl extends _BoardState {
   const _$BoardStateImpl({
     required final List<List<Piece?>> grid,
     required final List<PowerField> powerFields,
+    @BoardSpecConverter() this.spec = BoardSpec.classic8,
   }) : _grid = grid,
        _powerFields = powerFields,
        super._();
@@ -130,10 +159,10 @@ class _$BoardStateImpl extends _BoardState {
   factory _$BoardStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$BoardStateImplFromJson(json);
 
-  /// 8x8 grid indexed as grid[row][col]. Null = empty square.
+  /// rows × cols grid indexed as grid[row][col]. Null = empty square.
   final List<List<Piece?>> _grid;
 
-  /// 8x8 grid indexed as grid[row][col]. Null = empty square.
+  /// rows × cols grid indexed as grid[row][col]. Null = empty square.
   @override
   List<List<Piece?>> get grid {
     if (_grid is EqualUnmodifiableListView) return _grid;
@@ -149,9 +178,15 @@ class _$BoardStateImpl extends _BoardState {
     return EqualUnmodifiableListView(_powerFields);
   }
 
+  /// The board variant. Missing in JSON from before variants: classic8.
+  @override
+  @JsonKey()
+  @BoardSpecConverter()
+  final BoardSpec spec;
+
   @override
   String toString() {
-    return 'BoardState(grid: $grid, powerFields: $powerFields)';
+    return 'BoardState(grid: $grid, powerFields: $powerFields, spec: $spec)';
   }
 
   @override
@@ -163,7 +198,8 @@ class _$BoardStateImpl extends _BoardState {
             const DeepCollectionEquality().equals(
               other._powerFields,
               _powerFields,
-            ));
+            ) &&
+            (identical(other.spec, spec) || other.spec == spec));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -172,6 +208,7 @@ class _$BoardStateImpl extends _BoardState {
     runtimeType,
     const DeepCollectionEquality().hash(_grid),
     const DeepCollectionEquality().hash(_powerFields),
+    spec,
   );
 
   /// Create a copy of BoardState
@@ -192,17 +229,23 @@ abstract class _BoardState extends BoardState {
   const factory _BoardState({
     required final List<List<Piece?>> grid,
     required final List<PowerField> powerFields,
+    @BoardSpecConverter() final BoardSpec spec,
   }) = _$BoardStateImpl;
   const _BoardState._() : super._();
 
   factory _BoardState.fromJson(Map<String, dynamic> json) =
       _$BoardStateImpl.fromJson;
 
-  /// 8x8 grid indexed as grid[row][col]. Null = empty square.
+  /// rows × cols grid indexed as grid[row][col]. Null = empty square.
   @override
   List<List<Piece?>> get grid;
   @override
   List<PowerField> get powerFields;
+
+  /// The board variant. Missing in JSON from before variants: classic8.
+  @override
+  @BoardSpecConverter()
+  BoardSpec get spec;
 
   /// Create a copy of BoardState
   /// with the given fields replaced by the non-null parameter values.

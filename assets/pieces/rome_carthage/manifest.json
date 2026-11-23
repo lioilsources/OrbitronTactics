@@ -1,0 +1,75 @@
+{
+ "id": "rome_carthage",
+ "name_cs": "Řím × Kartágo",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#E6D5B8",
+  "dark": "#8C7A6B"
+ },
+ "sides": [
+  {
+   "id": "rome",
+   "color": "white",
+   "name_cs": "Řím",
+   "pieces": {
+    "king": {
+     "name_cs": "Vojevůdce s vavřínem",
+     "candidate": 3
+    },
+    "queen": {
+     "name_cs": "Bohyně Roma s kopím",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Testudo, želva ze štítů",
+     "candidate": 0
+    },
+    "bishop": {
+     "name_cs": "Aquilifer, nosič orla",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Jezdec equites",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Legionář se scutem",
+     "candidate": 1
+    }
+   }
+  },
+  {
+   "id": "carthage",
+   "color": "black",
+   "name_cs": "Kartágo",
+   "pieces": {
+    "king": {
+     "name_cs": "Hannibal",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Královna Dídó",
+     "candidate": 2
+    },
+    "rook": {
+     "name_cs": "Válečný slon s věžičkou",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Baleárský prakovník",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Numidský jezdec",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Libyjský kopiník",
+     "candidate": 2
+    }
+   }
+  }
+ ]
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/game_logic/models/board_state.dart';
 import '../../../../../core/game_logic/models/position.dart';
 import '../../../../../core/theme/board_theme.dart';
+import 'board_layout.dart';
 
 /// CustomPainter that draws selection highlights, valid move indicators,
 /// and last move highlights on top of the board.
@@ -22,130 +23,62 @@ class BoardOverlayPainter extends CustomPainter {
     this.flipBoard = false,
   });
 
-  int _vRow(int r) => flipBoard ? 7 - r : r;
-  int _vCol(int c) => flipBoard ? 7 - c : c;
-
   @override
   void paint(Canvas canvas, Size size) {
-    final squareSize = size.width / 8;
+    final layout =
+        BoardLayout.fit(board.geometry, size.width, flipped: flipBoard);
 
-    // Draw last move highlight
+    void highlight(Position pos, Color color) =>
+        canvas.drawPath(layout.cellPath(pos), Paint()..color = color);
+
     if (lastMoveFrom != null) {
-      _drawSquareHighlight(
-          canvas, lastMoveFrom!, squareSize, BoardTheme.lastMoveHighlight);
+      highlight(lastMoveFrom!, BoardTheme.lastMoveHighlight);
     }
     if (lastMoveTo != null) {
-      _drawSquareHighlight(
-          canvas, lastMoveTo!, squareSize, BoardTheme.lastMoveHighlight);
+      highlight(lastMoveTo!, BoardTheme.lastMoveHighlight);
     }
-
-    // Draw selected square
     if (selectedPosition != null) {
-      _drawSquareHighlight(
-          canvas, selectedPosition!, squareSize, BoardTheme.selectedSquare);
+      highlight(selectedPosition!, BoardTheme.selectedSquare);
     }
 
-    // Draw valid move indicators
     for (final move in validMoves) {
-      final isCapture = board.pieceAt(move) != null;
-      if (isCapture) {
-        _drawCaptureIndicator(canvas, move, squareSize);
+      if (board.pieceAt(move) != null) {
+        _drawCaptureIndicator(canvas, layout, move);
       } else {
-        _drawMoveIndicator(canvas, move, squareSize);
+        canvas.drawCircle(
+          layout.centreOf(move),
+          layout.cellSize * 0.15,
+          Paint()..color = BoardTheme.validMoveIndicator,
+        );
       }
     }
   }
 
-  void _drawSquareHighlight(
-    Canvas canvas,
-    Position pos,
-    double squareSize,
-    Color color,
-  ) {
-    final rect = Rect.fromLTWH(
-      _vCol(pos.col) * squareSize,
-      _vRow(pos.row) * squareSize,
-      squareSize,
-      squareSize,
-    );
-    canvas.drawRect(rect, Paint()..color = color);
-  }
-
-  void _drawMoveIndicator(Canvas canvas, Position pos, double squareSize) {
-    final center = Offset(
-      _vCol(pos.col) * squareSize + squareSize / 2,
-      _vRow(pos.row) * squareSize + squareSize / 2,
-    );
-    canvas.drawCircle(
-      center,
-      squareSize * 0.15,
-      Paint()..color = BoardTheme.validMoveIndicator,
-    );
-  }
-
-  void _drawCaptureIndicator(Canvas canvas, Position pos, double squareSize) {
-    final rect = Rect.fromLTWH(
-      _vCol(pos.col) * squareSize,
-      _vRow(pos.row) * squareSize,
-      squareSize,
-      squareSize,
-    );
-    // Draw corner brackets
+  void _drawCaptureIndicator(Canvas canvas, BoardLayout layout, Position pos) {
     final paint = Paint()
       ..color = BoardTheme.captureIndicator
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    final cornerSize = squareSize * 0.25;
-    final inset = squareSize * 0.05;
+    if (layout.isHex) {
+      canvas.drawPath(
+          layout.cellPath(pos, inset: layout.cellSize * 0.06), paint);
+      return;
+    }
 
-    // Top-left corner
-    canvas.drawLine(
-      Offset(rect.left + inset, rect.top + inset + cornerSize),
-      Offset(rect.left + inset, rect.top + inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(rect.left + inset, rect.top + inset),
-      Offset(rect.left + inset + cornerSize, rect.top + inset),
-      paint,
-    );
-
-    // Top-right corner
-    canvas.drawLine(
-      Offset(rect.right - inset - cornerSize, rect.top + inset),
-      Offset(rect.right - inset, rect.top + inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(rect.right - inset, rect.top + inset),
-      Offset(rect.right - inset, rect.top + inset + cornerSize),
-      paint,
-    );
-
-    // Bottom-left corner
-    canvas.drawLine(
-      Offset(rect.left + inset, rect.bottom - inset - cornerSize),
-      Offset(rect.left + inset, rect.bottom - inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(rect.left + inset, rect.bottom - inset),
-      Offset(rect.left + inset + cornerSize, rect.bottom - inset),
-      paint,
-    );
-
-    // Bottom-right corner
-    canvas.drawLine(
-      Offset(rect.right - inset - cornerSize, rect.bottom - inset),
-      Offset(rect.right - inset, rect.bottom - inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(rect.right - inset, rect.bottom - inset - cornerSize),
-      Offset(rect.right - inset, rect.bottom - inset),
-      paint,
-    );
+    final rect = layout.pieceBox(pos);
+    final cornerSize = layout.cellSize * 0.25;
+    final inset = layout.cellSize * 0.05;
+    final inner = rect.deflate(inset);
+    for (final (corner, dx, dy) in [
+      (inner.topLeft, 1.0, 1.0),
+      (inner.topRight, -1.0, 1.0),
+      (inner.bottomLeft, 1.0, -1.0),
+      (inner.bottomRight, -1.0, -1.0),
+    ]) {
+      canvas.drawLine(corner, corner + Offset(dx * cornerSize, 0), paint);
+      canvas.drawLine(corner, corner + Offset(0, dy * cornerSize), paint);
+    }
   }
 
   @override
@@ -154,6 +87,7 @@ class BoardOverlayPainter extends CustomPainter {
         validMoves != oldDelegate.validMoves ||
         lastMoveFrom != oldDelegate.lastMoveFrom ||
         lastMoveTo != oldDelegate.lastMoveTo ||
+        board != oldDelegate.board ||
         flipBoard != oldDelegate.flipBoard;
   }
 }

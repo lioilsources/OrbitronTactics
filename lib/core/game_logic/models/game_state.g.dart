@@ -44,6 +44,7 @@ const _$GamePhaseEnumMap = {
   GamePhase.waitingForPlayers: 'waitingForPlayers',
   GamePhase.formation: 'formation',
   GamePhase.playing: 'playing',
+  GamePhase.battle: 'battle',
   GamePhase.finished: 'finished',
 };
 

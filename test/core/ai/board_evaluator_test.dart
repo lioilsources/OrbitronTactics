@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/ai/board_ai.dart';
 import 'package:orbitron_tactics/core/ai/board_evaluator.dart';
+import 'package:orbitron_tactics/core/game_logic/board/board_spec.dart';
 import 'package:orbitron_tactics/core/game_logic/engine/game_engine.dart';
 import 'package:orbitron_tactics/core/game_logic/models/board_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/game_phase.dart';
@@ -36,7 +37,8 @@ void main() {
         ],
         powerFields: [
           for (final field in state.board.powerFields)
-            PowerField(position: field.position.mirrored),
+            PowerField(
+                position: BoardSpec.classic8.geometry.mirror(field.position)),
         ],
       ),
       currentTurn: state.currentTurn.opposite,

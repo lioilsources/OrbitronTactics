@@ -22,10 +22,14 @@ _$BoardStateImpl _$$BoardStateImplFromJson(Map<String, dynamic> json) =>
       powerFields: (json['powerFields'] as List<dynamic>)
           .map((e) => PowerField.fromJson(e as Map<String, dynamic>))
           .toList(),
+      spec: json['spec'] == null
+          ? BoardSpec.classic8
+          : const BoardSpecConverter().fromJson(json['spec'] as String),
     );
 
 Map<String, dynamic> _$$BoardStateImplToJson(_$BoardStateImpl instance) =>
     <String, dynamic>{
       'grid': instance.grid,
       'powerFields': instance.powerFields,
+      'spec': const BoardSpecConverter().toJson(instance.spec),
     };

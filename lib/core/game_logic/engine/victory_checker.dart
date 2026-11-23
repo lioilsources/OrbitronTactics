@@ -24,8 +24,9 @@ class VictoryChecker {
     }
 
     // 2. Infiltration — does the player have a pawn on the opponent's back rank?
-    final infiltrationRank = playerWhoJustMoved.infiltrationRank;
-    for (int col = 0; col < 8; col++) {
+    final infiltrationRank =
+        board.geometry.infiltrationRank(playerWhoJustMoved);
+    for (int col = 0; col < board.geometry.cols; col++) {
       final pos = Position(row: infiltrationRank, col: col);
       final piece = board.pieceAt(pos);
       if (piece != null &&

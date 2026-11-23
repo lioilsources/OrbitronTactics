@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
+import '../../../../core/game_logic/engine/battle_engine.dart';
 import '../../../../core/game_logic/models/battle_state.dart';
 import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../game/presentation/providers/ai_opponent_controller.dart';
 import '../../../game/presentation/providers/game_state_provider.dart';
+import '../../../game/presentation/providers/piece_skin_provider.dart';
+import '../../../../l10n/l10n.dart';
 import '../../data/battle_element.dart';
 import '../../data/fleet_skin.dart';
 import '../audio/battle_audio.dart';
@@ -20,6 +23,8 @@ import '../widgets/battle_arena_painter.dart';
 import '../widgets/maneuver_pad.dart';
 import '../widgets/pattern_glyph.dart';
 import '../widgets/shield_button.dart';
+import '../../../onboarding/presentation/onboarding_provider.dart';
+import '../../../store/presentation/providers/store_providers.dart';
 import '../widgets/ship_bank.dart';
 import '../widgets/unit_combat_panel.dart';
 
@@ -65,6 +70,16 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
   /// Plays the losing ship's explosion once the battle is over; the result
   /// shows when it has finished.
   late final AnimationController _destruction;
+
+  /// The controls spelled out over the arena, until the first battle's
+  /// first touch.
+  late bool _showHint = !ref.read(onboardingStoreProvider).battleHintSeen;
+
+  void _dismissHint() {
+    if (!_showHint) return;
+    setState(() => _showHint = false);
+    ref.read(onboardingStoreProvider).markBattleHintSeen();
+  }
 
   @override
   void initState() {
@@ -115,7 +130,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
     _toast?.cancel();
     setState(() {
-      _maneuverName = slot.maneuver.name;
+      _maneuverName = context.l10n.maneuverName(slot.maneuver);
       _maneuverColor = accent;
     });
     _toast = Timer(const Duration(milliseconds: 1100), () {
@@ -125,6 +140,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
 
   void _startAudio(BattleState battle) {
     final started = BattleAudio.instance.start(
+      music: ref.read(battleMusicProvider),
       attacker: battle.attacker.piece.type,
       elements: {
         BattleElement.of(battle.attacker.piece.type),
@@ -246,40 +262,47 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) => Listener(
-                          behavior: HitTestBehavior.opaque,
-                          onPointerDown: (e) => _onArenaPointerDown(
-                              e, constraints, isHotSeat, attackerAtBottom),
-                          onPointerMove: (e) => _onArenaPointerMove(
-                              e, constraints, attackerAtBottom),
-                          onPointerUp: (e) =>
-                              _pointerInTopHalf.remove(e.pointer),
-                          onPointerCancel: (e) =>
-                              _pointerInTopHalf.remove(e.pointer),
-                          child: AnimatedBuilder(
-                            animation: _destruction,
-                            builder: (context, child) => CustomPaint(
-                              painter: BattleArenaPainter(
-                                battleState,
-                                attackerAtBottom: attackerAtBottom,
-                                attackerSprite: attackerSprite,
-                                defenderSprite: defenderSprite,
-                                attackerBank: attackerBank,
-                                defenderBank: defenderBank,
-                                nowMs: battleState.elapsedMs +
-                                    (_destruction.value *
-                                            BattleArenaPainter.destructionMs)
-                                        .round(),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) => Listener(
+                                behavior: HitTestBehavior.opaque,
+                                onPointerDown: (e) => _onArenaPointerDown(
+                                    e, constraints, isHotSeat, attackerAtBottom),
+                                onPointerMove: (e) => _onArenaPointerMove(
+                                    e, constraints, attackerAtBottom),
+                                onPointerUp: (e) =>
+                                    _pointerInTopHalf.remove(e.pointer),
+                                onPointerCancel: (e) =>
+                                    _pointerInTopHalf.remove(e.pointer),
+                                child: AnimatedBuilder(
+                                  animation: _destruction,
+                                  builder: (context, child) => CustomPaint(
+                                    painter: BattleArenaPainter(
+                                      battleState,
+                                      attackerAtBottom: attackerAtBottom,
+                                      attackerSprite: attackerSprite,
+                                      defenderSprite: defenderSprite,
+                                      attackerBank: attackerBank,
+                                      defenderBank: defenderBank,
+                                      nowMs: battleState.elapsedMs +
+                                          (_destruction.value *
+                                                  BattleArenaPainter.destructionMs)
+                                              .round(),
+                                    ),
+                                    child: child,
+                                  ),
+                                  child: Container(),
+                                ),
                               ),
-                              child: child,
                             ),
-                            child: Container(),
                           ),
                         ),
-                      ),
+                        if (_showHint) const _ControlsHint(),
+                      ],
                     ),
                   ),
                 ),
@@ -302,7 +325,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                   ),
                   label: isHotSeat
                       ? _shieldLabel(bottomUnit.piece.color)
-                      : 'YOUR SHIELD',
+                      : context.l10n.yourShield,
                   onShield: () => ref
                       .read(battleStateProvider.notifier)
                       .activateLocalShield(isAttacker: attackerAtBottom),
@@ -314,6 +337,10 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
             if (battleState.isFinished && _destruction.isCompleted)
               _BattleResultOverlay(
                 winner: battleState.winner!,
+                winnerName: ref
+                    .watch(pieceSkinProvider)
+                    .skin
+                    .sideName(context.l10n, battleState.winner!),
                 localColor: localColor,
                 unlocked:
                     ref.read(aiOpponentProvider)?.lastUnlocked.value ?? const [],
@@ -331,6 +358,7 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
     bool isHotSeat,
     bool attackerAtBottom,
   ) {
+    _dismissHint();
     final inTopHalf = e.localPosition.dy < constraints.maxHeight / 2;
     // In network mode only the bottom (local) half is steerable —
     // the opponent's ship position arrives over the transport.
@@ -373,8 +401,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
   }
 
-  String _shieldLabel(PlayerColor color) =>
-      color == PlayerColor.white ? 'WHITE SHIELD' : 'BLACK SHIELD';
+  String _shieldLabel(PlayerColor color) {
+    final l10n = context.l10n;
+    final side = ref.watch(pieceSkinProvider).skin.sideName(l10n, color);
+    return l10n.sideShield(side.toUpperCase());
+  }
 }
 
 /// One player's battle controls: unit panel and shield button side by side.
@@ -478,9 +509,9 @@ class _BattleHeader extends StatelessWidget {
         children: [
           const Icon(Icons.bolt, color: Colors.amber, size: 20),
           const SizedBox(width: 8),
-          const Text(
-            'BATTLE',
-            style: TextStyle(
+          Text(
+            context.l10n.battleTitle,
+            style: const TextStyle(
               color: Colors.amber,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -501,8 +532,22 @@ class _BattleHeader extends StatelessWidget {
                 ),
               ),
             ),
+          if (BattleEngine.isSuddenDeath(battleState.elapsedMs))
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Text(
+                context.l10n.battleSuddenDeath,
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
           Text(
-            '${(battleState.elapsedMs / 1000).toStringAsFixed(1)}s',
+            context.l10n.battleElapsed(
+                (battleState.elapsedMs / 1000).toStringAsFixed(1)),
             style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
           ),
           IconButton(
@@ -510,7 +555,7 @@ class _BattleHeader extends StatelessWidget {
             color: Colors.grey.shade500,
             iconSize: 20,
             visualDensity: VisualDensity.compact,
-            tooltip: muted ? 'Sound on' : 'Sound off',
+            tooltip: muted ? context.l10n.soundOn : context.l10n.soundOff,
             onPressed: onToggleMute,
           ),
         ],
@@ -521,6 +566,9 @@ class _BattleHeader extends StatelessWidget {
 
 class _BattleResultOverlay extends StatelessWidget {
   final PlayerColor winner;
+
+  /// The winning side's name in the active piece skin.
+  final String winnerName;
   final PlayerColor? localColor;
 
   /// Maneuvers this win has just unlocked.
@@ -529,6 +577,7 @@ class _BattleResultOverlay extends StatelessWidget {
 
   const _BattleResultOverlay({
     required this.winner,
+    required this.winnerName,
     required this.localColor,
     required this.onContinue,
     this.unlocked = const [],
@@ -537,6 +586,7 @@ class _BattleResultOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLocalWin = localColor == null || winner == localColor;
+    final l10n = context.l10n;
     return GestureDetector(
       onTap: onContinue,
       child: Container(
@@ -571,7 +621,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isLocalWin ? 'VICTORY!' : 'DEFEATED',
+                  isLocalWin ? l10n.battleVictory : l10n.battleDefeated,
                   style: TextStyle(
                     color: isLocalWin ? Colors.amber : Colors.redAccent,
                     fontSize: 28,
@@ -581,13 +631,13 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${winner == PlayerColor.white ? "White" : "Black"} unit survives',
+                  l10n.unitSurvives(winnerName),
                   style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
                 ),
                 if (unlocked.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   Text(
-                    unlocked.length > 1 ? 'NEW MANEUVERS' : 'NEW MANEUVER',
+                    l10n.newManeuvers(unlocked.length),
                     style: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 10,
@@ -608,7 +658,7 @@ class _BattleResultOverlay extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            maneuver.name,
+                            l10n.maneuverName(maneuver),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -621,7 +671,7 @@ class _BattleResultOverlay extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 Text(
-                  'Tap to continue',
+                  l10n.tapToContinue,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 11,
@@ -635,4 +685,31 @@ class _BattleResultOverlay extends StatelessWidget {
       ),
     );
   }
+}
+
+/// How to fly, over the lower half of the arena in a player's first battle.
+class _ControlsHint extends StatelessWidget {
+  const _ControlsHint();
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+        left: 12,
+        right: 12,
+        bottom: 12,
+        child: IgnorePointer(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.6)),
+            ),
+            child: Text(
+              context.l10n.controlsHint,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 13, height: 1.35),
+            ),
+          ),
+        ),
+      );
 }

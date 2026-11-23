@@ -11,14 +11,8 @@ extension PlayerColorX on PlayerColor {
   PlayerColor get opposite =>
       this == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
 
-  /// Forward direction: white moves toward higher rows, black toward lower.
-  int get forwardDir => this == PlayerColor.white ? 1 : -1;
-
-  /// The back rank row for this player (where they start).
-  int get backRank => this == PlayerColor.white ? 0 : 7;
-
-  /// The opponent's back rank (infiltration target).
-  int get infiltrationRank => this == PlayerColor.white ? 7 : 0;
+  // Forward is toward higher rows for white, lower for black; the ranks
+  // depend on the board: see BoardGeometry.backRank and infiltrationRank.
 }
 
 @freezed

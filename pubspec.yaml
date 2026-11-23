@@ -1,7 +1,7 @@
 name: orbitron_tactics
 description: "OrbitronTactics - Strategic board game for two players"
 publish_to: 'none'
-version: 0.8.0-alpha.1+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.10.7
@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
@@ -19,6 +22,9 @@ dependencies:
   supabase_flutter: ^2.8.0
   shared_preferences: ^2.3.0
   flutter_soloud: ^4.1.7
+  purchases_flutter: ^11.0.1
+  sentry_flutter: ^9.0.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +39,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     # Battle ship sprites, one folder per fleet (see FleetSkin)
     - assets/fleets/vanguard/
@@ -47,12 +54,30 @@ flutter:
     - assets/fleets/star_nomads/
     # Battle music and effects (see BattleSounds), built by tools/battle_audio
     - assets/audio/music/
+    - assets/audio/music_retro/
     - assets/audio/sfx/
+    # Board piece skin packs, one folder per pack (see PieceSkin)
+    - assets/pieces/heaven_hell/
+    - assets/pieces/rome_carthage/
+    - assets/pieces/knights_orcs/
+    - assets/pieces/olympus_titans/
+    - assets/pieces/samurai_yokai/
+    - assets/pieces/hussites_crusaders/
+    - assets/pieces/asgard_ragnarok/
+    - assets/pieces/bogatyrs_koschei/
+    - assets/pieces/camelot_morgana/
+    - assets/pieces/dwarves_dragons/
+    - assets/pieces/egypt_assyria/
+    - assets/pieces/elves_goblins/
+    - assets/pieces/horus_seth/
+    - assets/pieces/living_undead/
+    - assets/pieces/vampires_werewolves/
+    - assets/pieces/white_black_magic/
 
 flutter_launcher_icons:
   android: "ic_launcher"
   ios: true
   image_path: "assets/icon/icon.png"
-  adaptive_icon_background: "#E5D6B4"
+  adaptive_icon_background: "#01020A"
   adaptive_icon_foreground: "assets/icon/icon_foreground.png"
   min_sdk_android: 21

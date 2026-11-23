@@ -5,8 +5,9 @@ import '../game_logic/models/weapon_type.dart';
 
 /// Arena rules a world may change. Space keeps today's arena.
 ///
-/// Only the balance's unit stats are read by the engine so far; the arena
-/// rules come with the melee track (plan 12, step 3).
+/// The engine reads the sudden-death rules (for every world, as space has
+/// them, until a battle knows its world) and the balance's unit stats; the
+/// other rules come with the melee track (plan 12, step 3).
 class ArenaRules {
   /// 1.0: a shot crosses in its weapon's fixed time (space); below 1 shots
   /// between close units arrive sooner.
@@ -15,14 +16,38 @@ class ArenaRules {
   /// Battle time after which the hit zones start to grow; null = no limit.
   final int? suddenDeathAfterMs;
 
+  /// How long the hit zones then grow until they cover the whole arena, so
+  /// no ship can dodge.
+  final int suddenDeathRampMs;
+
+  /// The hit zones' growth at the end of the ramp: both half-sizes then
+  /// exceed the arena.
+  final double suddenDeathMaxScale;
+
   /// Energy a melee hit wins back for maneuvers.
   final double energyPerHit;
 
   const ArenaRules({
     this.rangeTravelScale = 1.0,
-    this.suddenDeathAfterMs,
+    this.suddenDeathAfterMs = 45000,
+    this.suddenDeathRampMs = 15000,
+    this.suddenDeathMaxScale = 15,
     this.energyPerHit = 0,
   });
+
+  /// Whether a battle at [elapsedMs] is in sudden death.
+  bool isSuddenDeath(int elapsedMs) {
+    final after = suddenDeathAfterMs;
+    return after != null && elapsedMs >= after;
+  }
+
+  /// How much the hit zones have grown at [elapsedMs]: 1 before sudden death.
+  double hitScaleAt(int elapsedMs) {
+    final after = suddenDeathAfterMs;
+    if (after == null || elapsedMs < after) return 1;
+    final ramp = ((elapsedMs - after) / suddenDeathRampMs).clamp(0.0, 1.0);
+    return 1 + (suddenDeathMaxScale - 1) * ramp;
+  }
 }
 
 /// The tunable numbers of one world: unit stats per role and arena rules.

@@ -22,7 +22,7 @@ Position _$PositionFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Position {
   int get row =>
-      throw _privateConstructorUsedError; // 0-7, where 0 = Player 1 (white) back rank
+      throw _privateConstructorUsedError; // 0 = Player 1 (white) back rank
   int get col => throw _privateConstructorUsedError;
 
   /// Serializes this Position to a JSON map.
@@ -125,7 +125,7 @@ class _$PositionImpl extends _Position {
 
   @override
   final int row;
-  // 0-7, where 0 = Player 1 (white) back rank
+  // 0 = Player 1 (white) back rank
   @override
   final int col;
 
@@ -170,7 +170,7 @@ abstract class _Position extends Position {
       _$PositionImpl.fromJson;
 
   @override
-  int get row; // 0-7, where 0 = Player 1 (white) back rank
+  int get row; // 0 = Player 1 (white) back rank
   @override
   int get col;
 

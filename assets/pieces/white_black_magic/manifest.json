@@ -1,0 +1,75 @@
+{
+ "id": "white_black_magic",
+ "name_cs": "Bílá magie × Černá magie",
+ "style": "EPIC",
+ "sensitivity": "green",
+ "model": "qwen",
+ "board": {
+  "light": "#ECE6DA",
+  "dark": "#8792A8"
+ },
+ "sides": [
+  {
+   "id": "white_magic",
+   "color": "white",
+   "name_cs": "Bílá magie",
+   "pieces": {
+    "king": {
+     "name_cs": "Arcimág s křišťálovou holí",
+     "candidate": 1
+    },
+    "queen": {
+     "name_cs": "Hvězdná čarodějka",
+     "candidate": 0
+    },
+    "rook": {
+     "name_cs": "Křišťálová věž",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Druid s holí",
+     "candidate": 3
+    },
+    "knight": {
+     "name_cs": "Jednorožec",
+     "candidate": 2
+    },
+    "pawn": {
+     "name_cs": "Učeň s lucernou",
+     "candidate": 2
+    }
+   }
+  },
+  {
+   "id": "black_magic",
+   "color": "black",
+   "name_cs": "Černá magie",
+   "pieces": {
+    "king": {
+     "name_cs": "Nekromant s lebkovou holí",
+     "candidate": 0
+    },
+    "queen": {
+     "name_cs": "Temná kněžka s havranem",
+     "candidate": 1
+    },
+    "rook": {
+     "name_cs": "Obsidiánová spirála",
+     "candidate": 1
+    },
+    "bishop": {
+     "name_cs": "Černokněžník v kápi",
+     "candidate": 1
+    },
+    "knight": {
+     "name_cs": "Havraní gryf",
+     "candidate": 0
+    },
+    "pawn": {
+     "name_cs": "Homunkulus",
+     "candidate": 1
+    }
+   }
+  }
+ ]
+}

@@ -37,6 +37,25 @@ class BattleEngine {
   /// …and the ship flies within this altitude of the projectile's.
   static const double hitHalfAltitude = 0.12;
 
+  /// The sudden-death rules every battle runs on: space's
+  /// ([ArenaRules.suddenDeathAfterMs] and the ramp after it). A battle does
+  /// not know its world yet.
+  static const ArenaRules arena = ArenaRules();
+
+  /// Whether a battle at [elapsedMs] is in sudden death.
+  static bool isSuddenDeath(int elapsedMs) => arena.isSuddenDeath(elapsedMs);
+
+  /// How much the hit zone has grown at [elapsedMs]: 1 before sudden death.
+  static double hitScaleAt(int elapsedMs) => arena.hitScaleAt(elapsedMs);
+
+  /// [hitHalfWidth] at [elapsedMs], grown by sudden death.
+  static double hitHalfWidthAt(int elapsedMs) =>
+      hitHalfWidth * hitScaleAt(elapsedMs);
+
+  /// [hitHalfAltitude] at [elapsedMs], grown by sudden death.
+  static double hitHalfAltitudeAt(int elapsedMs) =>
+      hitHalfAltitude * hitScaleAt(elapsedMs);
+
   /// Ships cannot move closer to the arena edge than this fraction.
   static const double shipEdgeMargin = 0.06;
 
@@ -421,8 +440,8 @@ class BattleEngine {
 
   static bool _isHit(BattleUnit target, Projectile p, int elapsedMs) =>
       !_untouchable(target, elapsedMs) &&
-      (target.xFraction - p.xFraction).abs() <= hitHalfWidth &&
-      (target.altitude - p.altitude).abs() <= hitHalfAltitude;
+      (target.xFraction - p.xFraction).abs() <= hitHalfWidthAt(elapsedMs) &&
+      (target.altitude - p.altitude).abs() <= hitHalfAltitudeAt(elapsedMs);
 
   /// Move a ship to [xFraction] (clamped to the arena, minus edge margin)
   /// and, when given, to [altitude] (clamped to 0–1).

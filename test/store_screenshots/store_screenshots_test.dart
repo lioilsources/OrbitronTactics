@@ -3,7 +3,7 @@
 //   STORE_SCREENSHOTS=1 flutter test test/store_screenshots
 //
 // writes docs/store/screenshots{,_ios,_ipad}/{en,cs}/NN_name.png (Play
-// 1080 x 1920, iPhone 6.9" 1290 x 2796, iPad 13" 2064 x 2752) and
+// 1080 x 1920, iPhone 6.9" 1320 x 2868, iPad 13" 2064 x 2752) and
 // docs/store/feature_graphic_{en,cs}.png (1024 x 500). Skipped unless the variable
 // is set, so CI and ordinary runs leave the images alone.
 import 'dart:io';
@@ -48,7 +48,7 @@ typedef _Device = ({String folder, Size logical, double scale});
 
 const _devices = <_Device>[
   (folder: 'screenshots', logical: Size(360, 640), scale: 3), // 1080 x 1920
-  (folder: 'screenshots_ios', logical: Size(430, 932), scale: 3), // 1290 x 2796
+  (folder: 'screenshots_ios', logical: Size(440, 956), scale: 3), // 1320 x 2868
   (folder: 'screenshots_ipad', logical: Size(1032, 1376), scale: 2), // 2064 x 2752
 ];
 

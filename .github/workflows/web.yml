@@ -1,0 +1,86 @@
+# Babylon.js web client (babylon/) → GitHub Pages.
+# Site layout: docs/ unchanged at the root (privacy.html, support.html, index.html … linked from
+# the store listings), the game under /play/.
+# Deploys only once Settings → Pages → Source is "GitHub Actions" (build_type "workflow"); while the
+# repo still serves docs/ from the branch (legacy), the deploy job is skipped and nothing changes.
+# The switch is the repo owner's decision, not this workflow's.
+name: Web
+
+on:
+  push:
+    branches: [main]
+    paths: ['babylon/**', 'docs/**', 'lib/core/**', 'lib/features/game/presentation/widgets/board/**', '.github/workflows/web.yml']
+  pull_request:
+    paths: ['babylon/**', 'lib/core/**', 'lib/features/game/presentation/widgets/board/**', '.github/workflows/web.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Lint, tests, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: babylon
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: babylon/package-lock.json
+      - run: npm ci
+      - run: npm run gate
+      - name: Assemble site (docs/ at root, game under /play/)
+        working-directory: .
+        run: |
+          mkdir -p _site
+          cp -R docs/. _site/
+          mkdir -p _site/play
+          cp -R babylon/dist/. _site/play/
+          touch _site/.nojekyll
+          # The legacy site serves these; the new one must too.
+          for f in index.html privacy.html support.html icon.png play/index.html; do
+            test -f "_site/$f" || { echo "missing $f"; exit 1; }
+          done
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  pages-mode:
+    name: Pages source is GitHub Actions?
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: read
+    outputs:
+      build_type: ${{ steps.mode.outputs.build_type }}
+    steps:
+      - id: mode
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          t=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo unknown)
+          echo "Pages build_type: $t"
+          echo "build_type=$t" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    if: needs.pages-mode.outputs.build_type == 'workflow'
+    needs: [gate, pages-mode]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}play/
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

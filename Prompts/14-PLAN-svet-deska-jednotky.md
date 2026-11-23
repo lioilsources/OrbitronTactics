@@ -44,15 +44,15 @@ na nakloněné desce a přesahovat přes pole, místo aby se mačkaly do jeho p�
 | # | Otázka | Návrh |
 |---|---|---|
 | 1 | Co je svět | `PieceSkin`. Identifikátor, slugy ani klíč `piece_skin` se nemění; `classic` se hráči ukazuje jako **Vesmír**. Nový model `GameWorld` z plánu 12 se nestaví. |
-| 2 | Vesmír na desce | Žetony lodí flotily dané strany; výchozí se šachovou značkou v rohu. Kdo chce, přepne na čisté symboly jako dnes. |
+| 2 | Vesmír na desce | **Rozhodnuto:** šachové symboly jako dnes. Lodě se na desku nedávají. |
 | 3 | Ostatní světy v aréně | Tytéž figurky jako na desce, i s podstavcem (styl oživlé figurky). Varianta bez podstavce by přidala asi 12 MB a nepřidává se. |
 | 4 | Pohled arény pro figurky | **Stolní pohled:** dnešní rozložení (soupeř nahoře, hráč dole), figurky stojí zpříma jako na desce. Boční aréna z plánu 12 (krok 2.7) se odkládá. |
 | 5 | Pohled desky | Podle pózy světa: lodě shora → plochá deska; stojící figurky → nakloněná deska. Čisté symboly vždy plochá. |
 | 6 | Pravidla souboje | Dvě balance: `space` pro Vesmír, `ground` pro všech 16 světů figurek. Světy se liší kresbou, ne čísly. |
-| 7 | Flotily | Výběr flotily a placené flotily platí jen ve Vesmíru. Světy figurek zůstávají zdarma. Ceny se nemění. |
+| 7 | Flotily a světy | **Rozhodnuto:** placené jsou flotily i světy figurek, každý za USD 0,99, Commander Edition obsahuje všechny. Product id `com.ol1n.orbitrontactics.pack.world_<slug>`. Výběr flotily platí jen ve Vesmíru. |
 | 8 | Postup hráče | Vylepšení, manévry a kredity jsou podle role (pěšec až král) a společné všem světům. |
 | 9 | Síť | `localWifi` do kroku 6 bojuje podle `space` (všichni střílí), každé zařízení kreslí svůj svět. Online beze změny. |
-| 10 | Remíza zblízka | **Střet:** dva údery, jejichž kontakt padne do stejného okna, se vyruší a oba útočníci dostanou zdržení. Žádná figura z desky nemizí navíc. |
+| 10 | Vzájemné zničení | **Rozhodnuto:** zničí-li se jednotky navzájem, z desky zmizí obě figury (v každém světě, i ve Vesmíru). |
 | 11 | Zoom | Jen pokud bude hex malý i po krocích 1 a 3. |
 
 ## Pravidla práce
@@ -67,7 +67,7 @@ na nakloněné desce a přesahovat přes pole, místo aby se mačkaly do jeho p�
 - Nepřejmenovávej `PieceSkin`, `FleetSkin`, `ship`, `fleet` ani uložené klíče: rozbilo by
   to uložený postup. Mění se jen texty.
 - Nepouštěj `dart format` na celé soubory.
-- **Nejdřív ukázka, pak stavba.** Kroky 2, 3 a 5 začínají listem pro Olina (P1–P3).
+- **Nejdřív ukázka, pak stavba.** Kroky 3 a 5 začínají listem pro Olina (P2, P3).
   Listy vykresli testem po vzoru `test/store_screenshots` do gitignorovaného `run/pilot/`
   a pošli je; do repa nepatří.
 - Novou grafiku tento plán nepotřebuje. Kdyby na ni došlo: jen přes frontu GPU podle
@@ -79,13 +79,12 @@ na nakloněné desce a přesahovat přes pole, místo aby se mačkaly do jeho p�
 
 ## Krok 0 — otázky na Olina
 
-Jednou zprávou na začátku. Kroky 1 a 4 na odpovědi nečekají.
+Olin 23/11/2026 rozhodl body 2, 7 a 10 (viz tabulka). Otevřené zůstávají:
 
-1. Rozhodnutí 2: výchozí vzhled Vesmíru na desce jsou lodě se značkou (návrh), nebo
-   symboly jako dnes? Rozhodni podle listu P1.
-2. Rozhodnutí 4: stolní pohled arény (návrh), nebo rovnou boční aréna z plánu 12?
-3. Rozhodnutí 7: placené flotily jen ve Vesmíru — souhlas?
-4. Rozhodnutí 10: střet (návrh), remízu vyhrává obránce, nebo z desky mizí obě figury?
+1. Rozhodnutí 4: stolní pohled arény (návrh), nebo boční aréna z plánu 12?
+2. Rozhodnutí 7: které světy figurek zůstanou zdarma (u flotil jsou zdarma 4 z 10)?
+
+Kroky 1 a 4 na odpovědi nečekají. Krok 2 čeká na obě, jeho bod 4 na odpověď 1.
 
 ---
 
@@ -113,9 +112,7 @@ Position? resolveTap(BoardLayout layout, Offset point,
 
 ## Krok 2 — svět jako jeden výběr (trať A)
 
-**P1 napřed:** list výchozího postavení Vesmíru s loděmi jako žetony na `classic8`
-i `hex6` při šířce 360 dp, vedle sebe „lodě“, „lodě se značkou“ a „symboly“. Počkej na
-odpověď 1.
+Ukázka P1 odpadla: Vesmír má na desce symboly (rozhodnutí 2).
 
 1. **Zdroj obrázku jednotky** (`features/battle/data/unit_art.dart`):
    ```dart
@@ -128,11 +125,8 @@ odpověď 1.
 2. **Flotily obou stran z jednoho místa:** provider, který pro barvu vrátí `FleetSkin`
    (single player přes `AiOpponentController.skinFor`, jinak `FleetSkin.fallback`). Čte
    ho deska i `game_screen.dart` při otevírání arény, aby se nemohly rozejít.
-3. **Deska ve Vesmíru:** `PieceRenderer` nakreslí loď flotily dané strany na kotouči
-   v barvě strany; příď míří k soupeři, i na otočené desce. Vzhled figurek má tři
-   hodnoty `BoardPieceStyle {art, artWithMarks, symbols}`; nahrazují přepínač
-   `classicMarks` (uložené `true` → `artWithMarks`). Odznak hrozby a záře posledního
-   válečníka beze změny.
+3. **Deska ve Vesmíru** zůstává se šachovými symboly jako dnes; přepínač `classicMarks`
+   pro světy figurek beze změny.
 4. **Aréna:** `BattleScreen` bere `attackerArt` a `defenderArt` místo flotil
    a `game_screen.dart` je plní ve všech režimech. `BattleArenaPainter` pro `standing`:
    - neotáčí horní jednotku o 180° (výjimka: hot-seat, kde horní hráč sedí naproti,
@@ -149,15 +143,19 @@ odpověď 1.
    z `_UnitsTab`, a vzhled figurek. JEDNOTKY = vylepšení rolí, kreslená jednotkami
    zvoleného světa. V lobby vedle výběru desky řádek se zvoleným světem, který výběr
    otevře.
+5b. **Obchod:** `StoreCatalog` prodává placené světy (`StoreItemKind.world`, id
+   `${_prefix}world_<slug>`, USD 0,99); Commander Edition je zahrnuje. `Entitlements`
+   zamyká výběr světa jako dnes flotily; vrácený nákup vrátí výběr na Vesmír.
+   Doplň tabulku produktů v `docs/store-listing.md`.
 6. **Texty:** `pieceSkinClassic` se ukazuje jako Space / Vesmír. Obecné texty mimo
    Vesmír nesmí říkat „loď“ a „flotila“ (projdi ARB, například `upgradeHint`,
    `yourFleet`).
 7. **Testy:** každý svět × typ × barva má obrázek; uložené `piece_skin=classic` je
-   Vesmír a `classic_marks=true` je `artWithMarks`; deska i aréna kreslí tutéž flotilu;
+   Vesmír; zamčený svět nejde vybrat;
    `BattleScreen` se světem figurek (`returnsNormally`, horní figurka není vzhůru nohama);
    záložky Comcenteru; `fleet_skin_test` beze změny.
 - **Hotovo, když:** v Římě × Kartágu se v aréně utkají římská a kartaginská figurka,
-  ve Vesmíru stojí na desce lodě, které pak letí v aréně, a nikde nejsou dva výběry
+  ve Vesmíru zůstávají symboly a lodě flotily, placené světy jdou koupit a nikde nejsou dva výběry
   vzhledu.
 
 ## Krok 3 — nakloněná deska se stojícími figurkami (trať C)
@@ -179,7 +177,7 @@ při šířce 360 dp pro zploštění `k` ∈ {1,0; 0,85; 0,72} a výšku figurk
 3. **Dotyk:** `resolveTap` z kroku 1 dostane pro stojící figurku druhý záchytný bod
    v polovině její výšky. Klepnutí na hlavu figurky ji vybere, když pole pod prstem
    nedrží nic, co vybrat jde.
-4. **Kdy:** jen pro světy s pózou `standing` a vzhled `art` nebo `artWithMarks`. Vesmír
+4. **Kdy:** jen pro světy figurek (póza `standing`). Vesmír
    a čisté symboly zůstávají ploché. Zvýraznění tahů, mocenská pole a poslední tah
    jdou přes `cellPath`, takže se zploští sama.
 5. **Testy:** `board_layout_test` (každé pole obou desek: `positionAt(centreOf(p)) == p`
@@ -208,9 +206,12 @@ Bez změny chování hry: `ground` zatím nikdo nepoužívá.
 **P3 napřed:** vykreslené fáze úderu ve stolní aréně (nápřah, výpad, kontakt, blok)
 pro pěšce a krále ve dvou světech.
 
-1. **Pravidlo remízy** podle odpovědi 4. Návrh „střet“: kontakty dvou úderů do 60 ms
-   od sebe se vyruší, oba útočníci dostanou `staggerMs`, do `impacts` jde střet.
-   Test a nový běh laboratoře; cíl je vzájemné zničení pěšců pod 5 %.
+1. **Vzájemné zničení** (rozhodnutí 10): dopadnou-li smrtící zásahy obou stran ve stejném
+   ticku, z desky zmizí obě figury. Platí ve všech světech a režimech: `BattleState`
+   dostane výsledek `mutualDestruction`, `GameEngine` odebere útočníka i obránce,
+   `BattleResolvedEvent` ho nese (tolerantní čtení, starší zpráva = výhra útočníka).
+   Výsledek arény i zápis do postupu (žádné kredity za remízu) ukaž hráči. Šachová AI
+   (`BattleOdds`) počítá remízu jako ztrátu obou figur.
 2. **Zapnutí:** `PieceSkin.balance` (`space` nebo `ground`). `BattleEngine.createBattle`
    ji dostane v `singlePlayer` a `hotSeat`; `localWifi` zůstává na `space`. Šachová AI
    (`BattleOdds`, `BoardEvaluator`, `SearchAi` v `compute()`) počítá s balancí hry;
@@ -256,7 +257,6 @@ pro pěšce a krále ve dvou světech.
 
 ## Rizika
 
-- **Lodě jako žetony jsou při 32 dp nečitelné.** Proto P1 a značka ve výchozím stavu.
 - **Zákryty na nakloněné desce**, hlavně král před pěšcem. Proto P2 a mez „nejvýš
   třetina“; ústupem je menší naklonění.
 - **Figurka bez animace působí v aréně staticky.** Styl oživlé figurky je záměr; pohyb
@@ -264,11 +264,14 @@ pro pěšce a krále ve dvou světech.
 - **Výška jako rozměr zásahu** nemá u figurek oporu ve velikosti a stínu. Pásmo zásahu
   musí být vidět jinak (krok 2.4), jinak hráč nepozná, proč minul.
 - **Placené flotily jsou vidět jen ve Vesmíru.** Popis v obchodě to musí říkat.
+- **Nové produkty:** světy za USD 0,99 se v Google Play dají založit až po nahrání AAB
+  s nimi; pak je importuj do RevenueCat. To dělá Olin, plán jen připraví katalog
+  a `docs/store-listing.md`.
 - **Sloučení větve zblízka** naráží na náhlou smrt; proto nový záznam před sloučením.
 
 ## Mimo rozsah
 
 - Nová grafika: zadní pohledy figurek, pózy úderu, varianty bez podstavce.
 - Komba (plán 12, krok 3.5), boční aréna, aréna v online hře.
-- Prodej světů, změna cen, telemetrie zvoleného světa (měnila by text zásad soukromí).
+- Změna cen, telemetrie zvoleného světa (měnila by text zásad soukromí).
 - Nové typy figur, frakční schopnosti, další tvary desky.

@@ -2,6 +2,7 @@
 
 ## [23/11/2026]
 - The game is called Archion, with a new icon
+- On the hex board a tap just beside a piece or a move target still lands on it
 
 ## [22/11/2026]
 - Hexagonal board (91 hexes, six a side) for single player and local games, picked in the lobby; a slide through a corner stops when both hexes beside it are taken

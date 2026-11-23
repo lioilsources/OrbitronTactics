@@ -11,6 +11,7 @@ import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/shield_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 
 void main() {
   const tickMs = 16;
@@ -215,6 +216,34 @@ void main() {
       }
     });
 
+    test('Hard steps out of a melee strike it sees coming', () {
+      final groundKnight = WorldBalance.ground.statsOf(PieceType.knight);
+      BattleUnit knightUnit(PlayerColor color, {int nextAttackMs = 0}) =>
+          BattleUnit(
+            piece: Piece(type: PieceType.knight, color: color),
+            stats: groundKnight,
+            currentHp: groundKnight.maxHp,
+            shieldState: const ShieldState(),
+            nextAttackMs: nextAttackMs,
+          );
+      var state = BattleState(
+        attacker: knightUnit(white),
+        defender: knightUnit(black, nextAttackMs: 1 << 30),
+      );
+      // A Hard pilot without a shield to fall back on.
+      final hard = pilot(AiProfile.hard.copyWith(shieldSkill: 0), 1);
+
+      state = BattleEngine.tick(state, tickMs);
+      final strike = state.attacker.strike!;
+      while (state.elapsedMs <= strike.contactMs) {
+        state = apply(state, hard.decide(state, isAttacker: false, deltaMs: tickMs),
+            isAttacker: false);
+        state = BattleEngine.tick(state, tickMs);
+      }
+
+      expect(state.defender.currentHp, groundKnight.maxHp);
+    });
+
     test('Hard reaches for a maneuver in a duel', () {
       expect(maneuverTicks(AiProfile.hard), greaterThan(0));
     });
@@ -241,8 +270,8 @@ void main() {
     });
 
     test('two Hard pilots cannot dodge forever: sudden death ends it', () {
-      const limit =
-          BattleEngine.suddenDeathAfterMs + BattleEngine.suddenDeathRampMs;
+      final limit = BattleEngine.arena.suddenDeathAfterMs! +
+          BattleEngine.arena.suddenDeathRampMs;
       for (var i = 0; i < PieceType.values.length; i++) {
         final result = fight(PieceType.values[i], pilot(AiProfile.hard, i),
             pilot(AiProfile.hard, 100 + i));

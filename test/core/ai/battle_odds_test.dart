@@ -8,6 +8,7 @@ import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/shield_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/unit_stats.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 
 void main() {
   const noUpgrades = UpgradeProfile();
@@ -95,6 +96,41 @@ void main() {
           );
         }
       }
+    });
+
+    test('timeToKillMs matches the arena for melee units of the ground world',
+        () {
+      const ground = WorldBalance.ground;
+      for (final shooter in PieceType.values) {
+        for (final target in PieceType.values) {
+          final shooterStats = ground.statsOf(shooter);
+          final targetStats = ground.statsOf(target);
+
+          final battle = fight(BattleState(
+            attacker: unit(white(shooter), shooterStats),
+            // A target that never strikes: its lunges would dodge.
+            defender: unit(black(target), targetStats)
+                .copyWith(nextAttackMs: 1 << 30),
+          ));
+
+          expect(
+            battle.elapsedMs,
+            closeTo(BattleOdds.timeToKillMs(shooterStats, targetStats),
+                2 * tickMs),
+            reason: '${shooter.name} striking ${target.name}',
+          );
+        }
+      }
+    });
+
+    test('odds tables are kept per world', () {
+      final space = BattleOdds.table(noUpgrades, noUpgrades);
+      final ground =
+          BattleOdds.table(noUpgrades, noUpgrades, balance: WorldBalance.ground);
+      expect(
+        ground.of(PieceType.knight, PieceType.bishop),
+        isNot(space.of(PieceType.knight, PieceType.bishop)),
+      );
     });
 
     test('the favourite wins the arena in all 36 pairings', () {

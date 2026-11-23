@@ -63,4 +63,4 @@ iOS, Android, Windows. Release steps that need accounts: `Prompts/10-RELEASE-che
 ## More
 
 - `docs/architecture.md` — dependencies, single player AI, battle arena, maneuvers, fleet ship art, store, localization, telemetry, Supabase.
-- `docs/lab/worlds-catalog.md` — world catalog. `Prompts/` — implementation plans.
+- `docs/lab/worlds-catalog.md` — world catalog. `docs/lab/duel-lab.md` — melee duel lab. `Prompts/` — implementation plans.

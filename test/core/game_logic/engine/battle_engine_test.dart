@@ -9,6 +9,7 @@ import 'package:orbitron_tactics/core/game_logic/models/shield_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 
 void main() {
   BattleState createBattle() {
@@ -413,13 +414,29 @@ void main() {
   });
 
   group('BattleEngine - sudden death', () {
+    test("the battle runs on space's rules: 45 s, then a 15 s ramp", () {
+      for (final arena in [BattleEngine.arena, WorldBalance.space.arena]) {
+        expect(arena.suddenDeathAfterMs, 45000);
+        expect(arena.suddenDeathRampMs, 15000);
+        expect(arena.suddenDeathMaxScale, 15);
+      }
+    });
+
+    test('a world without a limit never enters sudden death', () {
+      const rules = ArenaRules(suddenDeathAfterMs: null);
+      expect(rules.isSuddenDeath(600000), isFalse);
+      expect(rules.hitScaleAt(600000), 1);
+    });
+
     test('the hit zone grows only once the battle runs long', () {
       expect(BattleEngine.hitScaleAt(0), 1);
-      expect(BattleEngine.hitScaleAt(BattleEngine.suddenDeathAfterMs - 1), 1);
-      expect(BattleEngine.isSuddenDeath(BattleEngine.suddenDeathAfterMs),
+      expect(
+          BattleEngine.hitScaleAt(BattleEngine.arena.suddenDeathAfterMs! - 1),
+          1);
+      expect(BattleEngine.isSuddenDeath(BattleEngine.arena.suddenDeathAfterMs!),
           isTrue);
-      final full = BattleEngine.suddenDeathAfterMs +
-          BattleEngine.suddenDeathRampMs;
+      final full = BattleEngine.arena.suddenDeathAfterMs! +
+          BattleEngine.arena.suddenDeathRampMs;
       expect(BattleEngine.hitHalfWidthAt(full), greaterThanOrEqualTo(1));
       expect(BattleEngine.hitHalfAltitudeAt(full), greaterThanOrEqualTo(1));
     });
@@ -443,8 +460,8 @@ void main() {
       }
 
       expect(shotAt(0).impacts, isEmpty);
-      final late = shotAt(BattleEngine.suddenDeathAfterMs +
-          BattleEngine.suddenDeathRampMs);
+      final late = shotAt(BattleEngine.arena.suddenDeathAfterMs! +
+          BattleEngine.arena.suddenDeathRampMs);
       expect(late.impacts, hasLength(1));
     });
   });

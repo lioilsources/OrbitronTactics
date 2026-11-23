@@ -3,8 +3,8 @@ import 'dart:math';
 import '../game_logic/engine/battle_engine.dart';
 import '../game_logic/models/battle_state.dart';
 import '../game_logic/models/battle_unit.dart';
-import '../game_logic/models/projectile.dart';
 import '../game_logic/models/spot.dart';
+import '../game_logic/models/strike_run.dart';
 import '../maneuvers/maneuver.dart';
 import '../maneuvers/maneuver_catalog.dart';
 import 'ai_difficulty.dart';
@@ -31,6 +31,32 @@ class BattleAiAction {
     this.maneuver,
     this.mirrored = false,
   });
+}
+
+/// Something about to hit where it is aimed: an enemy shot in flight, or an
+/// enemy melee strike in its wind-up or lunge.
+class _Threat {
+  final String id;
+  final double x;
+  final double altitude;
+
+  /// How far across from [x] and above or below [altitude] it still hits.
+  final double halfWidth;
+  final double halfAltitude;
+  final int damage;
+
+  const _Threat({
+    required this.id,
+    required this.x,
+    required this.altitude,
+    required this.halfWidth,
+    required this.halfAltitude,
+    required this.damage,
+  });
+
+  bool hits(Spot spot) =>
+      (x - spot.x).abs() <= halfWidth &&
+      (altitude - spot.altitude).abs() <= halfAltitude;
 }
 
 /// Pilots one ship in the battle arena: flies at the enemy ship's altitude
@@ -158,39 +184,72 @@ class BattleAi {
     );
   }
 
-  /// Enemy shots in flight, with their time to impact in ms.
-  List<(Projectile, double)> _incoming(
+  /// Enemy shots in flight and the enemy's strike on its way, with their
+  /// time to impact in ms.
+  List<(_Threat, double)> _incoming(
     BattleState state,
     bool isAttacker,
     BattleUnit enemy,
   ) {
     final speed = BattleEngine.projectileSpeed(enemy.stats.weaponType);
+    final strike = enemy.strike;
+    final melee = enemy.stats.melee;
     return [
       for (final shot in state.projectiles)
         if (shot.fromAttacker != isAttacker)
-          (shot, (1 - shot.positionFraction) / speed),
+          (
+            _Threat(
+              id: shot.id,
+              x: shot.xFraction,
+              altitude: shot.altitude,
+              halfWidth: _hitHalfWidth,
+              halfAltitude: _hitHalfAltitude,
+              damage: shot.damage,
+            ),
+            (1 - shot.positionFraction) / speed,
+          ),
+      if (strike != null &&
+          melee != null &&
+          !strike.resolved &&
+          strike.phaseAt(state.elapsedMs).index <= StrikePhase.dash.index)
+        (
+          _Threat(
+            id: 'strike-${strike.startedMs}',
+            x: enemy.xFraction,
+            altitude: enemy.altitude,
+            // Sudden death grows the zone of shots only.
+            halfWidth: melee.arcHalfWidth,
+            halfAltitude: BattleEngine.hitHalfAltitude,
+            damage: enemy.stats.damage,
+          ),
+          (strike.contactMs - state.elapsedMs).toDouble(),
+        ),
     ];
   }
 
-  List<Projectile> _dangerous(List<(Projectile, double)> incoming) => [
-        for (final (shot, eta) in incoming)
-          if (eta < _profile.dodgeWindowMs) shot,
+  List<_Threat> _dangerous(List<(_Threat, double)> incoming) => [
+        for (final (threat, eta) in incoming)
+          if (eta < _profile.dodgeWindowMs) threat,
       ];
 
   /// Where to steer.
   Spot _chooseTarget(
     BattleUnit me,
     BattleUnit enemy,
-    List<Projectile> dangerous,
+    List<_Threat> dangerous,
   ) {
     var aimX = enemy.xFraction;
-    var aimAltitude = enemy.altitude;
+    // A melee unit keeps to the top of the enemy's band: closer to the
+    // divider, so its lunges are shorter.
+    var aimAltitude = me.stats.isMelee
+        ? enemy.altitude + BattleEngine.hitHalfAltitude / 2
+        : enemy.altitude;
     if (_profile.predictOpponent && _enemyTrack.length > 1) {
       // Lead the enemy by how far it moves while our shot is in flight.
       final (fromMs, from) = _enemyTrack.first;
       final (toMs, to) = _enemyTrack.last;
       if (toMs > fromMs) {
-        final lead = BattleOdds.travelMs(me.stats.weaponType) / (toMs - fromMs);
+        final lead = BattleOdds.leadMs(me.stats) / (toMs - fromMs);
         aimX += (to.x - from.x) * lead;
         aimAltitude += (to.altitude - from.altitude) * lead;
       }
@@ -208,25 +267,29 @@ class BattleAi {
     ));
   }
 
-  /// The nearest spot out of a dangerous shot's way — beside its lane, or
+  /// The nearest spot out of a dangerous threat's way — beside its lane, or
   /// above or below its altitude — preferring the side of [aim] with fewer
-  /// shots. Null when every way out is covered.
-  Spot? _dodge(Spot aim, List<Projectile> dangerous) {
-    final clearX = _hitHalfWidth + _dodgeClearance;
-    final clearAltitude = _hitHalfAltitude + _dodgeClearance;
+  /// threats. Null when every way out is covered.
+  Spot? _dodge(Spot aim, List<_Threat> dangerous) {
     final spots = <Spot>[
       for (final shot in dangerous) ...[
-        (x: shot.xFraction - clearX, altitude: aim.altitude),
-        (x: shot.xFraction + clearX, altitude: aim.altitude),
-        (x: aim.x, altitude: shot.altitude - clearAltitude),
-        (x: aim.x, altitude: shot.altitude + clearAltitude),
+        (x: shot.x - (shot.halfWidth + _dodgeClearance), altitude: aim.altitude),
+        (x: shot.x + (shot.halfWidth + _dodgeClearance), altitude: aim.altitude),
+        (
+          x: aim.x,
+          altitude: shot.altitude - (shot.halfAltitude + _dodgeClearance)
+        ),
+        (
+          x: aim.x,
+          altitude: shot.altitude + (shot.halfAltitude + _dodgeClearance)
+        ),
       ],
     ].where((spot) => spot == _clamp(spot) && !_isHitBy(dangerous, spot)).toList();
     if (spots.isEmpty) return null;
 
     int shotsOnSide(Spot spot) => spot.x != aim.x
         ? dangerous
-            .where((shot) => (shot.xFraction < aim.x) == (spot.x < aim.x))
+            .where((shot) => (shot.x < aim.x) == (spot.x < aim.x))
             .length
         : dangerous
             .where((shot) =>
@@ -247,7 +310,7 @@ class BattleAi {
   (Maneuver?, bool) _chooseManeuver(
     BattleUnit me,
     BattleUnit enemy,
-    List<Projectile> dangerous,
+    List<_Threat> dangerous,
     bool cornered,
   ) {
     final affordable = [
@@ -262,7 +325,7 @@ class BattleAi {
           if (maneuver.family != family) continue;
           // Away from the shots.
           final fromRight =
-              dangerous.any((shot) => shot.xFraction >= me.xFraction);
+              dangerous.any((shot) => shot.x >= me.xFraction);
           return (maneuver, fromRight);
         }
       }
@@ -298,13 +361,15 @@ class BattleAi {
   }
 
   bool _inSights(BattleUnit me, BattleUnit enemy) =>
-      (me.xFraction - enemy.xFraction).abs() <= _hitHalfWidth &&
-      (me.altitude - enemy.altitude).abs() <= _hitHalfAltitude;
+      (me.xFraction - enemy.xFraction).abs() <=
+          (me.stats.melee?.arcHalfWidth ?? _hitHalfWidth) &&
+      (me.altitude - enemy.altitude).abs() <=
+          (me.stats.isMelee ? BattleEngine.hitHalfAltitude : _hitHalfAltitude);
 
   bool _shouldShield(
     BattleUnit me,
     Spot target,
-    List<(Projectile, double)> incoming,
+    List<(_Threat, double)> incoming,
   ) {
     if (!me.shieldState.canActivate) return false;
     final here = _spotOf(me);
@@ -337,9 +402,8 @@ class BattleAi {
         altitude: from.altitude + (to.altitude - from.altitude).clamp(-step, step),
       );
 
-  bool _isHitBy(Iterable<Projectile> shots, Spot spot) => shots.any((shot) =>
-      (shot.xFraction - spot.x).abs() <= _hitHalfWidth &&
-      (shot.altitude - spot.altitude).abs() <= _hitHalfAltitude);
+  static bool _isHitBy(Iterable<_Threat> threats, Spot spot) =>
+      threats.any((threat) => threat.hits(spot));
 
   static Spot _clamp(Spot spot) => (
         x: spot.x

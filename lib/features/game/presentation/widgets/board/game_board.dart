@@ -13,6 +13,7 @@ import 'board_background_painter.dart';
 import 'board_layout.dart';
 import 'board_overlay_painter.dart';
 import 'piece_renderer.dart';
+import 'tap_resolver.dart';
 
 /// Ephemeral data for a piece-move animation.
 class _MoveAnimationData {
@@ -344,17 +345,48 @@ class _GameBoardState extends ConsumerState<GameBoard>
     return piece.color == ref.read(gameStateProvider).currentTurn;
   }
 
+  /// The cells where a tap does something, for [resolveTap]: with a
+  /// selection its move targets and the selected cell, and always the own
+  /// pieces that have a move.
+  Set<Position> _tapTargets(
+    GameState gameState,
+    BoardInteractionState interaction,
+    GameStateNotifier notifier,
+  ) {
+    final targets = <Position>{};
+    final selected = interaction.selectedPosition;
+    if (selected != null) {
+      targets
+        ..add(selected)
+        ..addAll(interaction.validMoves);
+    }
+    for (final cell in gameState.board.geometry.cells) {
+      final piece = gameState.board.pieceAt(cell);
+      if (piece != null &&
+          _canSelectPiece(piece, notifier) &&
+          notifier.getLegalMoves(cell).isNotEmpty) {
+        targets.add(cell);
+      }
+    }
+    return targets;
+  }
+
   void _handleTap(Offset localPosition, BoardLayout layout) {
     // Block input during animation
     if (_moveController.isAnimating) return;
-
-    final tappedPos = layout.positionAt(localPosition);
-    if (tappedPos == null) return;
 
     final gameState = ref.read(gameStateProvider);
     final interaction = ref.read(boardInteractionProvider);
     final gameNotifier = ref.read(gameStateProvider.notifier);
     final interactionNotifier = ref.read(boardInteractionProvider.notifier);
+
+    final reach = tapReachFor(layout);
+    final tappedPos = reach > 0 && gameState.phase == GamePhase.playing
+        ? resolveTap(layout, localPosition,
+            preferred: _tapTargets(gameState, interaction, gameNotifier),
+            reach: reach)
+        : layout.positionAt(localPosition);
+    if (tappedPos == null) return;
 
     if (gameState.phase != GamePhase.playing) return;
 

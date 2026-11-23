@@ -70,7 +70,7 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 
 - `BoardSpec` (`lib/core/game_logic/board/`) names a board: its `BoardGeometry` (`SquareGeometry` or `HexGeometry`), layout and power fields. `BoardState.spec` travels in the JSON; a missing one is `classic8`.
 - Hex (`hex6`): a hexagon with six cells a side (91 cells, rows of 6 to 11) cut out of an 11×11 grid by `HexGeometry.hexagon`; pointy-top hexes in horizontal rows, offset coordinates with odd rows shifted half a cell right. A slide through a corner stops when both hexes beside the corner are taken (`CornerBlock.both`); `docs/lab/variant-lab.md` has the numbers behind that choice.
-- `BoardLayout` (`features/game/presentation/widgets/board/`) places every cell on screen for both painters, the piece layer and taps (nearest cell centre). The lobby's board picker applies to single player and local games; online and WiFi games stay on `classic8`.
+- `BoardLayout` (`features/game/presentation/widgets/board/`) places every cell on screen for both painters, the piece layer and taps (nearest cell centre). `resolveTap` (`tap_resolver.dart`, same folder) makes hex taps tolerant: a tap off every useful cell snaps to the nearest move target, selected piece or own piece with a move within `tapReachFor(layout)` = 0.8 cell widths; the square board keeps exact taps (reach 0). The lobby's board picker applies to single player and local games; online and WiFi games stay on `classic8`.
 
 ## Telemetry and onboarding
 

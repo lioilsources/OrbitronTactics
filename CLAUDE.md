@@ -4,6 +4,8 @@
 
 Flutter 2-player chess variant with custom piece movement, power field domination victory conditions, and Supabase Realtime multiplayer. Supports local hot-seat, single player against an on-device AI, and cloud lobby.
 
+The game is called Archion. Orbitron Tactics is the old name; the repo, the Dart package, the bundle ids and the store product ids keep it. User-facing text says Archion.
+
 ## Commands
 
 ```bash

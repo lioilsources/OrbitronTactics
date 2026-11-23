@@ -1,4 +1,4 @@
-Orbitron2D is a strategy game for two that plays like chess and fights like an arcade shooter.
+Archion is a strategy game for two that plays like chess and fights like an arcade shooter.
 
 THREE WAYS TO WIN
 • Hold all five power fields at the end of your turn

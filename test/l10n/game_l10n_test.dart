@@ -35,8 +35,8 @@ void main() {
   });
 
   test('AI player names follow the difficulty', () {
-    expect(en.aiNameForIdentity('ai-hard'), 'Orbitron AI · Hard');
-    expect(cs.aiNameForIdentity('ai-easy'), 'Orbitron AI · Lehká');
+    expect(en.aiNameForIdentity('ai-hard'), 'Archion AI · Hard');
+    expect(cs.aiNameForIdentity('ai-easy'), 'Archion AI · Lehká');
     expect(en.aiNameForIdentity('player'), isNull);
   });
 }

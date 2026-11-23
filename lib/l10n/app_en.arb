@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "OrbitronTactics",
+  "appTitle": "Archion",
   "defaultPlayerName": "Player",
   "defaultHostName": "Host",
   "defaultGuestName": "Guest",
@@ -601,7 +601,7 @@
   "@singlePlayerAiMovesFirst": {
     "description": "Shown when the AI gets the side that moves first"
   },
-  "aiPlayerName": "Orbitron AI · {difficulty}",
+  "aiPlayerName": "Archion AI · {difficulty}",
   "@aiPlayerName": {
     "description": "Name of the AI opponent, with its difficulty",
     "placeholders": {
@@ -736,7 +736,7 @@
   "@pieceTypeKing": {
     "description": "Unit type"
   },
-  "fleetVanguard": "Orbitron Vanguard",
+  "fleetVanguard": "Archion Vanguard",
   "@fleetVanguard": {
     "description": "Fleet name"
   },

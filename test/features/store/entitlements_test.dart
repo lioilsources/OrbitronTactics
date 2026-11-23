@@ -3,6 +3,7 @@ import 'package:orbitron_tactics/core/maneuvers/maneuver.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
+import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
 import 'package:orbitron_tactics/features/store/data/entitlements.dart';
 import 'package:orbitron_tactics/features/store/data/store_catalog.dart';
 
@@ -33,6 +34,17 @@ void main() {
             isTrue,
             reason: id);
       }
+    });
+
+    test('sells every premium world at its own id', () {
+      for (final world in PieceSkin.values.where((world) => world.premium)) {
+        final item = StoreCatalog.forWorld(world);
+        expect(item.world, world);
+        expect(item.kind, StoreItemKind.world);
+        expect(item.id, 'com.ol1n.orbitrontactics.pack.world_${world.slug}');
+      }
+      expect(StoreCatalog.byId(StoreCatalog.worldId(PieceSkin.classic)),
+          isNull);
     });
 
     test('lists the commander edition first', () {
@@ -99,6 +111,29 @@ void main() {
           isTrue);
     });
 
+    test('free worlds need nothing, premium ones a purchase or commander',
+        () {
+      const none = Entitlements();
+      for (final world in PieceSkin.values) {
+        expect(none.ownsWorld(world), !world.premium, reason: world.slug);
+      }
+      expect(none.ownsWorld(PieceSkin.classic), isTrue);
+
+      const samurai = PieceSkin.samuraiYokai;
+      final one = Entitlements(products: {StoreCatalog.worldId(samurai)});
+      expect(one.ownsWorld(samurai), isTrue);
+      expect(one.owns(StoreCatalog.forWorld(samurai)), isTrue);
+      expect(one.ownsWorld(PieceSkin.horusSeth), isFalse);
+
+      const commander = Entitlements(products: {StoreCatalog.commanderId});
+      for (final world in PieceSkin.values) {
+        expect(commander.ownsWorld(world), isTrue, reason: world.slug);
+      }
+
+      final legacy = Entitlements(legacyWorlds: {samurai.slug});
+      expect(legacy.ownsWorld(samurai), isTrue);
+    });
+
     test('a legacy fleet stays owned', () {
       final legacy = Entitlements(legacyFleets: {solar.slug});
       expect(legacy.ownsFleet(solar), isTrue);
@@ -109,13 +144,23 @@ void main() {
       final entitlements = Entitlements(
         products: {StoreCatalog.packId('ace'), StoreCatalog.fleetId(neon)},
         legacyFleets: {solar.slug},
+        legacyWorlds: {PieceSkin.horusSeth.slug},
       );
       expect(Entitlements.fromJson(entitlements.toJson()), entitlements);
     });
 
     test('reads garbage as nothing owned', () {
-      expect(Entitlements.fromJson({'products': 'x', 'legacyFleets': [1]}),
+      expect(
+          Entitlements.fromJson(
+              {'products': 'x', 'legacyFleets': [1], 'legacyWorlds': 2}),
           const Entitlements());
+    });
+
+    test('a cache from before worlds were sold is not settled yet', () {
+      expect(Entitlements.fromJson({'products': <String>[]}).worldsSettled,
+          isFalse);
+      expect(Entitlements.fromJson(const Entitlements().toJson()).worldsSettled,
+          isTrue);
     });
   });
 }

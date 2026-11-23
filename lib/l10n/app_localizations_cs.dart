@@ -414,11 +414,15 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get itemCommanderDescription =>
-      'Všechny prémiové flotily, balíčky manévrů i hudby a vše, co do obchodu přibude.';
+      'Všechny prémiové světy, flotily, balíčky manévrů i hudby a vše, co do obchodu přibude.';
 
   @override
   String get itemFleetDescription =>
-      'Vzhled lodí všech šesti jednotek, bílých i černých. Jen vzhled: létá jako každá jiná flotila.';
+      'Vzhled lodí všech šesti jednotek, bílých i černých, pro svět Vesmír. Jen vzhled: létá jako každá jiná flotila.';
+
+  @override
+  String get itemWorldDescription =>
+      'Obě armády tohoto světa, na desce i v aréně. Jen vzhled: bojují jako v každém jiném světě.';
 
   @override
   String itemMusicTitle(String name) {
@@ -485,7 +489,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get rulesBattle1 =>
-      'Obě figurky se promění v lodě a utkají se v aréně. Vítěz pole drží.';
+      'Obě figurky se utkají v aréně: ve Vesmíru jako lodě, v ostatních světech samy za sebe. Vítěz pole drží.';
 
   @override
   String get rulesBattle2 =>
@@ -493,18 +497,18 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get rulesBattle3 =>
-      'Střela zasáhne jen loď ve stejné výšce, takže abys trefil nepřítele, musíš letět tam, kde může trefit on tebe.';
+      'Střela zasáhne jen jednotku ve stejné výšce, takže abys trefil nepřítele, musíš tam, kde může trefit on tebe.';
 
   @override
   String get rulesBattle4 =>
       'Když letí střely a nemáš kam uhnout, zvedni štít.';
 
   @override
-  String get rulesFleetTitle => 'Manévry a tvá flotila';
+  String get rulesFleetTitle => 'Manévry a vylepšení';
 
   @override
   String get rulesFleet1 =>
-      'Nakresli gesto na mřížce a loď sama provede manévr. Každý stojí energii, která se během bitvy dobíjí.';
+      'Nakresli gesto na mřížce a jednotka sama provede manévr. Každý stojí energii, která se během bitvy dobíjí.';
 
   @override
   String get rulesFleet2 =>
@@ -512,17 +516,23 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get rulesFleet3 =>
-      'Celá hra je zdarma. Obchod prodává jen nový vzhled a balíčky manévrů.';
+      'Celá hra je zdarma. Obchod prodává jen nový vzhled (světy, flotily, hudbu) a balíčky manévrů.';
 
   @override
-  String get boardTab => 'DESKA';
+  String get worldTab => 'SVĚT';
 
   @override
-  String get pieceSkinTitle => 'Figurky na desce';
+  String get worldTitle => 'Svět';
 
   @override
-  String get pieceSkinHint =>
-      'Vyber armády, které se kreslí na desku ve všech režimech hry.';
+  String get worldHint =>
+      'Svět určí figurky na desce i jednotky, které bojují v aréně, ve všech režimech hry.';
+
+  @override
+  String get worldFleetHint => 'Lodě, které za tebe bojují ve Vesmíru.';
+
+  @override
+  String get worldChange => 'Změnit';
 
   @override
   String get classicMarks => 'Klasické značky';
@@ -531,7 +541,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get classicMarksHint => 'Na každé figurce ukáže malý šachový symbol.';
 
   @override
-  String get pieceSkinClassic => 'Klasické';
+  String get pieceSkinClassic => 'Vesmír';
 
   @override
   String get pieceSkinClassicWhite => 'Bílí';
@@ -708,7 +718,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get singlePlayerDifficulty => 'Obtížnost';
 
   @override
-  String get singlePlayerAiFleets => 'Flotily AI';
+  String get singlePlayerAiFleets => 'Soupeři AI';
 
   @override
   String get singlePlayerYourSide => 'Tvoje strana';

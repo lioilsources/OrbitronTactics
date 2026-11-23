@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/telemetry/telemetry.dart';
 import '../../../battle/data/battle_music.dart';
 import '../../../battle/data/fleet_skin.dart';
+import '../../../game/data/piece_skin.dart';
+import '../../../game/presentation/providers/piece_skin_provider.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import '../../data/entitlements.dart';
@@ -35,9 +37,10 @@ final storePricesProvider = FutureProvider<Map<String, String>>((ref) async {
 ///
 /// Starts from the cache, then [sync] asks the store. On the very first
 /// launch with a store, a premium fleet the player already flies is kept
-/// for good. Owned maneuver packs are handed to the player's fleet, and a
-/// premium fleet that is no longer owned (a refund) is swapped for the
-/// default.
+/// for good, and so is a premium world the player already plays in on the
+/// first launch since worlds are sold. Owned maneuver packs are handed to
+/// the player's fleet, and a premium fleet or world that is no longer owned
+/// (a refund) is swapped for the default.
 class EntitlementsNotifier extends StateNotifier<Entitlements> {
   EntitlementsNotifier({
     required EntitlementsStore store,
@@ -47,15 +50,19 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
     required void Function(String slug) setPlayerSkin,
     required void Function(String pack) grantPack,
     void Function(BattleMusic music)? selectMusic,
+    PieceSkin Function()? world,
+    void Function(PieceSkin world)? selectWorld,
   })  : _store = store,
+        _world = world,
+        _selectWorld = selectWorld,
         _selectMusic = selectMusic,
         _service = service,
         _telemetry = telemetry,
         _playerSkin = playerSkin,
         _setPlayerSkin = setPlayerSkin,
         _grantPack = grantPack,
-        super(store.load() ?? _firstLaunch(playerSkin())) {
-    if (store.load() == null) _store.save(state);
+        super(_initial(store.load(), playerSkin(), world?.call())) {
+    if (store.load() != state) _store.save(state);
     _changes = service.ownedChanges.listen(_apply);
   }
 
@@ -74,10 +81,19 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
   final void Function(String slug) _setPlayerSkin;
   final void Function(String pack) _grantPack;
   final void Function(BattleMusic music)? _selectMusic;
+  final PieceSkin Function()? _world;
+  final void Function(PieceSkin world)? _selectWorld;
 
-  static Entitlements _firstLaunch(String? skin) {
+  static Entitlements _initial(
+      Entitlements? cached, String? skin, PieceSkin? world) {
+    if (cached != null && cached.worldsSettled) return cached;
     final flown = FleetSkin.fromSlug(skin);
-    return Entitlements(legacyFleets: {if (flown.premium) flown.slug});
+    final base =
+        cached ?? Entitlements(legacyFleets: {if (flown.premium) flown.slug});
+    return base.copyWith(
+      legacyWorlds: {if (world != null && world.premium) world.slug},
+      worldsSettled: true,
+    );
   }
 
   /// Asks the store what this install owns. Offline, the cache stands.
@@ -96,6 +112,9 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
       _apply(owned);
       if (item.fleet case final fleet? when state.ownsFleet(fleet)) {
         _setPlayerSkin(fleet.slug);
+      }
+      if (item.world case final world? when state.ownsWorld(world)) {
+        _selectWorld?.call(world);
       }
       if (item.music case final music? when state.ownsMusic(music)) {
         _selectMusic?.call(music);
@@ -131,6 +150,10 @@ class EntitlementsNotifier extends StateNotifier<Entitlements> {
     }
     final flown = FleetSkin.fromSlug(_playerSkin());
     if (!state.ownsFleet(flown)) _setPlayerSkin(FleetSkin.fallback.slug);
+    final world = _world?.call();
+    if (world != null && !state.ownsWorld(world)) {
+      _selectWorld?.call(PieceSkin.fallback);
+    }
   }
 }
 
@@ -148,6 +171,8 @@ final entitlementsProvider =
     grantPack: (pack) => player().grantPack(pack),
     selectMusic: (music) =>
         ref.read(chosenBattleMusicProvider.notifier).choose(music),
+    world: () => ref.read(pieceSkinProvider).skin,
+    selectWorld: (world) => ref.read(pieceSkinProvider.notifier).select(world),
   );
 });
 

@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../l10n/l10n.dart';
+import '../../../battle/data/fleet_skin.dart';
 import '../../../game/data/piece_skin.dart';
 import '../../../game/presentation/providers/piece_skin_provider.dart';
 import '../../../game/presentation/widgets/board/piece_renderer.dart';
+import '../../../progress/presentation/providers/fleet_progress_provider.dart';
+import '../../../store/data/store_catalog.dart';
+import '../../../store/presentation/providers/store_providers.dart';
+import '../../../store/presentation/widgets/store_item_sheet.dart';
 
-/// Picks the board's piece skin and the classic marks toggle. Each pack is
-/// previewed with both armies on its own squares.
+/// Picks the world: the pieces on the board and the units in the arena.
+/// Each world is previewed with both armies on its own squares; Space adds
+/// the fleet picker, the figure worlds the classic marks toggle. A premium
+/// world not owned yet shows a lock and opens its store page.
 class PieceSkinPicker extends ConsumerWidget {
   const PieceSkinPicker({super.key});
 
@@ -17,40 +24,49 @@ class PieceSkinPicker extends ConsumerWidget {
     final l10n = context.l10n;
     final look = ref.watch(pieceSkinProvider);
     final notifier = ref.read(pieceSkinProvider.notifier);
+    final entitlements = ref.watch(entitlementsProvider);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          l10n.pieceSkinTitle,
+          l10n.worldTitle,
           style: const TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
-          l10n.pieceSkinHint,
+          l10n.worldHint,
           style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
         ),
-        const SizedBox(height: 8),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          activeThumbColor: Colors.amber,
-          title: Text(l10n.classicMarks,
-              style: const TextStyle(color: Colors.white)),
-          subtitle: Text(l10n.classicMarksHint,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-          value: look.classicMarks,
-          onChanged: notifier.setClassicMarks,
-        ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        if (look.skin.isSpace)
+          const FleetPicker()
+        else
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            activeThumbColor: Colors.amber,
+            title: Text(l10n.classicMarks,
+                style: const TextStyle(color: Colors.white)),
+            subtitle: Text(l10n.classicMarksHint,
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+            value: look.classicMarks,
+            onChanged: notifier.setClassicMarks,
+          ),
+        const SizedBox(height: 12),
         for (final skin in PieceSkin.values)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: PieceSkinCard(
               skin: skin,
               selected: skin == look.skin,
+              locked: !entitlements.ownsWorld(skin),
               classicMarks: look.classicMarks,
-              onTap: () => notifier.select(skin),
+              onTap: entitlements.ownsWorld(skin)
+                  ? () => notifier.select(skin)
+                  : () => showStoreItemSheet(
+                      context, ref, StoreCatalog.forWorld(skin),
+                      from: 'world'),
             ),
           ),
       ],
@@ -66,10 +82,14 @@ class PieceSkinCard extends StatelessWidget {
     required this.selected,
     required this.classicMarks,
     required this.onTap,
+    this.locked = false,
   });
 
   final PieceSkin skin;
   final bool selected;
+
+  /// A premium world not owned yet: dimmed, with a lock.
+  final bool locked;
   final bool classicMarks;
   final VoidCallback onTap;
 
@@ -113,7 +133,9 @@ class PieceSkinCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (selected)
+                if (locked)
+                  const Icon(Icons.lock, color: Colors.amber, size: 18)
+                else if (selected)
                   Icon(Icons.check_circle,
                       color: Colors.amber.shade700, size: 18),
               ],
@@ -127,7 +149,7 @@ class PieceSkinCard extends StatelessWidget {
               const SizedBox(height: 4),
               LayoutBuilder(builder: (context, constraints) {
                 final square = constraints.maxWidth / _order.length;
-                return Row(
+                final row = Row(
                   children: [
                     for (var i = 0; i < _order.length; i++)
                       Container(
@@ -146,9 +168,131 @@ class PieceSkinCard extends StatelessWidget {
                       ),
                   ],
                 );
+                return locked ? Opacity(opacity: 0.55, child: row) : row;
               }),
               const SizedBox(height: 6),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The player's fleet: the ships that fight in the Space world. A premium
+/// fleet not owned yet shows a lock and opens its store page.
+class FleetPicker extends ConsumerWidget {
+  const FleetPicker({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fleet = ref.watch(fleetProgressProvider(playerFleetIdentity));
+    final skin = FleetSkin.fromSlug(fleet.skin);
+    final player =
+        ref.read(fleetProgressProvider(playerFleetIdentity).notifier);
+    final entitlements = ref.watch(entitlementsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.worldFleetHint,
+          style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          context.l10n.yourFleet(skin.localizedName(context.l10n)),
+          style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 112,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: FleetSkin.values.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, index) {
+              final option = FleetSkin.values[index];
+              final owned = entitlements.ownsFleet(option);
+              return _FleetCard(
+                skin: option,
+                selected: option == skin,
+                locked: !owned,
+                onTap: owned
+                    ? () => player.setSkin(option.slug)
+                    : () => showStoreItemSheet(
+                        context, ref, StoreCatalog.forFleet(option),
+                        from: 'fleet'),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// One selectable fleet, previewed by its white knight.
+class _FleetCard extends StatelessWidget {
+  final FleetSkin skin;
+  final bool selected;
+  final bool locked;
+  final VoidCallback onTap;
+
+  const _FleetCard({
+    required this.skin,
+    required this.selected,
+    required this.locked,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 92,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A2E),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? Colors.amber.shade700 : Colors.blueGrey.shade800,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Opacity(
+                  opacity: locked ? 0.45 : 1,
+                  child: Image.asset(
+                    skin.assetFor(PieceType.knight, PlayerColor.white),
+                    width: 56,
+                    height: 56,
+                  ),
+                ),
+                if (locked)
+                  const Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Icon(Icons.lock, size: 16, color: Colors.amber),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              skin.localizedName(context.l10n),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.white70,
+                fontSize: 10,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ],
         ),
       ),

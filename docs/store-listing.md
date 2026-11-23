@@ -37,10 +37,11 @@ the front line. Knights are blocked by a Rook right in front. Lose your King
 or Queen and the survivor becomes the Last Warrior.
 
 EVERY CAPTURE IS A BATTLE
-The two pieces become ships and fight it out in a real-time arena. Dodge,
-climb and dive; a shot only hits a ship at its own altitude. Draw gestures
-to fly maneuvers: loops, barrel rolls, dashes and a signature move for
-every ship.
+The two pieces fight it out in a real-time arena: as ships in the Space
+world, as the figures themselves in Rome × Carthage, Knights × Orcs,
+Heaven × Hell and the other worlds. Dodge, climb and dive; a shot only hits
+at its target's own altitude. Draw gestures to fly maneuvers: loops, barrel
+rolls, dashes and a signature move for every unit.
 
 PLAY YOUR WAY
 • Single player against an AI on Easy, Medium or Hard
@@ -50,9 +51,10 @@ PLAY YOUR WAY
 BUILD YOUR FLEET
 Win battles to earn credits, upgrade your units and learn new maneuvers.
 
-The whole game is free, with no ads. Optional purchases add premium fleets,
-maneuver packs and a retro chiptune soundtrack; they change how the game
-looks and sounds, not who wins.
+The whole game is free, with no ads. Optional purchases add premium
+worlds, premium fleets (flown in the Space world), maneuver packs and a
+retro chiptune soundtrack; they change how the game looks and sounds, not
+who wins.
 
 ## Plný popis — čeština
 
@@ -70,9 +72,11 @@ frontu. Jezdce zastaví věž těsně před ním. Přijdeš o krále nebo králo
 a ten, kdo zbyl, se stane Posledním bojovníkem.
 
 KAŽDÉ BRANÍ JE BITVA
-Obě figurky se promění v lodě a utkají se v aréně v reálném čase. Uhýbej,
-stoupej a klesej; střela zasáhne jen loď ve své výšce. Gesty kreslíš
-manévry: looping, výkrut, průlet i podpisový manévr každé lodi.
+Obě figurky se utkají v aréně v reálném čase: ve světě Vesmír jako lodě,
+v Římě × Kartágu, Rytířích × Orcích, Nebi × Pekle a dalších světech samy
+za sebe. Uhýbej, stoupej a klesej; střela zasáhne jen cíl ve své výšce.
+Gesty kreslíš manévry: looping, výkrut, průlet i podpisový manévr každé
+jednotky.
 
 HRAJ PO SVÉM
 • Sám proti AI na Easy, Medium nebo Hard
@@ -83,7 +87,7 @@ VYBUDUJ SI FLOTILU
 Vyhrané bitvy přinášejí kredity na vylepšení jednotek a nové manévry.
 
 Celá hra je zdarma a bez reklam. Volitelné nákupy přidávají prémiové
-flotily, balíčky manévrů a retro chiptune hudbu; mění vzhled a zvuk hry,
+světy, prémiové flotily (létají ve světě Vesmír), balíčky manévrů a retro chiptune hudbu; mění vzhled a zvuk hry,
 ne to, kdo vyhraje.
 
 ## In-app products (one-time, non-consumable)
@@ -95,6 +99,19 @@ Price: **USD 0.99** for each single product, **USD 4.99** for the Commander Edit
 | Product id | Name | USD |
 |---|---|---|
 | `com.ol1n.orbitrontactics.pack.commander` | Commander Edition | 4.99 |
+| `com.ol1n.orbitrontactics.pack.world_olympus_titans` | Olympus × Titans (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_samurai_yokai` | Samurai × Yōkai (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_hussites_crusaders` | Hussites × Crusaders (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_asgard_ragnarok` | Asgard × Ragnarök (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_bogatyrs_koschei` | Bogatyrs × Koschei (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_camelot_morgana` | Round Table × Morgana (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_dwarves_dragons` | Dwarves × Dragons (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_egypt_assyria` | Egypt × Assyria (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_elves_goblins` | Elves × Goblins (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_horus_seth` | Horus × Seth (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_living_undead` | Living × Undead (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_vampires_werewolves` | Vampires × Werewolves (world) | 0.99 |
+| `com.ol1n.orbitrontactics.pack.world_white_black_magic` | White Magic × Black Magic (world) | 0.99 |
 | `com.ol1n.orbitrontactics.pack.fleet_solar_crusade` | Solar Crusade | 0.99 |
 | `com.ol1n.orbitrontactics.pack.fleet_neon_runners` | Neon Runners | 0.99 |
 | `com.ol1n.orbitrontactics.pack.fleet_crystal_choir` | Crystal Choir | 0.99 |
@@ -105,6 +122,13 @@ Price: **USD 0.99** for each single product, **USD 4.99** for the Commander Edit
 | `com.ol1n.orbitrontactics.pack.phantom` | Phantom pack | 0.99 |
 | `com.ol1n.orbitrontactics.pack.striker` | Striker pack | 0.99 |
 | `com.ol1n.orbitrontactics.pack.music_retro` | Retro Arcade music | 0.99 |
+
+Free worlds: Space, Rome × Carthage, Knights × Orcs and Heaven × Hell
+(`PieceSkin.free`; the choice awaits Olin's confirmation). Every other
+world is sold and is in the Commander Edition. Fleets show only in the
+Space world, which their store text says. A Google Play product can only
+be created once an AAB that knows it has been uploaded; then import it
+into RevenueCat.
 
 The ids come from `StoreCatalog` in the app; a product the app does not
 know is ignored, and an item the store does not list shows "Not in the

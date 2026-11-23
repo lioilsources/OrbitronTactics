@@ -14,6 +14,8 @@ import '../../../game/presentation/providers/piece_skin_provider.dart';
 import '../../../../l10n/l10n.dart';
 import '../../data/battle_element.dart';
 import '../../data/fleet_skin.dart';
+import '../../data/unit_art.dart';
+import '../../../game/data/piece_skin.dart';
 import '../audio/battle_audio.dart';
 import '../audio/battle_sound_cues.dart';
 import '../providers/battle_state_provider.dart';
@@ -31,9 +33,9 @@ import '../widgets/unit_combat_panel.dart';
 class BattleScreen extends ConsumerStatefulWidget {
   final PlayerColor? attackerColor;
 
-  /// The fleets whose ship art each side flies.
-  final FleetSkin attackerSkin;
-  final FleetSkin defenderSkin;
+  /// What each side's unit fights as; null flies the default fleet.
+  final UnitArt? attackerArt;
+  final UnitArt? defenderArt;
 
   /// The maneuvers each side has armed; null arms what the ship starts with.
   final List<ManeuverSlot>? attackerManeuvers;
@@ -42,8 +44,8 @@ class BattleScreen extends ConsumerStatefulWidget {
   const BattleScreen({
     super.key,
     this.attackerColor,
-    this.attackerSkin = FleetSkin.fallback,
-    this.defenderSkin = FleetSkin.fallback,
+    this.attackerArt,
+    this.defenderArt,
     this.attackerManeuvers,
     this.defenderManeuvers,
   });
@@ -185,10 +187,14 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         attackerAtBottom ? battleState.attacker : battleState.defender;
 
     // Until a sprite has loaded the arena draws the plain vector hull.
-    final attackerAsset = widget.attackerSkin.assetFor(
-        battleState.attacker.piece.type, battleState.attacker.piece.color);
-    final defenderAsset = widget.defenderSkin.assetFor(
-        battleState.defender.piece.type, battleState.defender.piece.color);
+    UnitArt artOf(BattleUnit unit, UnitArt? given) =>
+        given ??
+        unitArt(PieceSkin.classic, FleetSkin.fallback, unit.piece.type,
+            unit.piece.color);
+    final attackerArt = artOf(battleState.attacker, widget.attackerArt);
+    final defenderArt = artOf(battleState.defender, widget.defenderArt);
+    final attackerAsset = attackerArt.asset;
+    final defenderAsset = defenderArt.asset;
     final attackerSprite =
         ref.watch(shipSpriteProvider(attackerAsset)).valueOrNull;
     final defenderSprite =
@@ -286,6 +292,11 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
                                       attackerAtBottom: attackerAtBottom,
                                       attackerSprite: attackerSprite,
                                       defenderSprite: defenderSprite,
+                                      attackerPose: attackerArt.pose,
+                                      defenderPose: defenderArt.pose,
+                                      attackerMirrored: attackerArt.mirrored,
+                                      defenderMirrored: defenderArt.mirrored,
+                                      topPlayerAcross: isHotSeat,
                                       attackerBank: attackerBank,
                                       defenderBank: defenderBank,
                                       nowMs: battleState.elapsedMs +

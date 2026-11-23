@@ -19,13 +19,23 @@ class UpgradeCard extends StatelessWidget {
   final int credits;
   final VoidCallback? onUpgrade;
 
+  /// The unit as it fights in the chosen world; without one the card
+  /// shows its chess symbol.
+  final String? artAsset;
+
   const UpgradeCard({
     super.key,
     required this.pieceType,
     required this.level,
     required this.credits,
     required this.onUpgrade,
+    this.artAsset,
   });
+
+  Widget get _symbol => Text(
+        _symbols[pieceType] ?? '',
+        style: const TextStyle(fontSize: 32, color: Colors.white),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +68,16 @@ class UpgradeCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-            // Symbol
-            Text(
-              _symbols[pieceType] ?? '',
-              style: const TextStyle(fontSize: 32, color: Colors.white),
-            ),
+            // The unit, or its symbol
+            if (artAsset case final asset?)
+              Image.asset(
+                asset,
+                width: 40,
+                height: 40,
+                errorBuilder: (_, _, _) => _symbol,
+              )
+            else
+              _symbol,
             const SizedBox(height: 4),
             // Name
             Text(

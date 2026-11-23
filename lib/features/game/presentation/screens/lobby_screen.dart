@@ -342,6 +342,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               const SizedBox(height: 16),
 
               const _BoardPicker(),
+              const SizedBox(height: 8),
+              const _WorldRow(),
               const SizedBox(height: 12),
 
               // Single player against the AI
@@ -710,6 +712,39 @@ class _BoardPicker extends ConsumerWidget {
           l10n.lobbyBoardHint,
           style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
           textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+/// The chosen world, next to the board picker; the button opens the
+/// world picker in the Comcenter.
+class _WorldRow extends ConsumerWidget {
+  const _WorldRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final world = ref.watch(pieceSkinProvider).skin;
+    return Row(
+      children: [
+        Text(l10n.worldTitle,
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            world.displayName(l10n),
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ComcenterScreen()),
+          ),
+          child: Text(l10n.worldChange),
         ),
       ],
     );

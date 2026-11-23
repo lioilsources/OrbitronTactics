@@ -11,6 +11,7 @@ import '../../../../core/game_logic/models/spot.dart';
 import '../../../../core/game_logic/models/weapon_type.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../data/battle_element.dart';
+import '../../data/unit_art.dart';
 import 'arena_layout.dart';
 import 'explosion_fx.dart';
 
@@ -21,6 +22,12 @@ import 'explosion_fx.dart';
 /// climbing ship or shot grows and its shadow falls further off. Ships bank
 /// into their turns, shots and their impacts take the shooter's element, and
 /// the losing ship goes up in an explosion of its own element.
+///
+/// A [UnitPose.standing] unit — a figure from a figure world — is drawn
+/// upright as on the board instead: it keeps one size whatever its
+/// altitude (the altitude only moves it forward), does not bank, stands on
+/// a contact shadow, and is turned around only for the player sitting
+/// across the device in hot-seat.
 class BattleArenaPainter extends CustomPainter {
   final BattleState battleState;
 
@@ -31,6 +38,17 @@ class BattleArenaPainter extends CustomPainter {
   /// is drawn as the plain vector hull.
   final ui.Image? attackerSprite;
   final ui.Image? defenderSprite;
+
+  /// How each side's unit is drawn, and whether its picture is flipped
+  /// left to right.
+  final UnitPose attackerPose;
+  final UnitPose defenderPose;
+  final bool attackerMirrored;
+  final bool defenderMirrored;
+
+  /// Whether a player sits across the device from the top unit (hot-seat),
+  /// so a standing figure up there is turned to face them.
+  final bool topPlayerAcross;
 
   /// How far each ship banks, -1 (hard left) to 1 (hard right).
   final double attackerBank;
@@ -45,6 +63,11 @@ class BattleArenaPainter extends CustomPainter {
     required this.attackerAtBottom,
     this.attackerSprite,
     this.defenderSprite,
+    this.attackerPose = UnitPose.topDown,
+    this.defenderPose = UnitPose.topDown,
+    this.attackerMirrored = false,
+    this.defenderMirrored = false,
+    this.topPlayerAcross = false,
     this.attackerBank = 0,
     this.defenderBank = 0,
     int? nowMs,
@@ -86,6 +109,23 @@ class BattleArenaPainter extends CustomPainter {
 
   /// Drawn size at [altitude] relative to mid altitude: 0.7 low, 1.3 high.
   static double _altitudeScale(double altitude) => 0.7 + 0.6 * altitude;
+
+  /// Size of every standing figure as a fraction of the arena width. All
+  /// six share it: the figures' heights by rank are in the pictures.
+  static const double _figureWidthFraction = 0.3;
+
+  /// How high a figure jumps in a flip, as a fraction of its size.
+  static const double _jumpHeight = 0.45;
+
+  /// Whether a unit at the top of the arena is drawn turned around. A ship
+  /// seen from above always points its bow at the enemy; a standing figure
+  /// stays upright unless a player sits across the device (hot-seat).
+  static bool drawsUpsideDown({
+    required UnitPose pose,
+    required bool atTop,
+    required bool topPlayerAcross,
+  }) =>
+      atTop && (pose == UnitPose.topDown || topPlayerAcross);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -159,6 +199,8 @@ class BattleArenaPainter extends CustomPainter {
       unit: attacker,
       facingUp: attackerAtBottom,
       sprite: attackerSprite,
+      pose: attackerPose,
+      mirrored: attackerMirrored,
       bank: attackerBank,
       opacity: identical(loser, attacker) ? fading : 1.0,
       enemy: (x: defender.xFraction, altitude: defender.altitude),
@@ -170,6 +212,8 @@ class BattleArenaPainter extends CustomPainter {
       unit: defender,
       facingUp: !attackerAtBottom,
       sprite: defenderSprite,
+      pose: defenderPose,
+      mirrored: defenderMirrored,
       bank: defenderBank,
       opacity: identical(loser, defender) ? fading : 1.0,
       enemy: (x: attacker.xFraction, altitude: attacker.altitude),
@@ -317,14 +361,25 @@ class BattleArenaPainter extends CustomPainter {
     required BattleUnit unit,
     required bool facingUp,
     required ui.Image? sprite,
+    required UnitPose pose,
+    required bool mirrored,
     required double bank,
     required double opacity,
     required Spot enemy,
   }) {
-    final scale = _altitudeScale(unit.altitude);
+    final standing = pose == UnitPose.standing;
+    final scale = standing ? 1.0 : _altitudeScale(unit.altitude);
+    final upsideDown = drawsUpsideDown(
+        pose: pose, atTop: !facingUp, topPlayerAcross: topPlayerAcross);
     final double shipSize;
     final double shieldRadius;
-    if (sprite != null) {
+    if (standing) {
+      shipSize = math.min(
+        arena.width * _figureWidthFraction,
+        arena.height * 0.22,
+      );
+      shieldRadius = shipSize * 0.55;
+    } else if (sprite != null) {
       // Never much more than the gap to the arena edge allows.
       shipSize = math.min(
         arena.width * _spriteWidthFractions[unit.piece.type]! * scale,
@@ -348,6 +403,21 @@ class BattleArenaPainter extends CustomPainter {
         run?.poseAt(battleState.elapsedMs, enemy).attitude ?? Attitude.level;
     final element = BattleElement.of(unit.piece.type);
 
+    // Runs [draw] in the unit's frame at [at], held as [held] asks.
+    void inFrame(Offset at, Attitude held, VoidCallback draw,
+        {bool lifted = true}) {
+      if (standing) {
+        _inFigureFrame(canvas, at, shipSize, draw,
+            upsideDown: upsideDown,
+            mirrored: mirrored,
+            attitude: held,
+            lifted: lifted);
+      } else {
+        _inShipFrame(canvas, at, shipSize, draw,
+            facingUp: !upsideDown, bank: bank, attitude: held);
+      }
+    }
+
     // A maneuver leaves afterimages. Its flight is a function of time, so
     // the ship's own poses a moment ago come straight back out of the run.
     if (run != null) {
@@ -361,8 +431,7 @@ class BattleArenaPainter extends CustomPainter {
               atBottom: facingUp, arena: arena),
         );
         final alpha = 0.07 * (4 - back) * opacity;
-        _inShipFrame(canvas, ghost, shipSize,
-            facingUp: facingUp, bank: bank, attitude: was.attitude, () {
+        inFrame(ghost, was.attitude, () {
           if (sprite != null) {
             _drawSprite(canvas, sprite, shipSize,
                 Paint()..color = Colors.white.withValues(alpha: alpha));
@@ -374,38 +443,71 @@ class BattleArenaPainter extends CustomPainter {
       }
     }
 
-    // The higher the ship, the further off and softer its shadow falls.
-    final shadowAt =
-        center + const Offset(1, 1) * shipSize * (0.06 + 0.22 * unit.altitude);
-    final shadowColor =
-        Colors.black.withValues(alpha: (0.45 - 0.2 * unit.altitude) * opacity);
-    final blur = 1 + 4 * unit.altitude;
-    _inShipFrame(canvas, shadowAt, shipSize,
-        facingUp: facingUp, bank: bank, attitude: attitude, () {
-      if (sprite != null) {
-        _drawSprite(
-          canvas,
-          sprite,
-          shipSize * 0.9,
-          Paint()
-            ..colorFilter = ColorFilter.mode(shadowColor, BlendMode.srcIn)
-            ..imageFilter = ui.ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        );
-      } else {
+    if (standing) {
+      // A figure stands on the arena floor: a soft contact shadow under its
+      // plinth, which stays put while the figure jumps.
+      inFrame(center, attitude, lifted: false, () {
         canvas.drawOval(
           Rect.fromCenter(
-              center: Offset.zero, width: _shipWidth * scale, height: shipSize),
+              center: Offset(0, shipSize * 0.44),
+              width: shipSize * 0.62,
+              height: shipSize * 0.16),
           Paint()
-            ..color = shadowColor
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
+            ..color = Colors.black.withValues(alpha: 0.45 * opacity)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, shipSize * 0.04),
         );
-      }
-    });
+      });
+    } else {
+      // The higher the ship, the further off and softer its shadow falls.
+      final shadowAt = center +
+          const Offset(1, 1) * shipSize * (0.06 + 0.22 * unit.altitude);
+      final shadowColor = Colors.black
+          .withValues(alpha: (0.45 - 0.2 * unit.altitude) * opacity);
+      final blur = 1 + 4 * unit.altitude;
+      inFrame(shadowAt, attitude, () {
+        if (sprite != null) {
+          _drawSprite(
+            canvas,
+            sprite,
+            shipSize * 0.9,
+            Paint()
+              ..colorFilter = ColorFilter.mode(shadowColor, BlendMode.srcIn)
+              ..imageFilter = ui.ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          );
+        } else {
+          canvas.drawOval(
+            Rect.fromCenter(
+                center: Offset.zero,
+                width: _shipWidth * scale,
+                height: shipSize),
+            Paint()
+              ..color = shadowColor
+              ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
+          );
+        }
+      });
+    }
+
+    // A figure kicks up dust where a ship's engines would burn.
+    if (standing && attitude.boost > 0) {
+      inFrame(center, attitude, lifted: false, () {
+        final dust = Paint()
+          ..color = const Color(0xFFB8A27A)
+              .withValues(alpha: 0.45 * attitude.boost * opacity)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, shipSize * 0.06);
+        for (final side in const [-1.0, 1.0]) {
+          canvas.drawCircle(
+            Offset(side * shipSize * 0.3, shipSize * 0.42),
+            shipSize * 0.12 * (0.5 + attitude.boost),
+            dust,
+          );
+        }
+      });
+    }
 
     // Engines burning through a maneuver
-    if (attitude.boost > 0) {
-      _inShipFrame(canvas, center, shipSize,
-          facingUp: facingUp, bank: bank, attitude: attitude, () {
+    if (!standing && attitude.boost > 0) {
+      inFrame(center, attitude, () {
         canvas.drawCircle(
           Offset(0, shipSize * 0.55),
           shipSize * 0.22 * (0.5 + attitude.boost),
@@ -417,8 +519,7 @@ class BattleArenaPainter extends CustomPainter {
       });
     }
 
-    _inShipFrame(canvas, center, shipSize,
-        facingUp: facingUp, bank: bank, attitude: attitude, () {
+    inFrame(center, attitude, () {
       if (sprite != null) {
         _drawSprite(
           canvas,
@@ -489,6 +590,41 @@ class BattleArenaPainter extends CustomPainter {
           ..rotateX(attitude.pitch * 0.45 + attitude.flip * math.pi))
         .storage);
     if (!facingUp) canvas.rotate(math.pi);
+    draw();
+    canvas.restore();
+  }
+
+  /// Runs [draw] in a standing figure's frame at [center]: upright, turned
+  /// around only when [upsideDown], flipped when [mirrored], and posed by
+  /// its maneuver — a roll spins it about its upright axis, a flip is a
+  /// jump (skipped unless [lifted]), a pitch leans it the way it faces.
+  void _inFigureFrame(
+    Canvas canvas,
+    Offset center,
+    double size,
+    VoidCallback draw, {
+    required bool upsideDown,
+    required bool mirrored,
+    required Attitude attitude,
+    bool lifted = true,
+  }) {
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    if (upsideDown) canvas.rotate(math.pi);
+    if (lifted) {
+      final jump = math.sin(attitude.flip * math.pi / 2).abs();
+      canvas.translate(0, -jump * size * _jumpHeight);
+    }
+    // Lean about the feet, toward the side the figure faces.
+    final feet = size * 0.44;
+    canvas.translate(0, feet);
+    canvas.rotate(attitude.pitch * 0.3 * (mirrored ? -1 : 1));
+    canvas.translate(0, -feet);
+    canvas.transform((Matrix4.identity()
+          ..setEntry(3, 2, 0.6 / size)
+          ..rotateY(attitude.roll * 2 * math.pi))
+        .storage);
+    if (mirrored) canvas.scale(-1, 1);
     draw();
     canvas.restore();
   }

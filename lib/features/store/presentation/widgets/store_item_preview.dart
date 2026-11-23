@@ -7,8 +7,8 @@ import '../../../battle/presentation/widgets/pattern_glyph.dart';
 import '../../data/store_catalog.dart';
 import '../../../../l10n/l10n.dart';
 
-/// What a store item looks like: a fleet's ships, a pack's gesture, or a
-/// knight from each fleet a bundle holds.
+/// What a store item looks like: a fleet's ships, a world's two armies, a
+/// pack's gesture, or a knight from each fleet a bundle holds.
 class StoreItemPreview extends StatelessWidget {
   const StoreItemPreview({super.key, required this.item, this.size = 40});
 
@@ -25,6 +25,20 @@ class StoreItemPreview extends StatelessWidget {
           assets: [
             for (final type in PieceType.values)
               item.fleet!.assetFor(type, PlayerColor.white),
+          ],
+          size: size,
+        );
+      case StoreItemKind.world:
+        final world = item.world!;
+        return _Ships(
+          assets: [
+            for (final color in PlayerColor.values)
+              for (final type in const [
+                PieceType.king,
+                PieceType.queen,
+                PieceType.knight,
+              ])
+                world.assetFor(type, color)!,
           ],
           size: size,
         );

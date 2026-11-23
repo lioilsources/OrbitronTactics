@@ -192,8 +192,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('VELITELSTVÍ'), findsOneWidget);
+      expect(find.text('SVĚT'), findsOneWidget);
       expect(find.text('JEDNOTKY'), findsOneWidget);
       expect(find.text('OBCHOD'), findsOneWidget);
+      expect(find.text('Vesmír'), findsOneWidget);
+
+      await tester.tap(find.text('JEDNOTKY'));
+      await tester.pumpAndSettle();
       expect(find.text('Pěšec'), findsOneWidget);
 
       await tester.tap(find.text('MANÉVRY'));

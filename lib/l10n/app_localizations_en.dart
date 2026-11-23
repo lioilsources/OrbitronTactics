@@ -412,11 +412,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get itemCommanderDescription =>
-      'Every premium fleet, maneuver pack and music pack, and everything added to the store later.';
+      'Every premium world, fleet, maneuver pack and music pack, and everything added to the store later.';
 
   @override
   String get itemFleetDescription =>
-      'Ship art for all six units, white and black. Looks only: it flies like any other fleet.';
+      'Ship art for all six units, white and black, flown in the Space world. Looks only: it flies like any other fleet.';
+
+  @override
+  String get itemWorldDescription =>
+      'Both armies of this world, on the board and in the arena. Looks only: they fight like any other world.';
 
   @override
   String itemMusicTitle(String name) {
@@ -483,7 +487,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesBattle1 =>
-      'The two pieces become ships and fight it out in the arena. The winner keeps the square.';
+      'The two pieces fight it out in the arena: as ships in Space, as themselves in the other worlds. The winner keeps the square.';
 
   @override
   String get rulesBattle2 =>
@@ -491,18 +495,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesBattle3 =>
-      'A shot only hits a ship at about its own altitude, so to hit the enemy you have to fly where it can hit you.';
+      'A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.';
 
   @override
   String get rulesBattle4 =>
       'Raise the shield when fire is coming and you cannot get away.';
 
   @override
-  String get rulesFleetTitle => 'Maneuvers and your fleet';
+  String get rulesFleetTitle => 'Maneuvers and upgrades';
 
   @override
   String get rulesFleet1 =>
-      'Draw a gesture on the pad and the ship flies a maneuver on its own. Each costs energy, which recharges during the battle.';
+      'Draw a gesture on the pad and your unit performs a maneuver on its own. Each costs energy, which recharges during the battle.';
 
   @override
   String get rulesFleet2 =>
@@ -510,17 +514,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesFleet3 =>
-      'The whole game is free. The store only sells new looks and maneuver packs.';
+      'The whole game is free. The store only sells new looks (worlds, fleets, music) and maneuver packs.';
 
   @override
-  String get boardTab => 'BOARD';
+  String get worldTab => 'WORLD';
 
   @override
-  String get pieceSkinTitle => 'Board pieces';
+  String get worldTitle => 'World';
 
   @override
-  String get pieceSkinHint =>
-      'Pick the armies drawn on the board in every game mode.';
+  String get worldHint =>
+      'The world sets the pieces on the board and the units that fight in the arena, in every game mode.';
+
+  @override
+  String get worldFleetHint =>
+      'The ships that fight for you in the Space world.';
+
+  @override
+  String get worldChange => 'Change';
 
   @override
   String get classicMarks => 'Classic marks';
@@ -529,7 +540,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get classicMarksHint => 'Show a small chess symbol on each figure.';
 
   @override
-  String get pieceSkinClassic => 'Classic';
+  String get pieceSkinClassic => 'Space';
 
   @override
   String get pieceSkinClassicWhite => 'White';
@@ -706,7 +717,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get singlePlayerDifficulty => 'Difficulty';
 
   @override
-  String get singlePlayerAiFleets => 'AI fleets';
+  String get singlePlayerAiFleets => 'AI opponents';
 
   @override
   String get singlePlayerYourSide => 'Your side';

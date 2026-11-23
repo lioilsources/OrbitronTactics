@@ -4,10 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/engine/battle_engine.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
+import 'package:orbitron_tactics/features/battle/data/unit_art.dart';
 import 'package:orbitron_tactics/features/battle/presentation/providers/battle_state_provider.dart';
 import 'package:orbitron_tactics/features/battle/presentation/screens/battle_screen.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/maneuver_pad.dart';
+import 'package:orbitron_tactics/features/battle/presentation/widgets/battle_arena_painter.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/shield_button.dart';
+import 'package:orbitron_tactics/features/battle/presentation/widgets/unit_combat_panel.dart';
+import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
 import 'package:orbitron_tactics/features/onboarding/data/onboarding_store.dart';
 import 'package:orbitron_tactics/features/onboarding/presentation/onboarding_provider.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
@@ -18,7 +23,7 @@ void main() {
   /// Pumps a hot-seat battle — both players get controls, the tightest
   /// layout there is — on a small phone.
   Future<ProviderContainer> pumpBattle(WidgetTester tester, Size size,
-      {OnboardingStore? onboarding}) async {
+      {OnboardingStore? onboarding, PieceSkin? world}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -44,8 +49,18 @@ void main() {
         );
     await tester.pumpWidget(UncontrolledProviderScope(
       container: container,
-      child: const MaterialApp(
-        home: BattleScreen(attackerColor: PlayerColor.white),
+      child: MaterialApp(
+        home: BattleScreen(
+          attackerColor: PlayerColor.white,
+          attackerArt: world == null
+              ? null
+              : unitArt(world, FleetSkin.fallback, PieceType.knight,
+                  PlayerColor.white),
+          defenderArt: world == null
+              ? null
+              : unitArt(world, FleetSkin.fallback, PieceType.queen,
+                  PlayerColor.black),
+        ),
       ),
     ));
     await tester.pump(const Duration(milliseconds: 50));
@@ -60,6 +75,33 @@ void main() {
     expect(tester.takeException(), isNull);
 
     // The battle's ticker outlives the widget tree otherwise.
+    container.read(battleStateProvider.notifier).stopBattle();
+    await tester.pump();
+  });
+
+  testWidgets('a figure world fights with its standing figures',
+      (tester) async {
+    final container = await pumpBattle(tester, const Size(360, 640),
+        world: PieceSkin.romeCarthage);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final painter = tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .map((paint) => paint.painter)
+        .whereType<BattleArenaPainter>()
+        .single;
+    expect(painter.attackerPose, UnitPose.standing);
+    expect(painter.defenderPose, UnitPose.standing);
+    expect(painter.defenderMirrored, isTrue);
+    // Hot-seat: the top player sits across the device.
+    expect(painter.topPlayerAcross, isTrue);
+    final panels = tester
+        .widgetList<UnitCombatPanel>(find.byType(UnitCombatPanel))
+        .map((panel) => panel.spriteAsset);
+    expect(panels, contains('assets/pieces/rome_carthage/knight_white.png'));
+    expect(panels, contains('assets/pieces/rome_carthage/queen_black.png'));
+    expect(tester.takeException(), isNull);
+
     container.read(battleStateProvider.notifier).stopBattle();
     await tester.pump();
   });

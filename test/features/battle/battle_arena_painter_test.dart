@@ -9,6 +9,7 @@ import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
+import 'package:orbitron_tactics/features/battle/data/unit_art.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/battle_arena_painter.dart';
 
 void main() {
@@ -75,6 +76,54 @@ void main() {
     }
   });
 
+  testWidgets('paints standing figures, either side at the bottom, mirrored '
+      'or not, in hot-seat or not', (tester) async {
+    final sprite = (await tester.runAsync(
+        () => createTestImage(width: 256, height: 256, cache: false)))!;
+    addTearDown(sprite.dispose);
+
+    for (final attackerAtBottom in [true, false]) {
+      for (final across in [true, false]) {
+        expect(
+          () => paint(BattleArenaPainter(
+            battle,
+            attackerAtBottom: attackerAtBottom,
+            attackerSprite: sprite,
+            defenderSprite: sprite,
+            attackerPose: UnitPose.standing,
+            defenderPose: UnitPose.standing,
+            defenderMirrored: true,
+            topPlayerAcross: across,
+            attackerBank: 0.8,
+          )),
+          returnsNormally,
+        );
+      }
+    }
+  });
+
+  test('a standing figure at the top stays upright unless a player sits '
+      'across the device; a ship always points at the enemy', () {
+    expect(
+        BattleArenaPainter.drawsUpsideDown(
+            pose: UnitPose.standing, atTop: true, topPlayerAcross: false),
+        isFalse);
+    expect(
+        BattleArenaPainter.drawsUpsideDown(
+            pose: UnitPose.standing, atTop: true, topPlayerAcross: true),
+        isTrue);
+    expect(
+        BattleArenaPainter.drawsUpsideDown(
+            pose: UnitPose.topDown, atTop: true, topPlayerAcross: false),
+        isTrue);
+    for (final pose in UnitPose.values) {
+      expect(
+          BattleArenaPainter.drawsUpsideDown(
+              pose: pose, atTop: false, topPlayerAcross: true),
+          isFalse);
+    }
+  });
+
   test('falls back to the vector hull without sprites', () {
     expect(
       () => paint(BattleArenaPainter(battle, attackerAtBottom: true,
@@ -98,11 +147,14 @@ void main() {
         expect(flying.attacker.maneuver, isNotNull, reason: maneuver.id);
 
         for (var step = 0; step <= 8; step++) {
-          expect(
-            () => paint(BattleArenaPainter(flying, attackerAtBottom: true)),
-            returnsNormally,
-            reason: '${maneuver.id} at step $step',
-          );
+          for (final pose in UnitPose.values) {
+            expect(
+              () => paint(BattleArenaPainter(flying,
+                  attackerAtBottom: true, attackerPose: pose)),
+              returnsNormally,
+              reason: '${maneuver.id} ${pose.name} at step $step',
+            );
+          }
           flying = BattleEngine.tick(flying, maneuver.durationMs ~/ 8);
         }
       }

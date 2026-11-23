@@ -6,6 +6,8 @@ import '../../../../core/game_logic/models/ship_maneuvers.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
 import '../../../battle/data/battle_element.dart';
 import '../../../battle/data/fleet_skin.dart';
+import '../../../battle/data/unit_art.dart';
+import '../../../game/presentation/providers/piece_skin_provider.dart';
 import '../../../battle/presentation/widgets/pattern_glyph.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../../../store/data/store_catalog.dart';
@@ -63,18 +65,18 @@ class ComcenterScreen extends ConsumerWidget {
             unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.amber,
             tabs: [
+              Tab(text: l10n.worldTab),
               Tab(text: l10n.unitsTab),
               Tab(text: l10n.maneuversTab),
-              Tab(text: l10n.boardTab),
               Tab(text: l10n.tabStore),
             ],
           ),
         ),
         body: TabBarView(
           children: [
+            const PieceSkinPicker(),
             _UnitsTab(fleet: fleet),
             _ManeuversTab(fleet: fleet),
-            const PieceSkinPicker(),
             const StoreTab(),
           ],
         ),
@@ -83,7 +85,7 @@ class ComcenterScreen extends ConsumerWidget {
   }
 }
 
-/// The fleet's ship art and unit upgrades.
+/// Unit upgrades, each unit drawn as it fights in the chosen world.
 class _UnitsTab extends ConsumerWidget {
   const _UnitsTab({required this.fleet});
 
@@ -91,44 +93,16 @@ class _UnitsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final world = ref.watch(pieceSkinProvider).skin;
     final skin = FleetSkin.fromSlug(fleet.skin);
     final player =
         ref.read(fleetProgressProvider(playerFleetIdentity).notifier);
-    final entitlements = ref.watch(entitlementsProvider);
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.l10n.yourFleet(skin.localizedName(context.l10n)),
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 112,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: FleetSkin.values.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                final option = FleetSkin.values[index];
-                final owned = entitlements.ownsFleet(option);
-                return _FleetCard(
-                  skin: option,
-                  selected: option == skin,
-                  locked: !owned,
-                  onTap: owned
-                      ? () => player.setSkin(option.slug)
-                      : () => showStoreItemSheet(
-                          context, ref, StoreCatalog.forFleet(option),
-                          from: 'fleet'),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 20),
           Text(
             context.l10n.upgradeHint,
             style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
@@ -146,6 +120,8 @@ class _UnitsTab extends ConsumerWidget {
                   level: fleet.profile.levelFor(type),
                   credits: fleet.credits,
                   onUpgrade: () => player.upgrade(type),
+                  artAsset:
+                      unitArt(world, skin, type, PlayerColor.white).asset,
                 );
               }).toList(),
             ),
@@ -310,75 +286,6 @@ class _Slot extends StatelessWidget {
                 child: PatternGlyph(
                     pattern: maneuver.pattern, color: accent, size: 46),
               ),
-      ),
-    );
-  }
-}
-
-/// One selectable fleet, previewed by its white knight. A premium fleet
-/// not owned yet shows a lock and opens its store page.
-class _FleetCard extends StatelessWidget {
-  final FleetSkin skin;
-  final bool selected;
-  final bool locked;
-  final VoidCallback onTap;
-
-  const _FleetCard({
-    required this.skin,
-    required this.selected,
-    required this.locked,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 92,
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? Colors.amber.shade700 : Colors.blueGrey.shade800,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Opacity(
-                  opacity: locked ? 0.45 : 1,
-                  child: Image.asset(
-                    skin.assetFor(PieceType.knight, PlayerColor.white),
-                    width: 56,
-                    height: 56,
-                  ),
-                ),
-                if (locked)
-                  const Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Icon(Icons.lock, size: 16, color: Colors.amber),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              skin.localizedName(context.l10n),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              style: TextStyle(
-                color: selected ? Colors.white : Colors.white70,
-                fontSize: 10,
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

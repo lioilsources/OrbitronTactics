@@ -779,14 +779,20 @@ abstract class AppLocalizations {
   /// No description provided for @itemCommanderDescription.
   ///
   /// In en, this message translates to:
-  /// **'Every premium fleet, maneuver pack and music pack, and everything added to the store later.'**
+  /// **'Every premium world, fleet, maneuver pack and music pack, and everything added to the store later.'**
   String get itemCommanderDescription;
 
   /// No description provided for @itemFleetDescription.
   ///
   /// In en, this message translates to:
-  /// **'Ship art for all six units, white and black. Looks only: it flies like any other fleet.'**
+  /// **'Ship art for all six units, white and black, flown in the Space world. Looks only: it flies like any other fleet.'**
   String get itemFleetDescription;
+
+  /// No description provided for @itemWorldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Both armies of this world, on the board and in the arena. Looks only: they fight like any other world.'**
+  String get itemWorldDescription;
 
   /// No description provided for @itemMusicTitle.
   ///
@@ -899,7 +905,7 @@ abstract class AppLocalizations {
   /// No description provided for @rulesBattle1.
   ///
   /// In en, this message translates to:
-  /// **'The two pieces become ships and fight it out in the arena. The winner keeps the square.'**
+  /// **'The two pieces fight it out in the arena: as ships in Space, as themselves in the other worlds. The winner keeps the square.'**
   String get rulesBattle1;
 
   /// No description provided for @rulesBattle2.
@@ -911,7 +917,7 @@ abstract class AppLocalizations {
   /// No description provided for @rulesBattle3.
   ///
   /// In en, this message translates to:
-  /// **'A shot only hits a ship at about its own altitude, so to hit the enemy you have to fly where it can hit you.'**
+  /// **'A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.'**
   String get rulesBattle3;
 
   /// No description provided for @rulesBattle4.
@@ -923,13 +929,13 @@ abstract class AppLocalizations {
   /// No description provided for @rulesFleetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Maneuvers and your fleet'**
+  /// **'Maneuvers and upgrades'**
   String get rulesFleetTitle;
 
   /// No description provided for @rulesFleet1.
   ///
   /// In en, this message translates to:
-  /// **'Draw a gesture on the pad and the ship flies a maneuver on its own. Each costs energy, which recharges during the battle.'**
+  /// **'Draw a gesture on the pad and your unit performs a maneuver on its own. Each costs energy, which recharges during the battle.'**
   String get rulesFleet1;
 
   /// No description provided for @rulesFleet2.
@@ -941,26 +947,38 @@ abstract class AppLocalizations {
   /// No description provided for @rulesFleet3.
   ///
   /// In en, this message translates to:
-  /// **'The whole game is free. The store only sells new looks and maneuver packs.'**
+  /// **'The whole game is free. The store only sells new looks (worlds, fleets, music) and maneuver packs.'**
   String get rulesFleet3;
 
-  /// Comcenter tab with the board piece skin picker
+  /// Comcenter tab picking the world: pieces on the board and units in the arena
   ///
   /// In en, this message translates to:
-  /// **'BOARD'**
-  String get boardTab;
+  /// **'WORLD'**
+  String get worldTab;
 
-  /// Heading above the piece skin packs
+  /// Heading of the world picker in the Comcenter, and its row in the lobby
   ///
   /// In en, this message translates to:
-  /// **'Board pieces'**
-  String get pieceSkinTitle;
+  /// **'World'**
+  String get worldTitle;
 
-  /// Explains what the piece skin picker changes
+  /// Explains what the world picker changes
   ///
   /// In en, this message translates to:
-  /// **'Pick the armies drawn on the board in every game mode.'**
-  String get pieceSkinHint;
+  /// **'The world sets the pieces on the board and the units that fight in the arena, in every game mode.'**
+  String get worldHint;
+
+  /// Above the fleet picker, shown only while the Space world is chosen
+  ///
+  /// In en, this message translates to:
+  /// **'The ships that fight for you in the Space world.'**
+  String get worldFleetHint;
+
+  /// Lobby button opening the world picker
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get worldChange;
 
   /// Toggle that draws a small chess glyph on every image piece
   ///
@@ -974,10 +992,10 @@ abstract class AppLocalizations {
   /// **'Show a small chess symbol on each figure.'**
   String get classicMarksHint;
 
-  /// Name of the default symbol pieces
+  /// Name of the Space world: chess symbols on the board, ships in the arena
   ///
   /// In en, this message translates to:
-  /// **'Classic'**
+  /// **'Space'**
   String get pieceSkinClassic;
 
   /// White side of the classic pieces
@@ -1316,10 +1334,10 @@ abstract class AppLocalizations {
   /// **'Difficulty'**
   String get singlePlayerDifficulty;
 
-  /// Label of the AI fleets' progress list
+  /// Label of the AI opponents' progress list
   ///
   /// In en, this message translates to:
-  /// **'AI fleets'**
+  /// **'AI opponents'**
   String get singlePlayerAiFleets;
 
   /// Label of the side picker; the options are the active piece skin's side names

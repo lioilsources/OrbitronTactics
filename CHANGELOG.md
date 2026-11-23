@@ -1,6 +1,9 @@
 # Changelog
 
 ## [23/11/2026]
+- One choice, the world, decides both the pieces on the board and who fights in the arena: in Rome × Carthage a Roman figure fights a Carthaginian one, while Space keeps the chess symbols on the board and the fleet's ships in the arena
+- The Comcenter opens on the WORLD tab (worlds, and the fleet while in Space), then UNITS (upgrades drawn as the chosen world's units), MANEUVERS and STORE; the lobby shows the chosen world next to the board picker
+- Space, Rome × Carthage, Knights × Orcs and Heaven × Hell are free; the other worlds are sold for USD 0.99 each and are in the Commander Edition; a world already played in before the store sold worlds is kept
 - The game is called Archion, with a new icon
 - On the hex board a tap just beside a piece or a move target still lands on it
 

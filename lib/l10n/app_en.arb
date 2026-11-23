@@ -287,8 +287,9 @@
     }
   },
   "itemCommanderTitle": "Commander Edition",
-  "itemCommanderDescription": "Every premium fleet, maneuver pack and music pack, and everything added to the store later.",
-  "itemFleetDescription": "Ship art for all six units, white and black. Looks only: it flies like any other fleet.",
+  "itemCommanderDescription": "Every premium world, fleet, maneuver pack and music pack, and everything added to the store later.",
+  "itemFleetDescription": "Ship art for all six units, white and black, flown in the Space world. Looks only: it flies like any other fleet.",
+  "itemWorldDescription": "Both armies of this world, on the board and in the arena. Looks only: they fight like any other world.",
   "itemMusicTitle": "{name} music",
   "@itemMusicTitle": {
     "placeholders": {
@@ -314,25 +315,33 @@
   "rulesPieces4": "Queen: 4 diagonally, 2 straight. King: 4 straight, 2 diagonally.",
   "rulesPieces5": "Tap a piece to see where it can go. A red ! means it can be taken.",
   "rulesBattleTitle": "Every capture is a battle",
-  "rulesBattle1": "The two pieces become ships and fight it out in the arena. The winner keeps the square.",
+  "rulesBattle1": "The two pieces fight it out in the arena: as ships in Space, as themselves in the other worlds. The winner keeps the square.",
   "rulesBattle2": "Drag across your half to dodge, forward to climb, back to dive.",
-  "rulesBattle3": "A shot only hits a ship at about its own altitude, so to hit the enemy you have to fly where it can hit you.",
+  "rulesBattle3": "A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.",
   "rulesBattle4": "Raise the shield when fire is coming and you cannot get away.",
-  "rulesFleetTitle": "Maneuvers and your fleet",
-  "rulesFleet1": "Draw a gesture on the pad and the ship flies a maneuver on its own. Each costs energy, which recharges during the battle.",
+  "rulesFleetTitle": "Maneuvers and upgrades",
+  "rulesFleet1": "Draw a gesture on the pad and your unit performs a maneuver on its own. Each costs energy, which recharges during the battle.",
   "rulesFleet2": "Single player battles earn credits. Spend them in the Comcenter on upgrades and new maneuvers.",
-  "rulesFleet3": "The whole game is free. The store only sells new looks and maneuver packs.",
-  "boardTab": "BOARD",
-  "@boardTab": {
-    "description": "Comcenter tab with the board piece skin picker"
+  "rulesFleet3": "The whole game is free. The store only sells new looks (worlds, fleets, music) and maneuver packs.",
+  "worldTab": "WORLD",
+  "@worldTab": {
+    "description": "Comcenter tab picking the world: pieces on the board and units in the arena"
   },
-  "pieceSkinTitle": "Board pieces",
-  "@pieceSkinTitle": {
-    "description": "Heading above the piece skin packs"
+  "worldTitle": "World",
+  "@worldTitle": {
+    "description": "Heading of the world picker in the Comcenter, and its row in the lobby"
   },
-  "pieceSkinHint": "Pick the armies drawn on the board in every game mode.",
-  "@pieceSkinHint": {
-    "description": "Explains what the piece skin picker changes"
+  "worldHint": "The world sets the pieces on the board and the units that fight in the arena, in every game mode.",
+  "@worldHint": {
+    "description": "Explains what the world picker changes"
+  },
+  "worldFleetHint": "The ships that fight for you in the Space world.",
+  "@worldFleetHint": {
+    "description": "Above the fleet picker, shown only while the Space world is chosen"
+  },
+  "worldChange": "Change",
+  "@worldChange": {
+    "description": "Lobby button opening the world picker"
   },
   "classicMarks": "Classic marks",
   "@classicMarks": {
@@ -342,9 +351,9 @@
   "@classicMarksHint": {
     "description": "Subtitle of the classic marks toggle"
   },
-  "pieceSkinClassic": "Classic",
+  "pieceSkinClassic": "Space",
   "@pieceSkinClassic": {
-    "description": "Name of the default symbol pieces"
+    "description": "Name of the Space world: chess symbols on the board, ships in the arena"
   },
   "pieceSkinClassicWhite": "White",
   "@pieceSkinClassicWhite": {
@@ -585,9 +594,9 @@
   "@singlePlayerDifficulty": {
     "description": "Label of the AI difficulty picker"
   },
-  "singlePlayerAiFleets": "AI fleets",
+  "singlePlayerAiFleets": "AI opponents",
   "@singlePlayerAiFleets": {
-    "description": "Label of the AI fleets' progress list"
+    "description": "Label of the AI opponents' progress list"
   },
   "singlePlayerYourSide": "Your side",
   "@singlePlayerYourSide": {

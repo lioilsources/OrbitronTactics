@@ -8,6 +8,8 @@ import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/core/telemetry/telemetry.dart';
 import 'package:orbitron_tactics/features/battle/data/battle_music.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
+import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
+import 'package:orbitron_tactics/features/game/presentation/providers/piece_skin_provider.dart';
 import 'package:orbitron_tactics/features/progress/data/fleet_progress_store.dart';
 import 'package:orbitron_tactics/features/progress/presentation/providers/fleet_progress_provider.dart';
 import 'package:orbitron_tactics/features/store/data/entitlements.dart';
@@ -103,6 +105,47 @@ void main() {
 
     expect(c.read(chosenBattleMusicProvider), BattleMusic.retro);
     expect(c.read(battleMusicProvider), BattleMusic.standard);
+  });
+
+  test('a bought world is chosen at once, and a refunded one falls back to '
+      'Space', () async {
+    final c = container();
+    final notifier = c.read(entitlementsProvider.notifier);
+    const world = PieceSkin.samuraiYokai;
+
+    await notifier.buy(StoreCatalog.forWorld(world));
+    expect(c.read(entitlementsProvider).ownsWorld(world), isTrue);
+    expect(c.read(pieceSkinProvider).skin, world);
+
+    await prefs.setStringList(DebugPurchaseService.key, []);
+    await notifier.sync();
+
+    expect(c.read(pieceSkinProvider).skin, PieceSkin.classic);
+  });
+
+  test('a free world stays chosen whatever the store says', () async {
+    final c = container(store: MemoryEntitlementsStore(const Entitlements()));
+    c.read(pieceSkinProvider.notifier).select(PieceSkin.romeCarthage);
+
+    await c.read(entitlementsProvider.notifier).sync();
+
+    expect(c.read(pieceSkinProvider).skin, PieceSkin.romeCarthage);
+  });
+
+  test('the first launch since worlds are sold keeps the world played in',
+      () async {
+    // A cache from before worlds were sold.
+    final store = MemoryEntitlementsStore(
+        Entitlements.fromJson({'products': <String>[]}));
+    final c = container(store: store);
+    c.read(pieceSkinProvider.notifier).select(PieceSkin.horusSeth);
+
+    final entitlements = c.read(entitlementsProvider);
+    await c.read(entitlementsProvider.notifier).sync();
+
+    expect(entitlements.legacyWorlds, {'horus_seth'});
+    expect(store.load()!.worldsSettled, isTrue);
+    expect(c.read(pieceSkinProvider).skin, PieceSkin.horusSeth);
   });
 
   test('buying the Ace pack teaches every ship its maneuvers', () async {

@@ -3,9 +3,13 @@ import 'dart:ui' show Color;
 import '../../../core/game_logic/models/piece.dart';
 import '../../../core/theme/board_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../battle/data/unit_art.dart' show UnitPose;
 
-/// How the board draws its pieces: the classic symbols, or an image pack
-/// with twelve figures in `assets/pieces/<slug>/` and its own square colors.
+/// The world a game is played in: what stands on the board and what fights
+/// in the arena. [classic] is Space — chess symbols on the board, the
+/// player's fleet in the arena; every other world is an image pack with
+/// twelve figures in `assets/pieces/<slug>/` and its own square colors, and
+/// the same figures fight in the arena.
 ///
 /// An image pack's figures face slightly to the right; the black army is
 /// mirrored on the board so both sides face each other.
@@ -104,12 +108,24 @@ enum PieceSkin {
   /// The skin drawn when none is chosen.
   static const fallback = PieceSkin.classic;
 
+  /// The worlds everyone gets; every other one is sold in the store.
+  static const free = {classic, romeCarthage, knightsOrcs, heavenHell};
+
   /// The skin stored as [slug], or [fallback] for none or an unknown id.
   static PieceSkin fromSlug(String? slug) =>
       values.firstWhere((skin) => skin.slug == slug, orElse: () => fallback);
 
   /// Whether the pieces are pictures rather than the classic symbols.
   bool get isImagePack => this != classic;
+
+  /// Whether this is Space: symbols on the board, ships in the arena.
+  bool get isSpace => this == classic;
+
+  /// How this world's units stand in the arena.
+  UnitPose get pose => isSpace ? UnitPose.topDown : UnitPose.standing;
+
+  /// Sold in the store rather than given to everyone.
+  bool get premium => !free.contains(this);
 
   /// The folder of an image pack's figures and manifest.
   String get assetFolder => 'assets/pieces/$slug/';

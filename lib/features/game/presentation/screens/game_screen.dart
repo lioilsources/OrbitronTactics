@@ -18,7 +18,8 @@ import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
 import '../widgets/board/board_layout.dart';
 import '../widgets/board/game_board.dart';
-import '../../../battle/data/fleet_skin.dart';
+import '../../../battle/data/unit_art.dart';
+import '../../../battle/presentation/providers/unit_art_provider.dart';
 import '../../../battle/presentation/providers/battle_state_provider.dart';
 import '../../../battle/presentation/screens/battle_screen.dart';
 import '../../../comcenter/presentation/screens/comcenter_screen.dart';
@@ -59,16 +60,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
 
     PlayerColor? attackerColor;
-    var attackerSkin = FleetSkin.fallback;
-    var defenderSkin = FleetSkin.fallback;
+    UnitArt? attackerArt;
+    UnitArt? defenderArt;
     List<ManeuverSlot>? attackerManeuvers;
     List<ManeuverSlot>? defenderManeuvers;
 
     if (pendingMove != null && pendingMove.capturedPiece != null) {
       attackerColor = pendingMove.piece.color;
       final defenderColor = pendingMove.capturedPiece!.color;
-      // Single player fights with the saved fleets and their ship art; other
-      // modes keep the per-color session upgrades and the default fleet.
+      // Every mode fights in the chosen world; its fleets come from one
+      // place. Single player fights with the saved upgrades and maneuvers,
+      // other modes keep the per-color session upgrades.
+      attackerArt = ref.read(
+          sideUnitArtProvider((pendingMove.piece.type, attackerColor)));
+      defenderArt = ref.read(sideUnitArtProvider(
+          (pendingMove.capturedPiece!.type, defenderColor)));
       final ai = ref.read(aiOpponentProvider);
       final attackerUpgrades = ai != null
           ? ai.upgradesFor(attackerColor)
@@ -77,8 +83,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           ? ai.upgradesFor(defenderColor)
           : ref.read(upgradeProfileProvider(defenderColor));
       if (ai != null) {
-        attackerSkin = ai.skinFor(attackerColor);
-        defenderSkin = ai.skinFor(defenderColor);
         attackerManeuvers =
             ai.maneuversFor(attackerColor, pendingMove.piece.type);
         defenderManeuvers =
@@ -110,8 +114,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         .push(MaterialPageRoute(
           builder: (_) => BattleScreen(
             attackerColor: attackerColor,
-            attackerSkin: attackerSkin,
-            defenderSkin: defenderSkin,
+            attackerArt: attackerArt,
+            defenderArt: defenderArt,
             attackerManeuvers: attackerManeuvers,
             defenderManeuvers: defenderManeuvers,
           ),

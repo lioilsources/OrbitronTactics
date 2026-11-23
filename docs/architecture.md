@@ -40,21 +40,30 @@ Moved from `CLAUDE.md` so it stays short. Short map and commands live there.
 - Progress: `FleetProgress.maneuvers` (`ShipManeuvers`: owned, four armed, trained levels) and `battleWins` per ship. `FleetProgressNotifier.recordBattleWin` unlocks what the wins are worth, `buyManeuver`/`upgradeManeuver`/`armManeuvers`/`grantPack` do the rest. Single player only, like credits and skins.
 - `dart run tools/dump_maneuvers.dart <dir>` writes the whole catalog out as a TSV plus flight paths sampled through `Maneuver.poseAt`. The olin.now store gallery animates them (`make import-fleets` there); sampling here rather than re-deriving the easing in JavaScript is what keeps the two from drifting.
 
+## Worlds
+
+- The world is `PieceSkin` (`features/game/data/piece_skin.dart`), still stored as `piece_skin`: `classic` is Space (shown as Space / Vesmír), chess symbols on the board and the fleet in the arena (`isSpace`, `pose` = `UnitPose.topDown`); the 16 figure worlds draw their figures on the board and in the arena (`UnitPose.standing`). It applies to every game mode.
+- `unitArt(world, fleet, type, color)` (`features/battle/data/unit_art.dart`) says what a unit fights as: the fleet's ship in Space, the board figure — plinth and all, black mirrored — elsewhere. No plinth-less battle variant ships with the app. `sideFleetProvider` (single player via `AiOpponentController.skinFor`, else `FleetSkin.fallback`) and `sideUnitArtProvider` are the one place `game_screen.dart` takes both sides' art from when it opens `BattleScreen(attackerArt:, defenderArt:)`.
+- `BattleArenaPainter` draws a standing unit upright at one size for all six types (`_figureWidthFraction`; ranks are in the pictures), on a contact shadow, without bank or altitude scaling: altitude only moves it forward (`ArenaLayout`). The top figure is turned around only in hot-seat (`drawsUpsideDown`). Maneuver attitudes: roll spins it about its upright axis, flip is a jump, pitch a lean, boost kicks up dust; no engine flames. The hit zone stays readable through the shots: one off its target's altitude is dimmed, one on it carries a ring.
+- Shots, elements, sounds and battle rules are the same in every world for now: figures still shoot (melee is plan 14, step 5).
+- `PieceSkin.free` is the one list of free worlds (Space, Rome × Carthage, Knights × Orcs, Heaven × Hell, awaiting Olin's confirmation); `premium` is everything else.
+- Comcenter tabs: WORLD (`PieceSkinPicker` with `FleetPicker` while in Space, the classic marks toggle in a figure world), UNITS, MANEUVERS, STORE. The lobby's `_WorldRow` opens the Comcenter.
+
 ## Fleet Ship Art
 
 - `assets/fleets/<slug>/<unit>_<white|black>.png`: 10 fleets × 6 unit types × 2 colors, 256 px, bow up. `FleetSkin` (`features/battle/data/fleet_skin.dart`) maps slugs to asset paths; `fleet_skin_test` keeps the enum, the files and the pubspec asset folders in sync.
 - `BattleArenaPainter` draws the sprites (decoded by `shipSpriteProvider`) sized as a fraction of the arena width and turns the top ship around; without a sprite it draws the vector hull.
-- The player's fleet is `FleetProgress.skin`, picked in the Comcenter; each difficulty's is `AiProfile.fleetSkin`. Only single player uses them (`AiOpponentController.skinFor`); other modes fly `FleetSkin.fallback` (Vanguard).
+- The player's fleet is `FleetProgress.skin`, picked on the Comcenter's WORLD tab while in Space; each difficulty's is `AiProfile.fleetSkin`. Only single player uses them (`AiOpponentController.skinFor`, through `sideFleetProvider`); other modes fly `FleetSkin.fallback` (Vanguard). Fleets show only in the Space world.
 - The sprites are generated on ComfyUI by `tools/fleet_art/` (see its README), which also covers re-rolling a ship and adding a fleet.
 
 ## Store
 
 - Free game, no ads; the store sells looks and sidegrades. `FleetSkin.premium` marks six fleets; Vanguard and the AI fleets are free.
-- `StoreCatalog` lists the products as `com.ol1n.orbitrontactics.pack.<packId>` (`commander`, `fleet_<slug>`, `<pack id>`, `music_<slug>`), the same id on Google Play and the App Store; every product costs USD 0.99, the Commander Edition (everything) USD 4.99. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
+- `StoreCatalog` lists the products as `com.ol1n.orbitrontactics.pack.<packId>` (`commander`, `world_<slug>`, `fleet_<slug>`, `<pack id>`, `music_<slug>`), the same id on Google Play and the App Store; every product costs USD 0.99, the Commander Edition (everything) USD 4.99. `Entitlements` answers what is owned: a product, a bundle covering it, or a `legacyFleets` slug kept from before the store.
 - `PurchaseService`: `RevenueCatPurchaseService` when the build has `REVENUECAT_GOOGLE_KEY` / `REVENUECAT_APPLE_KEY`, `DebugPurchaseService` (free, saved on device) in debug builds, else `UnavailablePurchaseService`. No RevenueCat entitlements or offerings: the app maps product ids itself.
-- `EntitlementsNotifier` (`entitlementsProvider`) caches in `store.entitlements`, syncs at start, grants owned packs with `FleetProgressNotifier.grantPack`, and swaps an unowned premium skin for the fallback (refunds). The first launch with a store grandfathers the premium skin the player flies.
+- `EntitlementsNotifier` (`entitlementsProvider`) caches in `store.entitlements`, syncs at start, grants owned packs with `FleetProgressNotifier.grantPack`, and swaps an unowned premium fleet or world for the fallback (refunds); buying a world chooses it. The first launch with a store grandfathers the premium fleet the player flies; the first launch since worlds are sold (a cache without `legacyWorlds`, `Entitlements.worldsSettled` false) grandfathers the world the player plays in.
 - Music: `BattleMusic` (`standard`, premium `retro` from `assets/audio/music_retro/`, built by `tools/battle_audio/chiptune.py`); `chosenBattleMusicProvider` keeps the pick in `battle_music`, `battleMusicProvider` falls back to standard when it is not owned; `BattleAudio.start(music:)` and `preview`.
-- UI: Comcenter Store tab (`StoreTab`, Restore purchases), `showStoreItemSheet` from locked fleet cards and pack maneuvers.
+- UI: Comcenter Store tab (`StoreTab`, Restore purchases), `showStoreItemSheet` from locked world and fleet cards and pack maneuvers.
 
 ## Localization
 

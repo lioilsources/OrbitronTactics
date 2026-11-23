@@ -26,6 +26,8 @@ import 'package:orbitron_tactics/core/game_logic/validators/move_validator.dart'
 import 'package:orbitron_tactics/core/maneuvers/maneuver.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
 import 'package:orbitron_tactics/features/battle/data/fleet_skin.dart';
+import 'package:orbitron_tactics/features/battle/data/unit_art.dart';
+import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
 import 'package:orbitron_tactics/features/battle/presentation/providers/battle_state_provider.dart';
 import 'package:orbitron_tactics/features/battle/presentation/screens/battle_screen.dart';
 import 'package:orbitron_tactics/features/comcenter/presentation/screens/comcenter_screen.dart';
@@ -354,8 +356,10 @@ Future<void> _shootAll(WidgetTester tester, Locale locale) async {
   battle.startBattle(initial: _midBattle(), attackerColor: PlayerColor.white);
   await scene.show(BattleScreen(
     attackerColor: PlayerColor.white,
-    attackerSkin: FleetSkin.solarCrusade,
-    defenderSkin: FleetSkin.voidHive,
+    attackerArt: unitArt(PieceSkin.classic, FleetSkin.solarCrusade,
+        PieceType.knight, PlayerColor.white),
+    defenderArt: unitArt(PieceSkin.classic, FleetSkin.voidHive,
+        PieceType.queen, PlayerColor.black),
     attackerManeuvers: _slots(PieceType.knight, const [
       ManeuverFamily.sidestep,
       ManeuverFamily.strike,

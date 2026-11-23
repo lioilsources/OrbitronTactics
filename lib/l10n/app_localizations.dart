@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'OrbitronTactics'**
+  /// **'Archion'**
   String get appTitle;
 
   /// No description provided for @defaultPlayerName.
@@ -1343,7 +1343,7 @@ abstract class AppLocalizations {
   /// Name of the AI opponent, with its difficulty
   ///
   /// In en, this message translates to:
-  /// **'Orbitron AI · {difficulty}'**
+  /// **'Archion AI · {difficulty}'**
   String aiPlayerName(String difficulty);
 
   /// Shown while the WiFi host waits
@@ -1493,7 +1493,7 @@ abstract class AppLocalizations {
   /// Fleet name
   ///
   /// In en, this message translates to:
-  /// **'Orbitron Vanguard'**
+  /// **'Archion Vanguard'**
   String get fleetVanguard;
 
   /// Fleet name

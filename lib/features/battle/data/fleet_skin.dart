@@ -5,7 +5,7 @@ import '../../../l10n/app_localizations.dart';
 /// in a white and a black variant. Sprites are bow-up PNGs in
 /// `assets/fleets/<slug>/`.
 enum FleetSkin {
-  vanguard('vanguard', 'Orbitron Vanguard'),
+  vanguard('vanguard', 'Archion Vanguard'),
   solarCrusade('solar_crusade', 'Solar Crusade', premium: true),
   voidHive('void_hive', 'Void Hive'),
   neonRunners('neon_runners', 'Neon Runners', premium: true),

@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'OrbitronTactics';
+  String get appTitle => 'Archion';
 
   @override
   String get defaultPlayerName => 'Player';
@@ -719,7 +719,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String aiPlayerName(String difficulty) {
-    return 'Orbitron AI · $difficulty';
+    return 'Archion AI · $difficulty';
   }
 
   @override
@@ -807,7 +807,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pieceTypeKing => 'King';
 
   @override
-  String get fleetVanguard => 'Orbitron Vanguard';
+  String get fleetVanguard => 'Archion Vanguard';
 
   @override
   String get fleetSolarCrusade => 'Solar Crusade';

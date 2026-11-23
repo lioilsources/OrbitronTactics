@@ -1,4 +1,7 @@
-# OrbitronTactics
+# Archion
+
+The game is called **Archion**; Orbitron Tactics is its old name, which the repo, the Dart package and the bundle ids still carry.
+
 
 A strategic 2-player chess variant with custom piece movement rules, power field domination victory conditions, and real-time multiplayer via Supabase. Features local hot-seat mode, a single-player mode against an on-device AI, threat indicators, custom formations, and a cloud-based lobby system.
 

@@ -1,4 +1,4 @@
-Orbitron2D je strategická hra pro dva, která se hraje jako šachy a bojuje se v ní jako v arkádové střílečce.
+Archion je strategická hra pro dva, která se hraje jako šachy a bojuje se v ní jako v arkádové střílečce.
 
 TŘI CESTY K VÍTĚZSTVÍ
 • Na konci tahu drž všech pět silových polí

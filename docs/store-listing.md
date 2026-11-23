@@ -1,4 +1,4 @@
-# Store listing — Orbitron Tactics
+# Store listing — Archion
 
 ## Graphics
 
@@ -18,12 +18,12 @@ Tablet screenshots (7" and 10") are optional on Play and not made.
 
 | | English | Čeština |
 |---|---|---|
-| App name (30) | Orbitron Tactics | Orbitron Tactics |
+| App name (30) | Archion | Archion |
 | Short description (80) | Chess-like tactics where every capture is a real-time space battle. | Taktika jako šachy, kde je každé braní bitva vesmírných lodí v reálném čase. |
 
 ## Full description — English
 
-Orbitron Tactics is a strategy game for two that plays like chess and fights
+Archion is a strategy game for two that plays like chess and fights
 like an arcade shooter.
 
 THREE WAYS TO WIN
@@ -56,7 +56,7 @@ looks and sounds, not who wins.
 
 ## Plný popis — čeština
 
-Orbitron Tactics je strategická hra pro dva, která se hraje jako šachy a
+Archion je strategická hra pro dva, která se hraje jako šachy a
 bojuje se v ní jako v arkádové střílečce.
 
 TŘI CESTY K VÍTĚZSTVÍ

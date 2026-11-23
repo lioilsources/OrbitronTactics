@@ -101,7 +101,7 @@ class AiProfile {
     maneuverCount: 2,
     rubberBandOffset: 0,
     identity: 'ai-easy',
-    displayName: 'Orbitron AI · Easy',
+    displayName: 'Archion AI · Easy',
     fleetSkin: 'star_nomads',
   );
 
@@ -122,7 +122,7 @@ class AiProfile {
     maneuverCount: 4,
     rubberBandOffset: 1,
     identity: 'ai-medium',
-    displayName: 'Orbitron AI · Medium',
+    displayName: 'Archion AI · Medium',
     fleetSkin: 'iron_armada',
   );
 
@@ -143,7 +143,7 @@ class AiProfile {
     maneuverCount: 6,
     rubberBandOffset: 2,
     identity: 'ai-hard',
-    displayName: 'Orbitron AI · Hard',
+    displayName: 'Archion AI · Hard',
     fleetSkin: 'void_hive',
   );
 

@@ -182,10 +182,29 @@ class _GameBoardState extends ConsumerState<GameBoard>
   /// destination of the current move animation.
   bool _isAnimatingTo(Position p) => _currentMoveAnim?.to == p;
 
-  /// Top left of the piece drawn on [p].
-  Offset _pieceOrigin(BoardLayout layout, Position p) =>
-      layout.pieceBox(p).topLeft +
-      Offset(layout.cellSize * 0.075, layout.cellSize * 0.075);
+  /// Top left of the piece drawn on [p]. A flat board insets the piece in
+  /// its cell; a standing figure fills its whole [BoardLayout.pieceBox].
+  Offset _pieceOrigin(BoardLayout layout, Position p) => layout.standing
+      ? layout.pieceBox(p).topLeft
+      : layout.pieceBox(p).topLeft +
+          Offset(layout.cellSize * 0.075, layout.cellSize * 0.075);
+
+  /// [piece] as drawn on [layout]'s cells.
+  Widget _piece(
+    BoardLayout layout,
+    Piece piece,
+    PieceSkinSettings look, {
+    bool isThreatened = false,
+  }) =>
+      PieceRenderer.build(
+        piece,
+        layout.cellSize,
+        isThreatened: isThreatened,
+        skin: look.skin,
+        classicMarks: look.classicMarks,
+        figureHeight:
+            layout.standing ? layout.tilt!.figureHeight * layout.cellSize : null,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -211,13 +230,20 @@ class _GameBoardState extends ConsumerState<GameBoard>
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final tilt = boardTiltFor(gameState.board.spec, look.skin);
         final layout = BoardLayout.within(
           gameState.board.geometry,
           constraints.biggest,
           flipped: widget.flipBoard,
+          tilt: tilt,
         );
         final boardSize = layout.size;
-        final squareSize = layout.cellSize;
+        // Back to front, so a standing figure overlaps the ones behind it.
+        final occupied = layout.inDrawOrder([
+          for (final cell in gameState.board.geometry.cells)
+            if (gameState.board.pieceAt(cell) != null && !_isAnimatingTo(cell))
+              cell,
+        ]);
 
         return Center(
           child: GestureDetector(
@@ -237,6 +263,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
                       board: gameState.board,
                       glowOpacity: _powerFieldGlow.value,
                       flipBoard: widget.flipBoard,
+                      tilt: tilt,
                       lightSquare: look.skin.lightSquare,
                       darkSquare: look.skin.darkSquare,
                     ),
@@ -253,24 +280,23 @@ class _GameBoardState extends ConsumerState<GameBoard>
                     lastMoveTo: lastMoveTo,
                     board: gameState.board,
                     flipBoard: widget.flipBoard,
+                    tilt: tilt,
                   ),
                 ),
 
                 // Layer 3: Static pieces (skip piece being animated to destination)
-                for (final cell in gameState.board.geometry.cells)
-                  if (gameState.board.pieceAt(cell) != null)
-                    if (!_isAnimatingTo(cell))
-                      Positioned(
-                        left: _pieceOrigin(layout, cell).dx,
-                        top: _pieceOrigin(layout, cell).dy,
-                        child: PieceRenderer.build(
-                          gameState.board.pieceAt(cell)!,
-                          squareSize,
-                          isThreatened: threatenedPositions.contains(cell),
-                            skin: look.skin,
-                            classicMarks: look.classicMarks,
-                          ),
-                        ),
+                for (final cell in occupied)
+                  Positioned(
+                    key: ValueKey(('piece', cell)),
+                    left: _pieceOrigin(layout, cell).dx,
+                    top: _pieceOrigin(layout, cell).dy,
+                    child: _piece(
+                      layout,
+                      gameState.board.pieceAt(cell)!,
+                      look,
+                      isThreatened: threatenedPositions.contains(cell),
+                    ),
+                  ),
 
                 // Layer 3.5: Capture ghost (fading out + shrinking)
                 if (_currentCaptureAnim != null)
@@ -285,12 +311,8 @@ class _GameBoardState extends ConsumerState<GameBoard>
                           opacity: _captureOpacity.value,
                           child: Transform.scale(
                             scale: _captureScale.value,
-                            child: PieceRenderer.build(
-                              _currentCaptureAnim!.piece,
-                              squareSize,
-                              skin: look.skin,
-                              classicMarks: look.classicMarks,
-                            ),
+                            child: _piece(
+                                layout, _currentCaptureAnim!.piece, look),
                           ),
                         ),
                       );
@@ -313,12 +335,7 @@ class _GameBoardState extends ConsumerState<GameBoard>
                       return Positioned(
                         left: origin.dx,
                         top: origin.dy,
-                        child: PieceRenderer.build(
-                          _currentMoveAnim!.piece,
-                          squareSize,
-                          skin: look.skin,
-                          classicMarks: look.classicMarks,
-                        ),
+                        child: _piece(layout, _currentMoveAnim!.piece, look),
                       );
                     },
                   ),
@@ -344,6 +361,20 @@ class _GameBoardState extends ConsumerState<GameBoard>
     // Hot-seat: select current turn player's pieces
     return piece.color == ref.read(gameStateProvider).currentTurn;
   }
+
+  /// The standing figures a tap on their head may pick, for [resolveTap]:
+  /// every piece on a [preferred] cell and every own piece.
+  Map<Position, PieceType> _tapHeads(
+    GameState gameState,
+    Set<Position> preferred,
+    GameStateNotifier notifier,
+  ) =>
+      {
+        for (final cell in gameState.board.geometry.cells)
+          if (gameState.board.pieceAt(cell) case final piece?)
+            if (preferred.contains(cell) || _canSelectPiece(piece, notifier))
+              cell: piece.type,
+      };
 
   /// The cells where a tap does something, for [resolveTap]: with a
   /// selection its move targets and the selected cell, and always the own
@@ -381,11 +412,19 @@ class _GameBoardState extends ConsumerState<GameBoard>
     final interactionNotifier = ref.read(boardInteractionProvider.notifier);
 
     final reach = tapReachFor(layout);
-    final tappedPos = reach > 0 && gameState.phase == GamePhase.playing
-        ? resolveTap(layout, localPosition,
-            preferred: _tapTargets(gameState, interaction, gameNotifier),
-            reach: reach)
-        : layout.positionAt(localPosition);
+    final Position? tappedPos;
+    if ((reach > 0 || layout.standing) &&
+        gameState.phase == GamePhase.playing) {
+      final preferred = _tapTargets(gameState, interaction, gameNotifier);
+      tappedPos = resolveTap(layout, localPosition,
+          preferred: preferred,
+          heads: layout.standing
+              ? _tapHeads(gameState, preferred, gameNotifier)
+              : const {},
+          reach: reach);
+    } else {
+      tappedPos = layout.positionAt(localPosition);
+    }
     if (tappedPos == null) return;
 
     if (gameState.phase != GamePhase.playing) return;

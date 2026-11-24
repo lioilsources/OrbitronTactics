@@ -1,5 +1,8 @@
 # Changelog
 
+## [24/11/2026]
+- In a world of figures the board leans back and the figures stand on it, taller than their cells, about half again as tall as before; a tap on a figure's head picks it. Space keeps its flat board with symbols
+
 ## [23/11/2026]
 - One choice, the world, decides both the pieces on the board and who fights in the arena: in Rome × Carthage a Roman figure fights a Carthaginian one, while Space keeps the chess symbols on the board and the fleet's ships in the arena
 - The Comcenter opens on the WORLD tab (worlds, and the fleet while in Space), then UNITS (upgrades drawn as the chosen world's units), MANEUVERS and STORE; the lobby shows the chosen world next to the board picker

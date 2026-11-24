@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/ai/ai_difficulty.dart';
+import 'package:orbitron_tactics/core/game_logic/board/board_geometry.dart';
 import 'package:orbitron_tactics/core/game_logic/board/board_spec.dart';
+import 'package:orbitron_tactics/core/game_logic/models/board_state.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/position.dart';
 import 'package:orbitron_tactics/core/game_logic/validators/move_validator.dart';
+import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/board_interaction_provider.dart';
 import 'package:orbitron_tactics/features/game/presentation/providers/game_state_provider.dart';
+import 'package:orbitron_tactics/features/game/presentation/providers/piece_skin_provider.dart';
 import 'package:orbitron_tactics/features/game/presentation/screens/game_screen.dart';
 import 'package:orbitron_tactics/features/game/presentation/widgets/board/board_layout.dart';
 import 'package:orbitron_tactics/features/game/presentation/widgets/board/game_board.dart';
@@ -166,5 +170,162 @@ void main() {
     expect(first.from, pawn);
     expect(first.to, target);
     await tester.pump(const Duration(seconds: 2));
+  });
+
+  // The tilted board of a world of standing figures.
+
+  BoardState startingBoard(BoardSpec spec) {
+    container.read(gameStateProvider.notifier).startSinglePlayerGame(
+          profile: AiProfile.easy,
+          humanColor: PlayerColor.white,
+          humanName: 'Ada',
+          spec: spec,
+        );
+    return container.read(gameStateProvider).board;
+  }
+
+  /// The share of [p]'s figure that the figures painted after it cover,
+  /// on their outlines ([BoardLayout.figureOutline]). The figure counts
+  /// from its top down to its plinth's centre: the plinth itself lies on
+  /// the cell, and the figure in front stands on the cell in front.
+  double occlusion(BoardLayout layout, BoardState board, Position p,
+      List<Position> inFront) {
+    final outline = layout.figureOutline(p, board.pieceAt(p)!.type);
+    final body = Rect.fromLTRB(
+        outline.left, outline.top, outline.right, layout.centreOf(p).dy);
+    final covers = [
+      for (final q in inFront) layout.figureOutline(q, board.pieceAt(q)!.type),
+    ];
+    const n = 60;
+    var covered = 0;
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
+        final point = Offset(body.left + (i + 0.5) / n * body.width,
+            body.top + (j + 0.5) / n * body.height);
+        if (covers.any((r) => r.contains(point))) covered++;
+      }
+    }
+    return covered / (n * n);
+  }
+
+  for (final spec in [BoardSpec.hex6, BoardSpec.classic8]) {
+    test('${spec.id} at 360 dp: tall figures, none more than a third hidden',
+        () {
+      final board = startingBoard(spec);
+      final tilt = boardTiltFor(spec, PieceSkin.romeCarthage)!;
+      for (final flipped in [false, true]) {
+        final layout = BoardLayout.fit(spec.geometry, 360,
+            flipped: flipped, tilt: tilt);
+        final order = layout.inDrawOrder(
+            board.geometry.cells.where((c) => board.pieceAt(c) != null));
+        expect(order, hasLength(2 * spec.armySize));
+
+        // Measured with the P2 defaults: hex6 40.9 dp, at most 7.5 %
+        // hidden; classic8 56.3 dp, at most 25 %.
+        for (var i = 0; i < order.length; i++) {
+          final share =
+              occlusion(layout, board, order[i], order.sublist(i + 1));
+          expect(share, lessThanOrEqualTo(1 / 3),
+              reason: '${board.pieceAt(order[i])} on ${order[i]}');
+        }
+        if (spec.geometry is HexGeometry) {
+          expect(layout.pieceBox(order.first).height,
+              greaterThanOrEqualTo(40));
+        }
+      }
+    });
+  }
+
+  test('Space and its symbols keep the board flat', () {
+    expect(boardTiltFor(BoardSpec.hex6, PieceSkin.classic), isNull);
+    expect(boardTiltFor(BoardSpec.classic8, PieceSkin.classic), isNull);
+    for (final spec in BoardSpec.all) {
+      expect(boardTiltFor(spec, PieceSkin.knightsOrcs), isNotNull,
+          reason: spec.id);
+      expect(standingTilts, contains(spec.id));
+    }
+  });
+
+  Future<BoardLayout> pumpHexGame(WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(500, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    container.read(pieceSkinProvider.notifier).select(PieceSkin.romeCarthage);
+    startingBoard(BoardSpec.hex6);
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(home: GameScreen()),
+    ));
+    final rect = tester.getRect(find.byType(GameBoard));
+    return BoardLayout.within(BoardSpec.hex6.geometry, rect.size,
+        tilt: boardTiltFor(BoardSpec.hex6, PieceSkin.romeCarthage));
+  }
+
+  /// Where [layout]'s origin sits on screen: GameBoard centres the board
+  /// in the space it gets.
+  Offset originOf(WidgetTester tester, BoardLayout layout) =>
+      tester.getRect(find.byType(GameBoard)).center -
+      Offset(layout.size.width / 2, layout.size.height / 2);
+
+  testWidgets('the tilted hex board paints its figures back to front',
+      (tester) async {
+    final layout = await pumpHexGame(tester);
+    final origin = originOf(tester, layout);
+    final board = container.read(gameStateProvider).board;
+
+    final tops = [
+      for (final element in find
+          .descendant(
+              of: find.byType(GameBoard), matching: find.byType(Positioned))
+          .evaluate())
+        if (element.widget.key case ValueKey(:final value)
+            when value is (String, Position))
+          (element.widget as Positioned).top!,
+    ];
+    final cells =
+        board.geometry.cells.where((c) => board.pieceAt(c) != null).toList();
+    expect(tops, hasLength(cells.length));
+    final expected = [
+      for (final p in layout.inDrawOrder(cells)) layout.pieceBox(p).top,
+    ];
+    for (var i = 0; i < tops.length; i++) {
+      expect(tops[i], closeTo(expected[i], 1e-6));
+    }
+    for (var i = 1; i < tops.length; i++) {
+      expect(tops[i], greaterThanOrEqualTo(tops[i - 1] - 1e-9));
+    }
+
+    // The figure stands on its cell: plinth on the cell's centre.
+    const king = Position(row: 0, col: 6);
+    final kingBox = tester.getRect(find.byKey(const ValueKey(('piece', king))));
+    final centre = origin + layout.centreOf(king);
+    expect(kingBox.center.dx, closeTo(centre.dx, 0.01));
+    expect(kingBox.top + StandingFigure.plinthAnchor * kingBox.height,
+        closeTo(centre.dy, 0.01));
+  });
+
+  testWidgets('a tap on the king\'s head selects him, one on the pawn '
+      'behind him the pawn', (tester) async {
+    final layout = await pumpHexGame(tester);
+    final origin = originOf(tester, layout);
+    final board = container.read(gameStateProvider).board;
+
+    const king = Position(row: 0, col: 6);
+    const pawn = Position(row: 2, col: 6);
+    expect(board.pieceAt(king)?.type, PieceType.king);
+    expect(board.pieceAt(pawn)?.type, PieceType.pawn);
+
+    // The head reaches up over the empty cell behind the king.
+    final head = layout.headOf(king, PieceType.king);
+    final under = layout.positionAt(head);
+    expect(under, isNot(king));
+    expect(board.pieceAt(under!), isNull);
+
+    await tester.tapAt(origin + head);
+    await tester.pump();
+    expect(container.read(boardInteractionProvider).selectedPosition, king);
+
+    await tester.tapAt(origin + layout.headOf(pawn, PieceType.pawn));
+    await tester.pump();
+    expect(container.read(boardInteractionProvider).selectedPosition, pawn);
   });
 }

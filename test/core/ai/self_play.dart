@@ -5,6 +5,7 @@ import 'package:orbitron_tactics/core/ai/board_ai.dart';
 import 'package:orbitron_tactics/core/ai/self_play.dart';
 import 'package:orbitron_tactics/core/game_logic/board/board_spec.dart';
 import 'package:orbitron_tactics/core/game_logic/validators/move_validator.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 
 export 'package:orbitron_tactics/core/ai/self_play.dart'
     show SelfPlayResult, selfPlayStart;
@@ -18,6 +19,7 @@ SelfPlayResult playGame(
   Random random, {
   int maxPlies = 300,
   BoardSpec spec = BoardSpec.classic8,
+  WorldBalance balance = WorldBalance.space,
 }) {
   return playSelfPlayGame(
     white,
@@ -25,6 +27,7 @@ SelfPlayResult playGame(
     random,
     maxPlies: maxPlies,
     spec: spec,
+    balance: balance,
     onMove: (state, move, ply) => expect(
         MoveValidator.createMove(state, move.from, move.to), move,
         reason: 'illegal move at ply $ply'),

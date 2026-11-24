@@ -1,7 +1,8 @@
-/// A shot that arrived on target: it struck the ship, or the shield raised in
-/// its way. Kept briefly so the arena can play the explosion.
+/// A shot that arrived on target, or a melee strike that made contact: it
+/// struck the unit, or the shield raised in its way. Kept briefly so the
+/// arena can play the explosion.
 class Impact {
-  /// The projectile's id.
+  /// The projectile's id, or a strike's own.
   final String id;
 
   /// Whether the struck ship is the attacker.
@@ -20,6 +21,9 @@ class Impact {
   /// Battle time of the impact.
   final int atMs;
 
+  /// Whether a melee strike made it (a blocked one is [shielded]).
+  final bool melee;
+
   const Impact({
     required this.id,
     required this.onAttacker,
@@ -28,5 +32,6 @@ class Impact {
     required this.damage,
     required this.shielded,
     required this.atMs,
+    this.melee = false,
   });
 }

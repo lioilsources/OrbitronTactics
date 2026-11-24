@@ -9,6 +9,7 @@ import '../game_logic/models/piece.dart';
 import '../game_logic/models/player.dart';
 import '../game_logic/models/upgrade_profile.dart';
 import '../game_logic/models/victory_condition.dart';
+import '../worlds/world_balance.dart';
 import 'battle_odds.dart';
 import 'board_ai.dart';
 
@@ -60,13 +61,15 @@ GameState selfPlayStart(Random random, {BoardSpec spec = BoardSpec.classic8}) {
 
 /// Plays [white] against [black] on [spec] until the game ends or
 /// [maxPlies] moves were played. Battles are decided by a draw against
-/// their [BattleOdds]. [onMove] sees every move before it is played.
+/// their [BattleOdds] in [balance] — won, both fallen or lost. [onMove]
+/// sees every move before it is played.
 SelfPlayResult playSelfPlayGame(
   BoardAi white,
   BoardAi black,
   Random random, {
   int maxPlies = 300,
   BoardSpec spec = BoardSpec.classic8,
+  WorldBalance balance = WorldBalance.space,
   void Function(GameState state, Move move, int ply)? onMove,
 }) {
   const noUpgrades = UpgradeProfile();
@@ -85,9 +88,15 @@ SelfPlayResult playSelfPlayGame(
       state = GameEngine.applyMove(state, move);
     } else {
       captures++;
-      final p = BattleOdds.attackerWinProbability(
-          move.piece, captured, noUpgrades, noUpgrades);
-      final winner = random.nextDouble() < p ? color : color.opposite;
+      final odds = BattleOdds.outcomes(
+          move.piece, captured, noUpgrades, noUpgrades,
+          balance: balance);
+      final roll = random.nextDouble();
+      final PlayerColor? winner = roll < odds.win
+          ? color
+          : roll < odds.win + odds.draw
+              ? null
+              : color.opposite;
       final battle = GameEngine.applyMove(state, move, triggerBattle: true);
       state = GameEngine.resolveBattle(battle, move, winner).$1;
     }

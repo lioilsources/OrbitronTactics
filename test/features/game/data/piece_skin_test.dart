@@ -5,7 +5,9 @@ import 'dart:ui' show Color;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/theme/board_theme.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 import 'package:orbitron_tactics/features/game/data/piece_skin.dart';
+import 'package:orbitron_tactics/features/game/presentation/providers/game_state_provider.dart';
 import 'package:orbitron_tactics/l10n/app_localizations.dart';
 
 Color _hex(String hex) =>
@@ -13,6 +15,28 @@ Color _hex(String hex) =>
 
 void main() {
   group('PieceSkin', () {
+    test('Space fights by space, every world of figures by ground', () {
+      expect(PieceSkin.classic.balance, WorldBalance.space);
+      for (final world in PieceSkin.values.where((w) => !w.isSpace)) {
+        expect(world.balance, WorldBalance.ground, reason: world.slug);
+      }
+      // Rome × Carthage: pawn, knight, rook and king up close; bishop and
+      // queen shoot.
+      final rome = PieceSkin.romeCarthage.balance;
+      expect([
+        for (final type in PieceType.values)
+          if (rome.statsOf(type).isMelee) type,
+      ], unorderedEquals(
+          [PieceType.pawn, PieceType.knight, PieceType.rook, PieceType.king]));
+    });
+
+    test('the chosen world\'s rules apply on one device only', () {
+      expect(GameMode.hotSeat.fightsInChosenWorld, isTrue);
+      expect(GameMode.singlePlayer.fightsInChosenWorld, isTrue);
+      expect(GameMode.localWifi.fightsInChosenWorld, isFalse);
+      expect(GameMode.multiplayer.fightsInChosenWorld, isFalse);
+    });
+
     test('finds every skin by its slug', () {
       for (final skin in PieceSkin.values) {
         expect(PieceSkin.fromSlug(skin.slug), skin);

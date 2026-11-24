@@ -59,7 +59,9 @@ void main() {
 }
 
 const _expected = <String>[
-  'pawn-pawn:white:7104:0:0',
+  // Both pawns fall in one tick: mutual destruction (plan 14, decision 10)
+  // has no winner. It was the attacker's before; time and HP are unchanged.
+  'pawn-pawn:-:7104:0:0',
   'pawn-rook:black:7264:0:94',
   'pawn-knight:black:7712:0:10',
   'pawn-bishop:black:3840:0:54',

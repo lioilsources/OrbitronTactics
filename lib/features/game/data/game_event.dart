@@ -58,8 +58,10 @@ sealed class GameEvent {
           enemyAltitude: (json['enemyAltitude'] as num?)?.toDouble() ?? 0.5,
         );
       case 'battle_resolved':
+        // A message from before mutual destruction has no flag: a win.
         return BattleResolvedEvent(
           winner: PlayerColor.values.byName(json['winner'] as String),
+          mutualDestruction: json['mutualDestruction'] as bool? ?? false,
         );
       default:
         throw ArgumentError('Unknown event type: ${json['type']}');
@@ -214,13 +216,28 @@ class ManeuverStartedEvent extends GameEvent {
 }
 
 class BattleResolvedEvent extends GameEvent {
+  /// The surviving side. For [mutualDestruction] it is the attacker's
+  /// color: what a version without the flag reads, as its arena gave such
+  /// a battle to the attacker.
   final PlayerColor winner;
 
-  const BattleResolvedEvent({required this.winner});
+  /// Both units fell together: both pieces leave the board.
+  final bool mutualDestruction;
+
+  const BattleResolvedEvent({
+    required this.winner,
+    this.mutualDestruction = false,
+  });
+
+  /// Both units fell in a battle [attacker] started.
+  const BattleResolvedEvent.mutualDestruction({required PlayerColor attacker})
+      : winner = attacker,
+        mutualDestruction = true;
 
   @override
   Map<String, dynamic> toJson() => {
         'type': 'battle_resolved',
         'winner': winner.name,
+        if (mutualDestruction) 'mutualDestruction': true,
       };
 }

@@ -4,6 +4,7 @@ import 'package:orbitron_tactics/core/game_logic/models/impact.dart';
 import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 import 'package:orbitron_tactics/features/battle/data/battle_element.dart';
 import 'package:orbitron_tactics/features/battle/presentation/audio/battle_sound_cues.dart';
 
@@ -71,5 +72,39 @@ void main() {
       expect(BattleSoundCues.between(start, won).destroyed, BattleElement.ice);
       expect(BattleSoundCues.between(won, won.copyWith()).destroyed, isNull);
     });
-  });
+  
+    test('a lunge and a block are heard; mutual destruction blows up both',
+        () {
+      var state = BattleEngine.createBattle(
+        attacker: const Piece(type: PieceType.knight, color: PlayerColor.white),
+        defender: const Piece(type: PieceType.rook, color: PlayerColor.black),
+        attackerUpgrades: const UpgradeProfile(),
+        defenderUpgrades: const UpgradeProfile(),
+        balance: WorldBalance.ground,
+      );
+      state = state.copyWith(
+          attacker: state.attacker.copyWith(nextAttackMs: 0),
+          defender: state.defender.copyWith(nextAttackMs: 1 << 30));
+      state = BattleEngine.activateShield(state, false);
+      final lunges = <BattleElement>[];
+      var blocks = 0;
+      for (var tick = 0; tick < 40; tick++) {
+        final next = BattleEngine.tick(state, 16);
+        final cues = BattleSoundCues.between(state, next);
+        lunges.addAll(cues.strikes);
+        blocks += cues.blocks;
+        // A blocked strike is a block, not an impact.
+        expect(cues.impacts, isEmpty);
+        state = next;
+      }
+      expect(lunges, [BattleElement.water]);
+      expect(blocks, 1);
+
+      final both = state.copyWith(isFinished: true);
+      final ended = BattleSoundCues.between(state, both);
+      expect(both.isMutualDestruction, isTrue);
+      expect(ended.destroyed, BattleElement.water);
+      expect(ended.alsoDestroyed, BattleElement.ice);
+    });
+});
 }

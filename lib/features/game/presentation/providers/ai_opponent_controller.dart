@@ -14,11 +14,13 @@ import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/upgrade_profile.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../../../core/maneuvers/maneuver_catalog.dart';
+import '../../../../core/worlds/world_balance.dart';
 import '../../../battle/data/fleet_skin.dart';
 import '../../../progress/presentation/providers/fleet_progress_provider.dart';
 import '../../../store/presentation/providers/store_providers.dart';
 import '../../../telemetry/presentation/telemetry_provider.dart';
 import 'game_state_provider.dart';
+import 'piece_skin_provider.dart';
 
 /// Plays the AI side of a single-player game and keeps both fleets' books.
 ///
@@ -89,6 +91,9 @@ class AiOpponentController {
             (maneuver: maneuver, level: armed.levelOf(id)),
     ];
   }
+
+  /// The numbers this game's battles are fought by: the chosen world's.
+  WorldBalance get balance => _ref.read(pieceSkinProvider).skin.balance;
 
   /// Ship art of the fleet playing [color]: the skin chosen for that fleet,
   /// else the AI difficulty's own, else the default.
@@ -288,12 +293,14 @@ class AiOpponentController {
   ) async {
     final ownUpgrades = upgradesFor(color);
     final oppUpgrades = upgradesFor(color.opposite);
+    final balance = this.balance;
     if (profile.searchDepth == 0) {
       return BoardAi.forProfile(
         profile,
         random: _random,
         ownUpgrades: ownUpgrades,
         oppUpgrades: oppUpgrades,
+        balance: balance,
       ).chooseMove(state, color);
     }
     return compute(
@@ -306,6 +313,7 @@ class AiOpponentController {
         seed: _random.nextInt(1 << 32),
         ownUpgrades: ownUpgrades,
         oppUpgrades: oppUpgrades,
+        balanceId: balance.id,
       ),
     );
   }
@@ -324,6 +332,7 @@ class _SearchRequest {
     required this.seed,
     required this.ownUpgrades,
     required this.oppUpgrades,
+    required this.balanceId,
   });
 
   final AiProfile profile;
@@ -332,6 +341,9 @@ class _SearchRequest {
   final int seed;
   final UpgradeProfile ownUpgrades;
   final UpgradeProfile oppUpgrades;
+
+  /// [WorldBalance.id]: the balance itself is found again over there.
+  final String balanceId;
 }
 
 Move? _searchMove(_SearchRequest request) {
@@ -340,6 +352,7 @@ Move? _searchMove(_SearchRequest request) {
     random: Random(request.seed),
     ownUpgrades: request.ownUpgrades,
     oppUpgrades: request.oppUpgrades,
+    balance: WorldBalance.byId(request.balanceId),
   );
   return ai.chooseMove(request.state, request.color);
 }

@@ -172,19 +172,24 @@ class GameEngine {
     return applyMove(state, move, triggerBattle: triggerBattle);
   }
 
-  /// Resolve a pending battle. [winner] is the color of the winning unit.
+  /// Resolve a pending battle. [winner] is the color of the winning unit;
+  /// null when both units fell together (mutual destruction), which takes
+  /// both pieces off the board and earns nothing.
   /// [pendingMove] is the capture move that triggered the battle.
   /// Returns (newState, creditsEarned) — caller tracks resources separately.
   static (GameState, int) resolveBattle(
     GameState state,
     Move pendingMove,
-    PlayerColor winner,
+    PlayerColor? winner,
   ) {
     assert(state.phase == GamePhase.battle);
 
     final attackerColor = pendingMove.piece.color;
     GameState resolved;
 
+    if (winner == null) {
+      return (_resolveMutualDestruction(state, pendingMove), 0);
+    }
     if (winner == attackerColor) {
       // Attacker wins: apply the capture move normally
       resolved = applyMove(state.copyWith(phase: GamePhase.playing), pendingMove);
@@ -203,6 +208,53 @@ class GameEngine {
     final loserPiece = winner == attackerColor ? pendingMove.capturedPiece! : pendingMove.piece;
     final reward = UpgradeEngine.resourcesFor(loserPiece.type);
     return (resolved, reward);
+  }
+
+  /// Both units fell: the defender is taken as in a won capture and the
+  /// attacker leaves its square as in a lost one. The turn passes and the
+  /// victory conditions are checked for the attacker, who moved.
+  static GameState _resolveMutualDestruction(GameState state, Move move) {
+    final captured = move.capturedPiece!;
+    var board = state.board
+        .setPiece(move.from, null)
+        .setPiece(move.to, null);
+
+    var playerWhite = state.playerWhite;
+    var playerBlack = state.playerBlack;
+    final capturedIsWhite = captured.color == PlayerColor.white;
+    if (captured.type == PieceType.king) {
+      if (capturedIsWhite) {
+        playerWhite = playerWhite.copyWith(hasKing: false);
+      } else {
+        playerBlack = playerBlack.copyWith(hasKing: false);
+      }
+    } else if (captured.type == PieceType.queen) {
+      if (capturedIsWhite) {
+        playerWhite = playerWhite.copyWith(hasQueen: false);
+      } else {
+        playerBlack = playerBlack.copyWith(hasQueen: false);
+      }
+    }
+    // Like a lost capture, a fallen attacker changes nothing else.
+    board = LastWarriorRule.apply(board, captured) ?? board;
+
+    final next = state.copyWith(
+      phase: GamePhase.playing,
+      board: board,
+      playerWhite: playerWhite,
+      playerBlack: playerBlack,
+      moveHistory: [...state.moveHistory, move],
+      moveCount: state.moveCount + 1,
+    );
+    final victory = VictoryChecker.checkVictory(board, state.currentTurn);
+    if (victory != null) {
+      return next.copyWith(
+        victoryCondition: victory,
+        winner: state.currentTurn,
+        phase: GamePhase.finished,
+      );
+    }
+    return next.copyWith(currentTurn: state.currentTurn.opposite);
   }
 
   /// Create a default "chess-like" formation for quick start / testing:

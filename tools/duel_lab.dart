@@ -1,12 +1,14 @@
 // Arena balance lab: seeded AI duels for every unit pairing of a world.
 //
 //   dart run tools/duel_lab.dart [--world ground] [--duels 200]
-//       [--pilot medium] [--limit 180]
+//       [--pilot medium] [--limit 180] [--contact 0.4]
+//
+// --contact tries another ArenaRules.contactDamageScale for the world.
 //
 // Prints, per attacker/defender pairing, the attacker's win share, the
-// median duel length, the share of duels that hit the time limit and the
-// `BattleOdds` estimate next to the simulated share. Then checks the
-// acceptance bounds of plan 12, step 1B.
+// median duel length, the share of duels that hit the time limit, the
+// share of mutual destruction and the `BattleOdds` estimates next to the
+// simulated shares. Then checks the acceptance bounds of plan 12, step 1B.
 
 import 'dart:io';
 
@@ -23,8 +25,9 @@ class _Cell {
   final double capShare;
   final double drawShare;
   final double odds;
-  const _Cell(
-      this.winShare, this.medianS, this.capShare, this.drawShare, this.odds);
+  final double drawOdds;
+  const _Cell(this.winShare, this.medianS, this.capShare, this.drawShare,
+      this.odds, this.drawOdds);
 }
 
 void main(List<String> args) {
@@ -34,8 +37,23 @@ void main(List<String> args) {
   }
 
   final worldId = option('world', 'ground');
-  final balance = WorldBalance.all.firstWhere((w) => w.id == worldId,
+  final known = WorldBalance.all.firstWhere((w) => w.id == worldId,
       orElse: () => throw ArgumentError('unknown world $worldId'));
+  final contact = double.tryParse(option('contact', ''));
+  final balance = contact == null
+      ? known
+      : WorldBalance(
+          id: known.id,
+          units: known.units,
+          arena: ArenaRules(
+            rangeTravelScale: known.arena.rangeTravelScale,
+            suddenDeathAfterMs: known.arena.suddenDeathAfterMs,
+            suddenDeathRampMs: known.arena.suddenDeathRampMs,
+            suddenDeathMaxScale: known.arena.suddenDeathMaxScale,
+            energyPerHit: known.arena.energyPerHit,
+            contactDamageScale: contact,
+          ),
+        );
   final duels = int.parse(option('duels', '200'));
   final limitMs = int.parse(option('limit', '180')) * 1000;
   final pilot = switch (option('pilot', 'medium')) {
@@ -54,7 +72,9 @@ void main(List<String> args) {
   String style(PieceType t) =>
       balance.statsOf(t).isMelee ? '${t.name}*' : t.name;
 
-  stdout.writeln('world ${balance.id}, ${pilot.difficulty.name} vs '
+  stdout.writeln('world ${balance.id} '
+      '(contact damage ×${balance.arena.contactDamageScale}), '
+      '${pilot.difficulty.name} vs '
       '${pilot.difficulty.name}, $duels duels per pairing, '
       'limit ${limitMs ~/ 1000} s; * = melee');
   stdout.writeln();
@@ -69,7 +89,7 @@ void main(List<String> args) {
           return '${pct(c.winShare)} (${pct(c.odds).trim()}) '
               '${c.medianS.toStringAsFixed(1)} s'
               '${c.capShare > 0 ? ' cap ${pct(c.capShare).trim()}' : ''}'
-              '${c.drawShare > 0 ? ' draw ${pct(c.drawShare).trim()}' : ''}';
+              '${c.drawShare > 0 || c.drawOdds >= 0.01 ? ' draw ${pct(c.drawShare).trim()} (${pct(c.drawOdds).trim()})' : ''}';
         }(),
     ];
     stdout.writeln('| ${style(a)} | ${row.join(' | ')} |');
@@ -77,7 +97,8 @@ void main(List<String> args) {
   stdout.writeln();
   stdout.writeln('cell: simulated attacker win share (BattleOdds estimate), '
       'median length, share at the time limit, share destroyed together '
-      '(counted as half a win; the arena gives those to the attacker)');
+      '(both pieces leave the board; counted as half a win) with the '
+      'BattleOdds estimate');
   stdout.writeln();
 
   // Acceptance bounds of plan 12, step 1B.
@@ -144,6 +165,11 @@ void main(List<String> args) {
             '${(worst.$3 * 100).round()} points');
   }
   check('at the limit at most 2 %', caps <= 0.02, pct(caps).trim());
+  final draws = cells.values.map((c) => c.drawShare).reduce((a, b) => a + b) /
+      cells.length;
+  final mirrorDraws = [for (final t in types) cells[(t, t)]!.drawShare];
+  stdout.writeln('- mutual destruction: ${pct(draws).trim()} of all duels, '
+      'mirrors ${mirrorDraws.map((v) => pct(v).trim()).join(', ')}');
   check(
       '|BattleOdds − simulation| ≤ 0.15',
       badOdds == 0,
@@ -176,7 +202,7 @@ Map<(PieceType, PieceType), _Cell> _simulate(
             defenderDecidesFirst: i.isOdd);
         if (!s.isFinished) {
           capped++;
-        } else if (!s.attacker.isAlive && !s.defender.isAlive) {
+        } else if (s.isMutualDestruction) {
           draws++;
         } else if (s.winner == PlayerColor.white) {
           wins++;
@@ -185,18 +211,20 @@ Map<(PieceType, PieceType), _Cell> _simulate(
       }
       lengths.sort();
       final finished = duels - capped;
+      final odds = BattleOdds.outcomes(
+        Piece(type: a, color: PlayerColor.white),
+        Piece(type: d, color: PlayerColor.black),
+        const UpgradeProfile(),
+        const UpgradeProfile(),
+        balance: balance,
+      );
       cells[(a, d)] = _Cell(
         finished == 0 ? 0.5 : (wins + draws / 2) / finished,
         lengths[lengths.length ~/ 2] / 1000,
         capped / duels,
         draws / duels,
-        BattleOdds.attackerWinProbability(
-          Piece(type: a, color: PlayerColor.white),
-          Piece(type: d, color: PlayerColor.black),
-          const UpgradeProfile(),
-          const UpgradeProfile(),
-          balance: balance,
-        ),
+        odds.score,
+        odds.draw,
       );
     }
     stderr.write('.');

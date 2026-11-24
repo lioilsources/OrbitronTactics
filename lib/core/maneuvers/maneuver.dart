@@ -131,7 +131,18 @@ class FireCue {
   /// Multiplier on the unit's damage.
   final double damage;
 
-  const FireCue(this.t, {this.shots = 1, this.spread = 0, this.damage = 1});
+  /// A melee unit's burst: one blow with the whole burst's damage (scaled
+  /// by `ArenaRules.contactDamageScale`), without a shot's flight, and only
+  /// within range 1 of the enemy.
+  final bool contact;
+
+  const FireCue(
+    this.t, {
+    this.shots = 1,
+    this.spread = 0,
+    this.damage = 1,
+    this.contact = false,
+  });
 }
 
 /// What one upgrade level adds. `levels[0]` is level 2, `levels[1]` level 3.
@@ -245,6 +256,35 @@ class Maneuver {
     this.price,
     this.levels = const [],
   });
+
+  /// This maneuver with [fire] for its bursts; everything else, the id and
+  /// the gesture included, stays.
+  Maneuver withFire(List<FireCue> fire) => Maneuver(
+        id: id,
+        ship: ship,
+        family: family,
+        tier: tier,
+        name: name,
+        description: description,
+        pattern: pattern,
+        mirrorable: mirrorable,
+        durationMs: durationMs,
+        energyCost: energyCost,
+        path: path,
+        fire: fire,
+        untouchable: untouchable,
+        shield: shield,
+        ignoresShieldCooldown: ignoresShieldCooldown,
+        keepsControl: keepsControl,
+        fireRateScale: fireRateScale,
+        cloaks: cloaks,
+        unlock: unlock,
+        price: price,
+        levels: levels,
+      );
+
+  /// Whether its bursts are contact strikes (a melee unit's).
+  bool get strikesInContact => fire.isNotEmpty && fire.first.contact;
 
   /// Levels this maneuver can still be upgraded to, 1 (as owned) to 3.
   static const int maxLevel = 3;

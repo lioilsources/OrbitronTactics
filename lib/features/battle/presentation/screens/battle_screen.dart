@@ -132,7 +132,10 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
         );
     _toast?.cancel();
     setState(() {
-      _maneuverName = context.l10n.maneuverName(slot.maneuver);
+      _maneuverName = context.l10n.maneuverName(slot.maneuver,
+          standing: (isAttacker ? widget.attackerArt : widget.defenderArt)
+                  ?.pose ==
+              UnitPose.standing);
       _maneuverColor = accent;
     });
     _toast = Timer(const Duration(milliseconds: 1100), () {
@@ -347,14 +350,18 @@ class _BattleScreenState extends ConsumerState<BattleScreen>
             // Battle result overlay, once the loser has exploded
             if (battleState.isFinished && _destruction.isCompleted)
               _BattleResultOverlay(
-                winner: battleState.winner!,
-                winnerName: ref
-                    .watch(pieceSkinProvider)
-                    .skin
-                    .sideName(context.l10n, battleState.winner!),
+                winner: battleState.winner,
+                winnerName: battleState.winner == null
+                    ? ''
+                    : ref
+                        .watch(pieceSkinProvider)
+                        .skin
+                        .sideName(context.l10n, battleState.winner!),
                 localColor: localColor,
                 unlocked:
                     ref.read(aiOpponentProvider)?.lastUnlocked.value ?? const [],
+                standing: ref.watch(pieceSkinProvider).skin.pose ==
+                    UnitPose.standing,
                 onContinue: () => Navigator.of(context).pop(),
               ),
           ],
@@ -543,7 +550,8 @@ class _BattleHeader extends StatelessWidget {
                 ),
               ),
             ),
-          if (BattleEngine.isSuddenDeath(battleState.elapsedMs))
+          if (BattleEngine.isSuddenDeath(
+              battleState.elapsedMs, battleState.balance.arena))
             Padding(
               padding: const EdgeInsets.only(right: 10),
               child: Text(
@@ -576,7 +584,8 @@ class _BattleHeader extends StatelessWidget {
 }
 
 class _BattleResultOverlay extends StatelessWidget {
-  final PlayerColor winner;
+  /// Null when both units fell together.
+  final PlayerColor? winner;
 
   /// The winning side's name in the active piece skin.
   final String winnerName;
@@ -584,6 +593,9 @@ class _BattleResultOverlay extends StatelessWidget {
 
   /// Maneuvers this win has just unlocked.
   final List<Maneuver> unlocked;
+
+  /// Whether the player's units are standing figures (their maneuver names).
+  final bool standing;
   final VoidCallback onContinue;
 
   const _BattleResultOverlay({
@@ -592,11 +604,19 @@ class _BattleResultOverlay extends StatelessWidget {
     required this.localColor,
     required this.onContinue,
     this.unlocked = const [],
+    this.standing = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isLocalWin = localColor == null || winner == localColor;
+    final mutual = winner == null;
+    final isLocalWin = !mutual && (localColor == null || winner == localColor);
+    // Mutual destruction is nobody's win: neither gold nor red.
+    final tone = mutual
+        ? Colors.blueGrey.shade200
+        : isLocalWin
+            ? Colors.amber
+            : Colors.redAccent;
     final l10n = context.l10n;
     return GestureDetector(
       onTap: onContinue,
@@ -609,14 +629,10 @@ class _BattleResultOverlay extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF1A1A2E),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isLocalWin ? Colors.amber : Colors.redAccent,
-                width: 2,
-              ),
+              border: Border.all(color: tone, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: (isLocalWin ? Colors.amber : Colors.redAccent)
-                      .withValues(alpha: 0.3),
+                  color: tone.withValues(alpha: 0.3),
                   blurRadius: 20,
                   spreadRadius: 4,
                 ),
@@ -626,15 +642,24 @@ class _BattleResultOverlay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  isLocalWin ? Icons.emoji_events : Icons.close,
-                  color: isLocalWin ? Colors.amber : Colors.redAccent,
+                  mutual
+                      ? Icons.balance
+                      : isLocalWin
+                          ? Icons.emoji_events
+                          : Icons.close,
+                  color: tone,
                   size: 48,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isLocalWin ? l10n.battleVictory : l10n.battleDefeated,
+                  mutual
+                      ? l10n.battleMutualDestruction
+                      : isLocalWin
+                          ? l10n.battleVictory
+                          : l10n.battleDefeated,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isLocalWin ? Colors.amber : Colors.redAccent,
+                    color: tone,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 4,
@@ -642,7 +667,10 @@ class _BattleResultOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.unitSurvives(winnerName),
+                  mutual
+                      ? l10n.battleMutualDestructionDetail
+                      : l10n.unitSurvives(winnerName),
+                  textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
                 ),
                 if (unlocked.isNotEmpty) ...[
@@ -669,7 +697,7 @@ class _BattleResultOverlay extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            l10n.maneuverName(maneuver),
+                            l10n.maneuverName(maneuver, standing: standing),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,

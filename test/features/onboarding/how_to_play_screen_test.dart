@@ -22,6 +22,7 @@ void main() {
     for (final title in [
       'Pieces move their own way',
       'Every capture is a battle',
+      'Up close, and both at once',
       'Maneuvers and upgrades',
     ]) {
       await tester.tap(find.text('NEXT'));

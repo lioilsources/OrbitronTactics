@@ -495,11 +495,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesBattle3 =>
-      'A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.';
+      'An attack only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.';
 
   @override
   String get rulesBattle4 =>
       'Raise the shield when fire is coming and you cannot get away.';
+
+  @override
+  String get rulesMeleeTitle => 'Up close, and both at once';
 
   @override
   String get rulesFleetTitle => 'Maneuvers and upgrades';
@@ -846,4 +849,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fleetStarNomads => 'Star Nomads';
+
+  @override
+  String get rulesBattle5 =>
+      'Among figures, pawns, knights, rooks and kings fight up close: a wind-up, a lunge and the blow. A raised shield blocks the blow and staggers the striker. Bishops and queens keep shooting.';
+
+  @override
+  String get rulesBattle6 =>
+      'When both units fall at the same moment, both pieces leave the board.';
+
+  @override
+  String get battleMutualDestruction => 'BOTH FALL';
+
+  @override
+  String get battleMutualDestructionDetail =>
+      'Both pieces leave the board. A draw earns no credits.';
+
+  @override
+  String get statMelee => 'MELEE';
+
+  @override
+  String get statRanged => 'RANGED';
+
+  @override
+  String get maneuverFamilyLeap => 'Leap';
+
+  @override
+  String get maneuverFamilyTumble => 'Tumble';
+
+  @override
+  String get maneuverFamilyFlurry => 'Flurry';
 }

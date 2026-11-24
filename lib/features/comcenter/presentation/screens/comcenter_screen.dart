@@ -122,6 +122,7 @@ class _UnitsTab extends ConsumerWidget {
                   onUpgrade: () => player.upgrade(type),
                   artAsset:
                       unitArt(world, skin, type, PlayerColor.white).asset,
+                  balance: world.balance,
                 );
               }).toList(),
             ),
@@ -149,6 +150,8 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
   Widget build(BuildContext context) {
     final fleet = widget.fleet;
     final entitlements = ref.watch(entitlementsProvider);
+    final standing =
+        ref.watch(pieceSkinProvider).skin.pose == UnitPose.standing;
     final learned = fleet.maneuversFor(_ship);
     final accent = BattleElement.of(_ship).color;
     final player =
@@ -244,6 +247,7 @@ class _ManeuversTabState extends ConsumerState<_ManeuversTab> {
                     onGetPack: (pack) => showStoreItemSheet(
                         context, ref, StoreCatalog.forPack(pack),
                         from: 'maneuver'),
+                    standing: standing,
                   ),
               ],
             ),

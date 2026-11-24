@@ -23,6 +23,7 @@ class ManeuverCard extends StatelessWidget {
     required this.onBuy,
     required this.onTrain,
     required this.onGetPack,
+    this.standing = false,
   });
 
   final Maneuver maneuver;
@@ -40,6 +41,10 @@ class ManeuverCard extends StatelessWidget {
 
   /// Opens the store page of the pack this maneuver comes in.
   final void Function(String pack) onGetPack;
+
+  /// Whether the chosen world's units are standing figures, which name
+  /// some maneuvers by how a figure moves.
+  final bool standing;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +85,7 @@ class ManeuverCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            l10n.maneuverName(maneuver),
+                            l10n.maneuverName(maneuver, standing: standing),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

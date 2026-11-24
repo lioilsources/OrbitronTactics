@@ -38,6 +38,12 @@ class BattleAudio {
   static const _minShotGap = Duration(milliseconds: 60);
   static const _minImpactGap = Duration(milliseconds: 120);
 
+  /// A lunge whooshes with the kinetic shot, a block clanks with the head
+  /// of its explosion, until melee gets sounds of its own.
+  static const double _strikeVolume = 0.35;
+  static const double _blockVolume = 0.5;
+  static const _blockLength = Duration(milliseconds: 180);
+
   final _random = Random();
   final Map<String, AudioSource> _effects = {};
   final Map<String, int> _lastPlayedMs = {};
@@ -78,7 +84,8 @@ class BattleAudio {
     if (!await _init()) return;
     await _stopMusic(fade: Duration.zero);
     try {
-      for (final element in elements) {
+      // Kinetic sounds stand in for every melee strike and block.
+      for (final element in {...elements, BattleElement.kinetic}) {
         await _load(BattleSounds.shot(element));
         await _load(BattleSounds.explosion(element));
       }
@@ -140,9 +147,25 @@ class BattleAudio {
           _soloud.scheduleStop(handle, _impactLength);
         }
       }
+      if (cues.strikes.isNotEmpty) {
+        _fire(BattleSounds.shot(BattleElement.kinetic),
+            _strikeVolume * _jitter(), _minShotGap);
+      }
+      for (var block = 0; block < cues.blocks; block++) {
+        final handle = _fire(BattleSounds.explosion(BattleElement.kinetic),
+            _blockVolume * _jitter(), _minImpactGap);
+        if (handle != null) {
+          _soloud.fadeVolume(handle, 0, _blockLength);
+          _soloud.scheduleStop(handle, _blockLength);
+        }
+      }
       final destroyed = cues.destroyed;
       if (destroyed != null) {
         _fire(BattleSounds.explosion(destroyed), 1, Duration.zero);
+        final also = cues.alsoDestroyed;
+        if (also != null && also != destroyed) {
+          _fire(BattleSounds.explosion(also), 1, Duration.zero);
+        }
         unawaited(_stopMusic(fade: _musicFadeOut));
       }
     } catch (error) {

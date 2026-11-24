@@ -136,8 +136,9 @@
   "rulesBattleTitle": "Každé braní je bitva",
   "rulesBattle1": "Obě figurky se utkají v aréně: ve Vesmíru jako lodě, v ostatních světech samy za sebe. Vítěz pole drží.",
   "rulesBattle2": "Táhni po své polovině do stran a uhýbej, dopředu stoupáš, dozadu klesáš.",
-  "rulesBattle3": "Střela zasáhne jen jednotku ve stejné výšce, takže abys trefil nepřítele, musíš tam, kde může trefit on tebe.",
+  "rulesBattle3": "Střela i úder zasáhnou jen jednotku ve stejné výšce, takže abys trefil nepřítele, musíš tam, kde může trefit on tebe.",
   "rulesBattle4": "Když letí střely a nemáš kam uhnout, zvedni štít.",
+  "rulesMeleeTitle": "Zblízka, a oba naráz",
   "rulesFleetTitle": "Manévry a vylepšení",
   "rulesFleet1": "Nakresli gesto na mřížce a jednotka sama provede manévr. Každý stojí energii, která se během bitvy dobíjí.",
   "rulesFleet2": "Bitvy proti AI vynášejí kredity. Ve Velitelství za ně kupuješ vylepšení a nové manévry.",
@@ -244,5 +245,14 @@
   "fleetRoninBlades": "Čepele róninů",
   "fleetAtomicAge": "Atomový věk",
   "fleetAbyssalTide": "Příliv hlubin",
-  "fleetStarNomads": "Hvězdní nomádi"
+  "fleetStarNomads": "Hvězdní nomádi",
+  "rulesBattle5": "Ve světech figurek bojují pěšec, kůň, věž a král zblízka: nápřah, výpad a úder. Zvednutý štít úder zablokuje a útočníka zdrží. Střelec a dáma dál střílejí.",
+  "rulesBattle6": "Padnou-li obě jednotky ve stejné chvíli, opustí desku obě figury.",
+  "battleMutualDestruction": "OBA PADLI",
+  "battleMutualDestructionDetail": "Obě figury opouštějí desku. Remíza nepřináší kredity.",
+  "statMelee": "ZBLÍZKA",
+  "statRanged": "NA DÁLKU",
+  "maneuverFamilyLeap": "Výskok",
+  "maneuverFamilyTumble": "Kotoul",
+  "maneuverFamilyFlurry": "Smršť"
 }

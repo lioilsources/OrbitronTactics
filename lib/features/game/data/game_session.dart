@@ -158,16 +158,20 @@ class GameSession {
     ));
   }
 
-  /// Resolve the current battle with the given winner.
-  void resolveBattle(PlayerColor winner) {
+  /// Resolve the current battle with the given winner; null when both
+  /// units fell together.
+  void resolveBattle(PlayerColor? winner) {
     if (_state.phase != GamePhase.battle) return;
-    if (_pendingBattleMove == null) return;
+    final pending = _pendingBattleMove;
+    if (pending == null) return;
 
-    final (newState, _) = GameEngine.resolveBattle(_state, _pendingBattleMove!, winner);
+    final (newState, _) = GameEngine.resolveBattle(_state, pending, winner);
     _pendingBattleMove = null;
     _state = newState;
     _stateController.add(_state);
-    transport.send(BattleResolvedEvent(winner: winner));
+    transport.send(winner == null
+        ? BattleResolvedEvent.mutualDestruction(attacker: pending.piece.color)
+        : BattleResolvedEvent(winner: winner));
 
     if (_state.isFinished) {
       transport.send(GameOverEvent(
@@ -232,11 +236,11 @@ class GameSession {
       case ManeuverStartedEvent():
         // Handled by battleStateProvider via the event stream
         break;
-      case BattleResolvedEvent(:final winner):
+      case BattleResolvedEvent(:final winner, :final mutualDestruction):
         // Apply if we haven't resolved locally yet (guest receiving host result)
         if (_state.phase == GamePhase.battle && _pendingBattleMove != null) {
-          final (newState, _) =
-              GameEngine.resolveBattle(_state, _pendingBattleMove!, winner);
+          final (newState, _) = GameEngine.resolveBattle(_state,
+              _pendingBattleMove!, mutualDestruction ? null : winner);
           _pendingBattleMove = null;
           _state = newState;
           _stateController.add(_state);

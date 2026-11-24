@@ -8,12 +8,14 @@ import '../../../../core/game_logic/models/battle_unit.dart';
 import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/projectile.dart';
 import '../../../../core/game_logic/models/spot.dart';
+import '../../../../core/game_logic/models/strike_run.dart';
 import '../../../../core/game_logic/models/weapon_type.dart';
 import '../../../../core/maneuvers/maneuver.dart';
 import '../../data/battle_element.dart';
 import '../../data/unit_art.dart';
 import 'arena_layout.dart';
 import 'explosion_fx.dart';
+import 'melee_fx.dart';
 
 /// Paints the battle arena in portrait orientation: one ship at the top,
 /// one at the bottom, projectiles travelling vertically between them.
@@ -28,6 +30,12 @@ import 'explosion_fx.dart';
 /// altitude (the altitude only moves it forward), does not bank, stands on
 /// a contact shadow, and is turned around only for the player sitting
 /// across the device in hot-seat.
+///
+/// A melee unit's strike is drawn in its phases: the wind-up telegraphs
+/// where the blow lands and the striker leans back; the lunge carries the
+/// figure along the line to the target with speed streaks (its logical
+/// position stays home); a hit slashes across the target, which flashes
+/// red; a block throws sparks and the striker recoils, washed out.
 class BattleArenaPainter extends CustomPainter {
   final BattleState battleState;
 
@@ -117,6 +125,15 @@ class BattleArenaPainter extends CustomPainter {
   /// How high a figure jumps in a flip, as a fraction of its size.
   static const double _jumpHeight = 0.45;
 
+  /// How far a striker leans, as an [Attitude.pitch]: about 10°.
+  static const double _strikeLean = 0.58;
+
+  /// How far short of its target's center a lunge ends, in unit sizes.
+  static const double _lungeStandOff = 0.55;
+
+  /// How far a blocked striker is thrown back, in unit sizes.
+  static const double _recoil = 0.2;
+
   /// Whether a unit at the top of the arena is drawn turned around. A ship
   /// seen from above always points its bow at the enemy; a standing figure
   /// stays upright unless a player sits across the device (hot-seat).
@@ -180,18 +197,33 @@ class BattleArenaPainter extends CustomPainter {
       );
     }
 
-    // Once the battle is over the losing ship fades into its explosion.
-    final BattleUnit? loser = !battleState.isFinished
-        ? null
-        : battleState.winner == attacker.piece.color
-            ? defender
-            : attacker;
+    // Once the battle is over the losing ship fades into its explosion;
+    // after mutual destruction both do.
+    final finished = battleState.isFinished;
+    final mutual = battleState.isMutualDestruction;
+    final attackerLost = finished &&
+        (mutual || battleState.winner != attacker.piece.color);
+    final defenderLost = finished &&
+        (mutual || battleState.winner != defender.piece.color);
     final destruction =
         ((nowMs - battleState.elapsedMs) / destructionMs).clamp(0.0, 1.0);
     final fading = 1 - (destruction / 0.35).clamp(0.0, 1.0);
 
-    final attackerCenter = Offset(attacker.xFraction * size.width, attackerY);
-    final defenderCenter = Offset(defender.xFraction * size.width, defenderY);
+    final attackerHome = Offset(attacker.xFraction * size.width, attackerY);
+    final defenderHome = Offset(defender.xFraction * size.width, defenderY);
+    final attackerUnitSize =
+        _unitSize(size, attacker, attackerPose, attackerSprite);
+    final defenderUnitSize =
+        _unitSize(size, defender, defenderPose, defenderSprite);
+    final attackerStrike = _strikeLook(attacker, attackerHome,
+        atBottom: attackerAtBottom, arena: size, unitSize: attackerUnitSize);
+    final defenderStrike = _strikeLook(defender, defenderHome,
+        atBottom: !attackerAtBottom, arena: size, unitSize: defenderUnitSize);
+    _drawStrikeUnderlay(canvas, attacker, attackerStrike, attackerUnitSize);
+    _drawStrikeUnderlay(canvas, defender, defenderStrike, defenderUnitSize);
+
+    final attackerCenter = attackerStrike.center;
+    final defenderCenter = defenderStrike.center;
     final attackerSize = _drawShip(
       canvas,
       attackerCenter,
@@ -202,8 +234,10 @@ class BattleArenaPainter extends CustomPainter {
       pose: attackerPose,
       mirrored: attackerMirrored,
       bank: attackerBank,
-      opacity: identical(loser, attacker) ? fading : 1.0,
+      opacity: attackerLost ? fading : 1.0,
       enemy: (x: defender.xFraction, altitude: defender.altitude),
+      lean: attackerStrike.lean,
+      tint: _struckTint(isAttacker: true) ?? attackerStrike.tint,
     );
     final defenderSize = _drawShip(
       canvas,
@@ -215,16 +249,45 @@ class BattleArenaPainter extends CustomPainter {
       pose: defenderPose,
       mirrored: defenderMirrored,
       bank: defenderBank,
-      opacity: identical(loser, defender) ? fading : 1.0,
+      opacity: defenderLost ? fading : 1.0,
       enemy: (x: attacker.xFraction, altitude: attacker.altitude),
+      lean: defenderStrike.lean,
+      tint: _struckTint(isAttacker: false) ?? defenderStrike.tint,
     );
 
-    // Impacts burst in the shooter's element, as big as the shot is strong
+    // Impacts burst in the shooter's element, as big as the shot is strong;
+    // a strike slashes across its target or sparks off the shield.
     for (final impact in battleState.impacts) {
+      final shooter = impact.onAttacker ? defender : attacker;
+      if (impact.melee) {
+        final progress = (nowMs - impact.atMs) / MeleeFx.contactMs;
+        final target = impact.onAttacker ? attackerHome : defenderHome;
+        final from = impact.onAttacker ? defenderHome : attackerHome;
+        final unitSize =
+            impact.onAttacker ? attackerUnitSize : defenderUnitSize;
+        if (impact.shielded) {
+          MeleeFx.blockSpark(
+            canvas,
+            at: target + _toward(target, from) * unitSize * 0.45,
+            size: unitSize,
+            progress: progress,
+            seed: impact.id.hashCode,
+          );
+        } else {
+          MeleeFx.slash(
+            canvas,
+            from: from,
+            target: target,
+            size: unitSize,
+            color: BattleElement.of(shooter.piece.type).color,
+            progress: progress,
+          );
+        }
+        continue;
+      }
       final duration = impact.shielded ? _shieldImpactMs : _impactMs;
       final progress = (nowMs - impact.atMs) / duration;
       if (progress <= 0 || progress >= 1) continue;
-      final shooter = impact.onAttacker ? defender : attacker;
       final radius = size.width *
           0.09 *
           math.sqrt(impact.damage / 20) *
@@ -242,17 +305,172 @@ class BattleArenaPainter extends CustomPainter {
     }
 
     // The loser goes up in its own element, as big as its ship
-    if (loser != null) {
-      final loserIsAttacker = identical(loser, attacker);
+    if (attackerLost) {
       ExplosionFx.paint(
         canvas,
-        loserIsAttacker ? attackerCenter : defenderCenter,
-        element: BattleElement.of(loser.piece.type),
-        radius: (loserIsAttacker ? attackerSize : defenderSize) * 1.1,
+        attackerCenter,
+        element: BattleElement.of(attacker.piece.type),
+        radius: attackerSize * 1.1,
         progress: destruction,
-        seed: loser.piece.type.index,
+        seed: attacker.piece.type.index,
       );
     }
+    if (defenderLost) {
+      ExplosionFx.paint(
+        canvas,
+        defenderCenter,
+        element: BattleElement.of(defender.piece.type),
+        radius: defenderSize * 1.1,
+        progress: destruction,
+        seed: defender.piece.type.index + PieceType.values.length,
+      );
+    }
+  }
+
+  /// The unit vector from [from] toward [to]; zero when they coincide.
+  static Offset _toward(Offset from, Offset to) {
+    final d = to - from;
+    final length = d.distance;
+    return length < 1e-6 ? Offset.zero : d / length;
+  }
+
+  /// A red flash on a unit a strike has just hit.
+  ColorFilter? _struckTint({required bool isAttacker}) {
+    for (final impact in battleState.impacts.reversed) {
+      if (!impact.melee || impact.shielded) continue;
+      if (impact.onAttacker != isAttacker) continue;
+      final progress = (nowMs - impact.atMs) / MeleeFx.contactMs;
+      if (progress < 0 || progress >= 1) continue;
+      return ColorFilter.mode(
+        Colors.redAccent.withValues(alpha: 0.55 * (1 - progress)),
+        BlendMode.srcATop,
+      );
+    }
+    return null;
+  }
+
+  /// How [unit] is drawn through its strike: where (home, or out along the
+  /// lunge), leaning which way and tinted how, plus what the wind-up
+  /// telegraphs. A unit without a strike stands at [home].
+  _StrikeLook _strikeLook(
+    BattleUnit unit,
+    Offset home, {
+    required bool atBottom,
+    required Size arena,
+    required double unitSize,
+  }) {
+    final strike = unit.strike;
+    final melee = unit.stats.melee;
+    if (strike == null || melee == null) return _StrikeLook(home);
+    final now = battleState.elapsedMs;
+    final target = Offset(
+      strike.target.x * arena.width,
+      ArenaLayout.shipY(strike.target.altitude.clamp(0.0, 1.0),
+          atBottom: !atBottom, arena: arena),
+    );
+    final direction = _toward(home, target);
+    final reach = math.max(
+        0.0, (target - home).distance - unitSize * _lungeStandOff);
+    switch (strike.phaseAt(now)) {
+      case StrikePhase.windup:
+        final progress = strike.windupMs <= 0
+            ? 1.0
+            : (now - strike.startedMs) / strike.windupMs;
+        return _StrikeLook(
+          home,
+          lean: Attitude(pitch: -_strikeLean * progress.clamp(0.0, 1.0)),
+          telegraph: target,
+          telegraphProgress: progress,
+          telegraphHalfWidth: BattleEngine.reachHalfWidthAt(
+                  melee, now, battleState.balance.arena) *
+              arena.width,
+        );
+      case StrikePhase.dash:
+        final lunge = strike.lungeAt(now);
+        return _StrikeLook(
+          home + direction * reach * lunge,
+          lean: const Attitude(pitch: _strikeLean),
+          streaks: direction,
+          streakStrength: 1,
+        );
+      case StrikePhase.recover:
+        final staggered = strike.recoverMs > melee.recoverMs;
+        final progress = strike.recoverMs <= 0
+            ? 1.0
+            : ((now - strike.contactMs) / strike.recoverMs).clamp(0.0, 1.0);
+        if (staggered) {
+          // Thrown back off the shield, then finding its feet.
+          final left = 1 - progress;
+          return _StrikeLook(
+            home - direction * unitSize * _recoil * left,
+            lean: Attitude(pitch: -_strikeLean * left),
+            tint: ColorFilter.mode(
+              Colors.white.withValues(alpha: 0.45 * left),
+              BlendMode.srcATop,
+            ),
+          );
+        }
+        final lunge = strike.lungeAt(now);
+        return _StrikeLook(
+          home + direction * reach * lunge,
+          lean: Attitude(pitch: _strikeLean * lunge),
+        );
+      case StrikePhase.done:
+        return _StrikeLook(home);
+    }
+  }
+
+  /// What a strike draws under the units: the wind-up's impact zone and
+  /// the lunge's speed streaks, in [unit]'s element.
+  void _drawStrikeUnderlay(
+    Canvas canvas,
+    BattleUnit unit,
+    _StrikeLook look,
+    double unitSize,
+  ) {
+    final color = BattleElement.of(unit.piece.type).color;
+    final telegraph = look.telegraph;
+    if (telegraph != null) {
+      MeleeFx.telegraph(
+        canvas,
+        from: look.center,
+        target: telegraph,
+        halfWidth: look.telegraphHalfWidth,
+        color: color,
+        progress: look.telegraphProgress,
+      );
+    }
+    final streaks = look.streaks;
+    if (streaks != null) {
+      MeleeFx.speedStreaks(
+        canvas,
+        at: look.center,
+        direction: streaks,
+        size: unitSize,
+        strength: look.streakStrength,
+      );
+    }
+  }
+
+  /// The drawn size of [unit]: a standing figure's is the same for all.
+  static double _unitSize(
+    Size arena,
+    BattleUnit unit,
+    UnitPose pose,
+    ui.Image? sprite,
+  ) {
+    if (pose == UnitPose.standing) {
+      return math.min(arena.width * _figureWidthFraction, arena.height * 0.22);
+    }
+    final scale = _altitudeScale(unit.altitude);
+    if (sprite != null) {
+      // Never much more than the gap to the arena edge allows.
+      return math.min(
+        arena.width * _spriteWidthFractions[unit.piece.type]! * scale,
+        arena.height * 0.2,
+      );
+    }
+    return _shipHeight * scale;
   }
 
   void _drawProjectile(
@@ -366,30 +584,16 @@ class BattleArenaPainter extends CustomPainter {
     required double bank,
     required double opacity,
     required Spot enemy,
+    Attitude lean = Attitude.level,
+    ColorFilter? tint,
   }) {
     final standing = pose == UnitPose.standing;
     final scale = standing ? 1.0 : _altitudeScale(unit.altitude);
     final upsideDown = drawsUpsideDown(
         pose: pose, atTop: !facingUp, topPlayerAcross: topPlayerAcross);
-    final double shipSize;
-    final double shieldRadius;
-    if (standing) {
-      shipSize = math.min(
-        arena.width * _figureWidthFraction,
-        arena.height * 0.22,
-      );
-      shieldRadius = shipSize * 0.55;
-    } else if (sprite != null) {
-      // Never much more than the gap to the arena edge allows.
-      shipSize = math.min(
-        arena.width * _spriteWidthFractions[unit.piece.type]! * scale,
-        arena.height * 0.2,
-      );
-      shieldRadius = shipSize * 0.55;
-    } else {
-      shipSize = _shipHeight * scale;
-      shieldRadius = shipSize * 0.7;
-    }
+    final shipSize = _unitSize(arena, unit, pose, sprite);
+    final shieldRadius =
+        standing || sprite != null ? shipSize * 0.55 : shipSize * 0.7;
     if (opacity <= 0) return shipSize;
 
     final run = unit.maneuver;
@@ -399,8 +603,15 @@ class BattleArenaPainter extends CustomPainter {
         run.untouchableAt(battleState.elapsedMs)) {
       opacity *= 0.15;
     }
-    final attitude =
+    final flown =
         run?.poseAt(battleState.elapsedMs, enemy).attitude ?? Attitude.level;
+    // A strike leans the unit on top of what its maneuver holds.
+    final attitude = Attitude(
+      roll: flown.roll,
+      pitch: flown.pitch + lean.pitch,
+      flip: flown.flip,
+      boost: flown.boost,
+    );
     final element = BattleElement.of(unit.piece.type);
 
     // Runs [draw] in the unit's frame at [at], held as [held] asks.
@@ -527,7 +738,8 @@ class BattleArenaPainter extends CustomPainter {
           shipSize,
           Paint()
             ..filterQuality = FilterQuality.medium
-            ..color = Colors.white.withValues(alpha: opacity),
+            ..color = Colors.white.withValues(alpha: opacity)
+            ..colorFilter = tint,
         );
       } else {
         canvas.scale(scale);
@@ -683,4 +895,32 @@ class BattleArenaPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BattleArenaPainter oldDelegate) => true;
+}
+
+/// How a unit is drawn at one moment of its strike.
+class _StrikeLook {
+  /// Where the unit is drawn; its logical position stays home.
+  final Offset center;
+  final Attitude lean;
+  final ColorFilter? tint;
+
+  /// Where the wind-up says the blow lands, while it does.
+  final Offset? telegraph;
+  final double telegraphProgress;
+  final double telegraphHalfWidth;
+
+  /// The lunge's heading, while it runs.
+  final Offset? streaks;
+  final double streakStrength;
+
+  const _StrikeLook(
+    this.center, {
+    this.lean = Attitude.level,
+    this.tint,
+    this.telegraph,
+    this.telegraphProgress = 0,
+    this.telegraphHalfWidth = 0,
+    this.streaks,
+    this.streakStrength = 0,
+  });
 }

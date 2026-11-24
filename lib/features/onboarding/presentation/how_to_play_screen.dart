@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
 
-/// The rules on four pages: how to win, how pieces move, battles and
-/// maneuvers. Shown on the first launch and from the lobby's help button.
+/// The rules on five pages: how to win, how pieces move, battles, melee
+/// and mutual destruction, and maneuvers. Shown on the first launch and from the lobby's help button.
 class HowToPlayScreen extends StatefulWidget {
   const HowToPlayScreen({super.key});
 
@@ -49,6 +49,14 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
           ],
         ),
         (
+          icon: Icons.sports_kabaddi,
+          title: l10n.rulesMeleeTitle,
+          lines: [
+            l10n.rulesBattle5,
+            l10n.rulesBattle6,
+          ],
+        ),
+        (
           icon: Icons.gesture,
           title: l10n.rulesFleetTitle,
           lines: [
@@ -59,7 +67,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
         ),
       ];
 
-  static const _pageCount = 4;
+  static const _pageCount = 5;
 
   bool get _last => _page == _pageCount - 1;
 

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:uuid/uuid.dart';
 
 import '../../maneuvers/maneuver.dart';
+import '../../maneuvers/maneuver_catalog.dart';
 import '../models/battle_state.dart';
 import '../models/battle_unit.dart';
 import '../models/impact.dart';
@@ -12,6 +13,7 @@ import '../models/projectile.dart';
 import '../models/shield_state.dart';
 import '../models/spot.dart';
 import '../models/strike_run.dart';
+import '../models/unit_stats.dart';
 import '../models/upgrade_profile.dart';
 import '../models/weapon_type.dart';
 import '../../worlds/world_balance.dart';
@@ -37,24 +39,39 @@ class BattleEngine {
   /// …and the ship flies within this altitude of the projectile's.
   static const double hitHalfAltitude = 0.12;
 
-  /// The sudden-death rules every battle runs on: space's
-  /// ([ArenaRules.suddenDeathAfterMs] and the ramp after it). A battle does
-  /// not know its world yet.
+  /// Space's arena rules, for callers without a battle at hand. A battle
+  /// runs on its own world's ([BattleState.balance]); every helper below
+  /// takes those as [rules].
   static const ArenaRules arena = ArenaRules();
 
   /// Whether a battle at [elapsedMs] is in sudden death.
-  static bool isSuddenDeath(int elapsedMs) => arena.isSuddenDeath(elapsedMs);
+  static bool isSuddenDeath(int elapsedMs, [ArenaRules rules = arena]) =>
+      rules.isSuddenDeath(elapsedMs);
 
   /// How much the hit zone has grown at [elapsedMs]: 1 before sudden death.
-  static double hitScaleAt(int elapsedMs) => arena.hitScaleAt(elapsedMs);
+  static double hitScaleAt(int elapsedMs, [ArenaRules rules = arena]) =>
+      rules.hitScaleAt(elapsedMs);
 
   /// [hitHalfWidth] at [elapsedMs], grown by sudden death.
-  static double hitHalfWidthAt(int elapsedMs) =>
-      hitHalfWidth * hitScaleAt(elapsedMs);
+  static double hitHalfWidthAt(int elapsedMs, [ArenaRules rules = arena]) =>
+      hitHalfWidth * hitScaleAt(elapsedMs, rules);
 
   /// [hitHalfAltitude] at [elapsedMs], grown by sudden death.
-  static double hitHalfAltitudeAt(int elapsedMs) =>
-      hitHalfAltitude * hitScaleAt(elapsedMs);
+  static double hitHalfAltitudeAt(int elapsedMs, [ArenaRules rules = arena]) =>
+      hitHalfAltitude * hitScaleAt(elapsedMs, rules);
+
+  /// How far across a strike of [melee] reaches at [elapsedMs]: its arc,
+  /// grown by sudden death exactly as the hit zone of shots grows, so two
+  /// melee units cannot keep out of each other's reach forever.
+  static double reachHalfWidthAt(MeleeProfile melee, int elapsedMs,
+          [ArenaRules rules = arena]) =>
+      melee.arcHalfWidth * hitScaleAt(elapsedMs, rules);
+
+  /// How far in altitude a strike reaches at [elapsedMs]; grows with
+  /// sudden death like [reachHalfWidthAt].
+  static double reachHalfAltitudeAt(int elapsedMs,
+          [ArenaRules rules = arena]) =>
+      hitHalfAltitudeAt(elapsedMs, rules);
 
   /// Ships cannot move closer to the arena edge than this fraction.
   static const double shipEdgeMargin = 0.06;
@@ -95,6 +112,7 @@ class BattleEngine {
     return BattleState(
       attacker: _makeUnit(attacker, attackerUpgrades, balance),
       defender: _makeUnit(defender, defenderUpgrades, balance),
+      balance: balance,
     );
   }
 
@@ -102,6 +120,8 @@ class BattleEngine {
     if (state.isFinished) return state;
 
     final elapsedMs = state.elapsedMs + deltaMs;
+    final balance = state.balance;
+    final rules = balance.arena;
     var attacker = state.attacker;
     var defender = state.defender;
     var projectiles = state.projectiles.toList();
@@ -114,18 +134,18 @@ class BattleEngine {
     // the enemy where this tick found it.
     final enemyOfAttacker = spotOf(defender);
     final enemyOfDefender = spotOf(attacker);
-    attacker =
-        _tickManeuver(attacker, enemyOfAttacker, elapsedMs, true, projectiles);
-    defender =
-        _tickManeuver(defender, enemyOfDefender, elapsedMs, false, projectiles);
+    (attacker, defender) = _tickManeuver(attacker, defender, enemyOfAttacker,
+        elapsedMs, true, projectiles, impacts, balance);
+    (defender, attacker) = _tickManeuver(defender, attacker, enemyOfDefender,
+        elapsedMs, false, projectiles, impacts, balance);
 
     // Tick attack timers and fire
     attacker = _tickAttack(attacker, deltaMs, true, projectiles);
     defender = _tickAttack(defender, deltaMs, false, projectiles);
-    (attacker, defender) =
-        _tickStrike(attacker, defender, deltaMs, elapsedMs, true, impacts);
-    (defender, attacker) =
-        _tickStrike(defender, attacker, deltaMs, elapsedMs, false, impacts);
+    (attacker, defender) = _tickStrike(
+        attacker, defender, deltaMs, elapsedMs, true, impacts, rules);
+    (defender, attacker) = _tickStrike(
+        defender, attacker, deltaMs, elapsedMs, false, impacts, rules);
 
     // Tick shield cooldowns and win energy back
     attacker = _tickShield(_tickEnergy(attacker, deltaMs), deltaMs);
@@ -146,7 +166,7 @@ class BattleEngine {
       }
       // Arrived at the enemy line — strikes only if the target didn't dodge
       final target = moved.fromAttacker ? defender : attacker;
-      if (!_isHit(target, moved, elapsedMs)) continue;
+      if (!_isHit(target, moved, elapsedMs, rules)) continue;
       final shielded = target.shieldState.isActive;
       impacts.add(Impact(
         id: moved.id,
@@ -165,10 +185,13 @@ class BattleEngine {
       }
     }
 
-    // Check victory
+    // Check victory. Both destroyed in one tick is mutual destruction: no
+    // winner, and both pieces leave the board.
     PlayerColor? winner;
     bool finished = false;
-    if (!defender.isAlive) {
+    if (!defender.isAlive && !attacker.isAlive) {
+      finished = true;
+    } else if (!defender.isAlive) {
       winner = attacker.piece.color;
       finished = true;
     } else if (!attacker.isAlive) {
@@ -242,17 +265,24 @@ class BattleEngine {
         ),
       );
 
-  /// Flies [unit] along its maneuver and fires the bursts it has reached.
-  static BattleUnit _tickManeuver(
+  /// Flies [unit] along its maneuver and fires the bursts it has reached;
+  /// a melee unit's bursts are contact strikes on [enemy]. Returns [unit]
+  /// and [enemy] as they are afterwards.
+  static (BattleUnit, BattleUnit) _tickManeuver(
     BattleUnit unit,
+    BattleUnit enemy,
     Spot enemyLive,
     int elapsedMs,
     bool isAttacker,
     List<Projectile> projectiles,
+    List<Impact> impacts,
+    WorldBalance balance,
   ) {
     final run = unit.maneuver;
-    if (run == null) return unit;
-    final maneuver = run.maneuver;
+    if (run == null) return (unit, enemy);
+    // The path is the same in every world; the bursts are the unit's own.
+    final maneuver =
+        ManeuverCatalog.byId(run.id, balance: balance) ?? run.maneuver;
     final progress = run.progressAt(elapsedMs);
 
     var flying = unit;
@@ -268,19 +298,70 @@ class BattleEngine {
     var fired = run.firedCues;
     for (var cue = 0; cue < maneuver.fire.length; cue++) {
       if (fired.contains(cue) || maneuver.fire[cue].t > progress) continue;
-      _fireBurst(flying, maneuver, maneuver.fire[cue], run.level, isAttacker,
-          projectiles);
+      final burst = maneuver.fire[cue];
+      if (burst.contact) {
+        enemy = _contactBurst(flying, enemy, maneuver, burst, run.level,
+            elapsedMs, isAttacker, impacts, balance.arena);
+      } else {
+        _fireBurst(
+            flying, maneuver, burst, run.level, isAttacker, projectiles);
+      }
       fired = {...fired, cue};
     }
 
     if (progress >= 1) {
       // Back to the trigger, but not with a full interval to wait out.
-      return flying.copyWith(
-        clearManeuver: true,
-        nextAttackMs: math.min(flying.nextAttackMs, 200),
+      return (
+        flying.copyWith(
+          clearManeuver: true,
+          nextAttackMs: math.min(flying.nextAttackMs, 200),
+        ),
+        enemy,
       );
     }
-    return flying.copyWith(maneuver: run.withFired(fired));
+    return (flying.copyWith(maneuver: run.withFired(fired)), enemy);
+  }
+
+  /// A melee unit's maneuver burst: one blow on [enemy], without a shot's
+  /// flight, only within range 1 and reach. It carries the burst's damage
+  /// (all its lanes) scaled by [ArenaRules.contactDamageScale]: a blow
+  /// cannot be dodged in flight the way most shots are. Returns [enemy] as
+  /// it is afterwards.
+  static BattleUnit _contactBurst(
+    BattleUnit unit,
+    BattleUnit enemy,
+    Maneuver maneuver,
+    FireCue cue,
+    int level,
+    int elapsedMs,
+    bool isAttacker,
+    List<Impact> impacts,
+    ArenaRules rules,
+  ) {
+    if (rangeBetween(unit, enemy) > 1) return enemy;
+    if (_untouchable(enemy, elapsedMs)) return enemy;
+    if (!inReach(unit, enemy, elapsedMs: elapsedMs, rules: rules)) {
+      return enemy;
+    }
+    final damage = math.max(
+        1,
+        (unit.stats.damage *
+                cue.damage *
+                maneuver.shotsAt(cue, level) *
+                rules.contactDamageScale)
+            .round());
+    final shielded = enemy.shieldState.isActive;
+    impacts.add(Impact(
+      id: _uuid.v4(),
+      onAttacker: !isAttacker,
+      xFraction: enemy.xFraction,
+      altitude: enemy.altitude,
+      damage: damage,
+      shielded: shielded,
+      atMs: elapsedMs,
+      melee: true,
+    ));
+    return shielded ? enemy : _applyDamage(enemy, damage);
   }
 
   static void _fireBurst(
@@ -339,12 +420,20 @@ class BattleEngine {
   static double rangeBetween(BattleUnit a, BattleUnit b) =>
       (1 - a.altitude) + (1 - b.altitude);
 
-  /// Whether [target] stands where [striker]'s strike lands.
-  static bool inReach(BattleUnit striker, BattleUnit target) {
+  /// Whether [target] stands where [striker]'s strike lands at
+  /// [elapsedMs]; sudden death in [rules] grows the reach.
+  static bool inReach(
+    BattleUnit striker,
+    BattleUnit target, {
+    int elapsedMs = 0,
+    ArenaRules rules = arena,
+  }) {
     final melee = striker.stats.melee;
     if (melee == null) return false;
-    return (striker.xFraction - target.xFraction).abs() <= melee.arcHalfWidth &&
-        (striker.altitude - target.altitude).abs() <= hitHalfAltitude;
+    return (striker.xFraction - target.xFraction).abs() <=
+            reachHalfWidthAt(melee, elapsedMs, rules) &&
+        (striker.altitude - target.altitude).abs() <=
+            reachHalfAltitudeAt(elapsedMs, rules);
   }
 
   static bool _untouchable(BattleUnit unit, int elapsedMs) =>
@@ -362,8 +451,10 @@ class BattleEngine {
     int elapsedMs,
     bool isAttacker,
     List<Impact> impacts,
+    ArenaRules rules,
   ) {
     final melee = me.stats.melee;
+    bool reaches() => inReach(me, enemy, elapsedMs: elapsedMs, rules: rules);
     // A unit destroyed this tick still lands a strike due now: both sides'
     // contacts of one tick count as simultaneous.
     if (melee == null) return (me, enemy);
@@ -378,7 +469,7 @@ class BattleEngine {
     var strike = me.strike;
 
     if (strike == null) {
-      if (next > 0 || !inReach(me, enemy)) {
+      if (next > 0 || !reaches()) {
         return (me.copyWith(nextAttackMs: next), enemy);
       }
       strike = StrikeRun(
@@ -401,7 +492,7 @@ class BattleEngine {
     }
 
     if (strike.phaseAt(elapsedMs) == StrikePhase.windup) {
-      if (inReach(me, enemy)) return (me.copyWith(nextAttackMs: next), enemy);
+      if (reaches()) return (me.copyWith(nextAttackMs: next), enemy);
       return (
         me.copyWith(
           nextAttackMs: math.max(next, feintCooldownMs),
@@ -412,7 +503,7 @@ class BattleEngine {
     }
 
     if (!strike.resolved && elapsedMs >= strike.contactMs) {
-      if (inReach(me, enemy) && !_untouchable(enemy, elapsedMs)) {
+      if (reaches() && !_untouchable(enemy, elapsedMs)) {
         final shielded = enemy.shieldState.isActive;
         impacts.add(Impact(
           id: _uuid.v4(),
@@ -422,6 +513,7 @@ class BattleEngine {
           damage: me.stats.damage,
           shielded: shielded,
           atMs: elapsedMs,
+          melee: true,
         ));
         if (shielded) {
           strike = strike.copyWith(recoverMs: strike.recoverMs + melee.staggerMs);
@@ -438,10 +530,13 @@ class BattleEngine {
     return (me.copyWith(nextAttackMs: next, strike: strike), enemy);
   }
 
-  static bool _isHit(BattleUnit target, Projectile p, int elapsedMs) =>
+  static bool _isHit(
+          BattleUnit target, Projectile p, int elapsedMs, ArenaRules rules) =>
       !_untouchable(target, elapsedMs) &&
-      (target.xFraction - p.xFraction).abs() <= hitHalfWidthAt(elapsedMs) &&
-      (target.altitude - p.altitude).abs() <= hitHalfAltitudeAt(elapsedMs);
+      (target.xFraction - p.xFraction).abs() <=
+          hitHalfWidthAt(elapsedMs, rules) &&
+      (target.altitude - p.altitude).abs() <=
+          hitHalfAltitudeAt(elapsedMs, rules);
 
   /// Move a ship to [xFraction] (clamped to the arena, minus edge margin)
   /// and, when given, to [altitude] (clamped to 0–1).

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/game_logic/engine/unit_base_stats.dart';
 import '../../../../core/game_logic/engine/upgrade_engine.dart';
 import '../../../../core/game_logic/models/piece.dart';
+import '../../../../core/worlds/world_balance.dart';
 import '../../../../l10n/l10n.dart';
 
 const Map<PieceType, String> _symbols = {
@@ -23,6 +23,10 @@ class UpgradeCard extends StatelessWidget {
   /// shows its chess symbol.
   final String? artAsset;
 
+  /// The numbers the unit fights by in the chosen world. Where some units
+  /// fight up close, the card says how this one fights.
+  final WorldBalance balance;
+
   const UpgradeCard({
     super.key,
     required this.pieceType,
@@ -30,6 +34,7 @@ class UpgradeCard extends StatelessWidget {
     required this.credits,
     required this.onUpgrade,
     this.artAsset,
+    this.balance = WorldBalance.space,
   });
 
   Widget get _symbol => Text(
@@ -41,7 +46,8 @@ class UpgradeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cost = UpgradeEngine.upgradeCost(level);
     final canUpgrade = level < 3 && credits >= cost && onUpgrade != null;
-    final base = unitBaseStats[pieceType]!;
+    final base = balance.statsOf(pieceType);
+    final showsStyle = balance.units.values.any((stats) => stats.isMelee);
     final upgraded = UpgradeEngine.applyUpgrades(base, level);
     final l10n = context.l10n;
 
@@ -88,6 +94,15 @@ class UpgradeCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (showsStyle)
+              Text(
+                base.isMelee ? l10n.statMelee : l10n.statRanged,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 9,
+                  letterSpacing: 1.2,
+                ),
+              ),
             const SizedBox(height: 6),
             // Stars
             Row(

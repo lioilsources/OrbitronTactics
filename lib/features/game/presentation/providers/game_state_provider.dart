@@ -25,7 +25,12 @@ enum GameMode {
   localWifi,
 
   /// One player against the on-device AI — includes the battle arena.
-  singlePlayer,
+  singlePlayer;
+
+  /// Whether both sides play on this device, so the chosen world's battle
+  /// rules apply to both. Over the network both devices fight by space's
+  /// until the session carries the host's world (plan 14, step 6).
+  bool get fightsInChosenWorld => this == hotSeat || this == singlePlayer;
 }
 
 /// Manages the game state for hot-seat, single player and multiplayer modes.
@@ -189,8 +194,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  /// Called by BattleStateNotifier when the battle ends locally.
-  void resolveBattle(PlayerColor winner) {
+  /// Called by BattleStateNotifier when the battle ends locally. A null
+  /// [winner] is mutual destruction: both pieces leave the board and
+  /// nobody earns credits.
+  void resolveBattle(PlayerColor? winner) {
     if (_session != null) {
       _session!.resolveBattle(winner);
       return;
@@ -202,6 +209,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final (newState, credits) =
         GameEngine.resolveBattle(state, pending, winner);
     _localPendingBattleMove = null;
+    if (winner == null) {
+      state = newState;
+      return;
+    }
     final ship = winner == pending.piece.color
         ? pending.piece.type
         : (pending.capturedPiece?.type ?? pending.piece.type);

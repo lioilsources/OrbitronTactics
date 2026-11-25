@@ -497,11 +497,14 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get rulesBattle3 =>
-      'Střela zasáhne jen jednotku ve stejné výšce, takže abys trefil nepřítele, musíš tam, kde může trefit on tebe.';
+      'Střela i úder zasáhnou jen jednotku ve stejné výšce, takže abys trefil nepřítele, musíš tam, kde může trefit on tebe.';
 
   @override
   String get rulesBattle4 =>
       'Když letí střely a nemáš kam uhnout, zvedni štít.';
+
+  @override
+  String get rulesMeleeTitle => 'Zblízka, a oba naráz';
 
   @override
   String get rulesFleetTitle => 'Manévry a vylepšení';
@@ -847,4 +850,34 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get fleetStarNomads => 'Hvězdní nomádi';
+
+  @override
+  String get rulesBattle5 =>
+      'Ve světech figurek bojují pěšec, kůň, věž a král zblízka: nápřah, výpad a úder. Zvednutý štít úder zablokuje a útočníka zdrží. Střelec a dáma dál střílejí.';
+
+  @override
+  String get rulesBattle6 =>
+      'Padnou-li obě jednotky ve stejné chvíli, opustí desku obě figury.';
+
+  @override
+  String get battleMutualDestruction => 'OBA PADLI';
+
+  @override
+  String get battleMutualDestructionDetail =>
+      'Obě figury opouštějí desku. Remíza nepřináší kredity.';
+
+  @override
+  String get statMelee => 'ZBLÍZKA';
+
+  @override
+  String get statRanged => 'NA DÁLKU';
+
+  @override
+  String get maneuverFamilyLeap => 'Výskok';
+
+  @override
+  String get maneuverFamilyTumble => 'Kotoul';
+
+  @override
+  String get maneuverFamilyFlurry => 'Smršť';
 }

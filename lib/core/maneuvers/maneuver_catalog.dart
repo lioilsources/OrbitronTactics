@@ -1,4 +1,5 @@
 import '../game_logic/models/piece.dart';
+import '../worlds/world_balance.dart';
 import 'maneuver.dart';
 
 /// Every maneuver each ship can fly.
@@ -37,10 +38,61 @@ class ManeuverCatalog {
       for (final maneuver in maneuvers) maneuver.id: maneuver,
   };
 
-  /// Everything [ship] can fly, easiest to come by first.
-  static List<Maneuver> forShip(PieceType ship) => _byShip[ship]!;
+  /// The same maneuvers for a melee unit: its bursts are contact strikes.
+  static final Map<PieceType, List<Maneuver>> _contactByShip = {
+    for (final ship in PieceType.values)
+      ship: [for (final maneuver in _byShip[ship]!) _inContact(maneuver)],
+  };
 
-  static Maneuver? byId(String id) => _byId[id];
+  static final Map<String, Maneuver> _contactById = {
+    for (final maneuvers in _contactByShip.values)
+      for (final maneuver in maneuvers) maneuver.id: maneuver,
+  };
+
+  /// Everything [ship] can fly, easiest to come by first. Where [balance]
+  /// makes the unit fight up close, its bursts are contact strikes; the
+  /// ids, gestures and paths stay the same.
+  static List<Maneuver> forShip(
+    PieceType ship, {
+    WorldBalance balance = WorldBalance.space,
+  }) =>
+      balance.statsOf(ship).isMelee ? _contactByShip[ship]! : _byShip[ship]!;
+
+  /// The maneuver [id] as flown in [balance]; see [forShip].
+  static Maneuver? byId(
+    String id, {
+    WorldBalance balance = WorldBalance.space,
+  }) {
+    final maneuver = _byId[id];
+    if (maneuver == null) return null;
+    return balance.statsOf(maneuver.ship).isMelee
+        ? _contactById[id]
+        : maneuver;
+  }
+
+  /// [maneuver] for a melee unit: every burst becomes a contact strike;
+  /// a volley becomes a series of three single strikes sharing its bursts'
+  /// damage.
+  static Maneuver _inContact(Maneuver maneuver) {
+    if (maneuver.fire.isEmpty) return maneuver;
+    if (maneuver.family == ManeuverFamily.volley) {
+      final total = maneuver.fire
+          .map((cue) => cue.damage)
+          .reduce((a, b) => a + b);
+      return maneuver.withFire([
+        for (final t in const [0.3, 0.55, 0.8])
+          FireCue(t, damage: total / 3, contact: true),
+      ]);
+    }
+    return maneuver.withFire([
+      for (final cue in maneuver.fire)
+        FireCue(cue.t,
+            shots: cue.shots,
+            spread: cue.spread,
+            damage: cue.damage,
+            contact: true),
+    ]);
+  }
 
   /// What a ship flies from the start.
   static List<String> starterIds(PieceType ship) => [

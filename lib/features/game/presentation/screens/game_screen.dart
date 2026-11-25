@@ -13,6 +13,7 @@ import '../../../../core/game_logic/models/piece.dart';
 import '../../../../core/game_logic/models/player.dart';
 import '../../../../core/game_logic/models/victory_condition.dart';
 import '../../../../core/maneuvers/maneuver.dart';
+import '../../../../core/worlds/world_balance.dart';
 import '../../data/game_event.dart';
 import '../providers/ai_opponent_controller.dart';
 import '../providers/game_state_provider.dart';
@@ -89,15 +90,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ai.maneuversFor(defenderColor, pendingMove.capturedPiece!.type);
       }
 
+      // On one device the battle follows the chosen world's rules; over the
+      // network both devices fight by space's.
+      final game = ref.read(gameStateProvider.notifier);
       final initialBattle = BattleEngine.createBattle(
         attacker: pendingMove.piece,
         defender: pendingMove.capturedPiece!,
         attackerUpgrades: attackerUpgrades,
         defenderUpgrades: defenderUpgrades,
+        balance: game.mode.fightsInChosenWorld
+            ? ref.read(pieceSkinProvider).skin.balance
+            : WorldBalance.space,
       );
 
       // In single player the AI flies its own ship.
-      final game = ref.read(gameStateProvider.notifier);
       final aiProfile =
           game.mode == GameMode.singlePlayer ? game.aiProfile : null;
       ref.read(battleStateProvider.notifier).startBattle(

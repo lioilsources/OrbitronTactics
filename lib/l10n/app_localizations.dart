@@ -917,7 +917,7 @@ abstract class AppLocalizations {
   /// No description provided for @rulesBattle3.
   ///
   /// In en, this message translates to:
-  /// **'A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.'**
+  /// **'An attack only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.'**
   String get rulesBattle3;
 
   /// No description provided for @rulesBattle4.
@@ -925,6 +925,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Raise the shield when fire is coming and you cannot get away.'**
   String get rulesBattle4;
+
+  /// Rules page title: melee and mutual destruction
+  ///
+  /// In en, this message translates to:
+  /// **'Up close, and both at once'**
+  String get rulesMeleeTitle;
 
   /// No description provided for @rulesFleetTitle.
   ///
@@ -1567,6 +1573,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Star Nomads'**
   String get fleetStarNomads;
+
+  /// Rules page on battles: melee units in the worlds of figures
+  ///
+  /// In en, this message translates to:
+  /// **'Among figures, pawns, knights, rooks and kings fight up close: a wind-up, a lunge and the blow. A raised shield blocks the blow and staggers the striker. Bishops and queens keep shooting.'**
+  String get rulesBattle5;
+
+  /// Rules page on battles: mutual destruction
+  ///
+  /// In en, this message translates to:
+  /// **'When both units fall at the same moment, both pieces leave the board.'**
+  String get rulesBattle6;
+
+  /// Battle result when both units are destroyed in the same moment
+  ///
+  /// In en, this message translates to:
+  /// **'BOTH FALL'**
+  String get battleMutualDestruction;
+
+  /// Battle result detail for mutual destruction
+  ///
+  /// In en, this message translates to:
+  /// **'Both pieces leave the board. A draw earns no credits.'**
+  String get battleMutualDestructionDetail;
+
+  /// Upgrade card: the unit fights up close in the chosen world
+  ///
+  /// In en, this message translates to:
+  /// **'MELEE'**
+  String get statMelee;
+
+  /// Upgrade card: the unit shoots in the chosen world
+  ///
+  /// In en, this message translates to:
+  /// **'RANGED'**
+  String get statRanged;
+
+  /// Name of the loop maneuver for a standing figure
+  ///
+  /// In en, this message translates to:
+  /// **'Leap'**
+  String get maneuverFamilyLeap;
+
+  /// Name of the barrel roll maneuver for a standing figure
+  ///
+  /// In en, this message translates to:
+  /// **'Tumble'**
+  String get maneuverFamilyTumble;
+
+  /// Name of the volley maneuver for a standing figure
+  ///
+  /// In en, this message translates to:
+  /// **'Flurry'**
+  String get maneuverFamilyFlurry;
 }
 
 class _AppLocalizationsDelegate

@@ -317,8 +317,12 @@
   "rulesBattleTitle": "Every capture is a battle",
   "rulesBattle1": "The two pieces fight it out in the arena: as ships in Space, as themselves in the other worlds. The winner keeps the square.",
   "rulesBattle2": "Drag across your half to dodge, forward to climb, back to dive.",
-  "rulesBattle3": "A shot only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.",
+  "rulesBattle3": "An attack only hits a unit at about its own altitude, so to hit the enemy you have to go where it can hit you.",
   "rulesBattle4": "Raise the shield when fire is coming and you cannot get away.",
+  "rulesMeleeTitle": "Up close, and both at once",
+  "@rulesMeleeTitle": {
+    "description": "Rules page title: melee and mutual destruction"
+  },
   "rulesFleetTitle": "Maneuvers and upgrades",
   "rulesFleet1": "Draw a gesture on the pad and your unit performs a maneuver on its own. Each costs energy, which recharges during the battle.",
   "rulesFleet2": "Single player battles earn credits. Spend them in the Comcenter on upgrades and new maneuvers.",
@@ -784,5 +788,41 @@
   "fleetStarNomads": "Star Nomads",
   "@fleetStarNomads": {
     "description": "Fleet name"
+  },
+  "rulesBattle5": "Among figures, pawns, knights, rooks and kings fight up close: a wind-up, a lunge and the blow. A raised shield blocks the blow and staggers the striker. Bishops and queens keep shooting.",
+  "@rulesBattle5": {
+    "description": "Rules page on battles: melee units in the worlds of figures"
+  },
+  "rulesBattle6": "When both units fall at the same moment, both pieces leave the board.",
+  "@rulesBattle6": {
+    "description": "Rules page on battles: mutual destruction"
+  },
+  "battleMutualDestruction": "BOTH FALL",
+  "@battleMutualDestruction": {
+    "description": "Battle result when both units are destroyed in the same moment"
+  },
+  "battleMutualDestructionDetail": "Both pieces leave the board. A draw earns no credits.",
+  "@battleMutualDestructionDetail": {
+    "description": "Battle result detail for mutual destruction"
+  },
+  "statMelee": "MELEE",
+  "@statMelee": {
+    "description": "Upgrade card: the unit fights up close in the chosen world"
+  },
+  "statRanged": "RANGED",
+  "@statRanged": {
+    "description": "Upgrade card: the unit shoots in the chosen world"
+  },
+  "maneuverFamilyLeap": "Leap",
+  "@maneuverFamilyLeap": {
+    "description": "Name of the loop maneuver for a standing figure"
+  },
+  "maneuverFamilyTumble": "Tumble",
+  "@maneuverFamilyTumble": {
+    "description": "Name of the barrel roll maneuver for a standing figure"
+  },
+  "maneuverFamilyFlurry": "Flurry",
+  "@maneuverFamilyFlurry": {
+    "description": "Name of the volley maneuver for a standing figure"
   }
 }

@@ -129,14 +129,19 @@ class BattleAi {
   double _hitHalfWidth = BattleEngine.hitHalfWidth;
   double _hitHalfAltitude = BattleEngine.hitHalfAltitude;
 
+  /// How much sudden death has grown a strike's reach this tick.
+  double _reachScale = 1;
+
   BattleAiAction decide(
     BattleState state, {
     required bool isAttacker,
     required int deltaMs,
   }) {
     if (state.isFinished) return const BattleAiAction();
-    _hitHalfWidth = BattleEngine.hitHalfWidthAt(state.elapsedMs);
-    _hitHalfAltitude = BattleEngine.hitHalfAltitudeAt(state.elapsedMs);
+    final rules = state.balance.arena;
+    _hitHalfWidth = BattleEngine.hitHalfWidthAt(state.elapsedMs, rules);
+    _hitHalfAltitude = BattleEngine.hitHalfAltitudeAt(state.elapsedMs, rules);
+    _reachScale = BattleEngine.hitScaleAt(state.elapsedMs, rules);
     final me = isAttacker ? state.attacker : state.defender;
     final enemy = isAttacker ? state.defender : state.attacker;
 
@@ -217,9 +222,9 @@ class BattleAi {
             id: 'strike-${strike.startedMs}',
             x: enemy.xFraction,
             altitude: enemy.altitude,
-            // Sudden death grows the zone of shots only.
-            halfWidth: melee.arcHalfWidth,
-            halfAltitude: BattleEngine.hitHalfAltitude,
+            // Sudden death grows a strike's reach like the zone of shots.
+            halfWidth: melee.arcHalfWidth * _reachScale,
+            halfAltitude: _hitHalfAltitude,
             damage: enemy.stats.damage,
           ),
           (strike.contactMs - state.elapsedMs).toDouble(),
@@ -362,9 +367,10 @@ class BattleAi {
 
   bool _inSights(BattleUnit me, BattleUnit enemy) =>
       (me.xFraction - enemy.xFraction).abs() <=
-          (me.stats.melee?.arcHalfWidth ?? _hitHalfWidth) &&
-      (me.altitude - enemy.altitude).abs() <=
-          (me.stats.isMelee ? BattleEngine.hitHalfAltitude : _hitHalfAltitude);
+          (me.stats.melee == null
+              ? _hitHalfWidth
+              : me.stats.melee!.arcHalfWidth * _reachScale) &&
+      (me.altitude - enemy.altitude).abs() <= _hitHalfAltitude;
 
   bool _shouldShield(
     BattleUnit me,

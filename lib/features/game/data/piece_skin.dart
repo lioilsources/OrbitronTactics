@@ -1,6 +1,7 @@
 import 'dart:ui' show Color;
 
 import '../../../core/game_logic/models/piece.dart';
+import '../../../core/worlds/world_balance.dart';
 import '../../../core/theme/board_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../battle/data/unit_art.dart' show UnitPose;
@@ -123,6 +124,11 @@ enum PieceSkin {
 
   /// How this world's units stand in the arena.
   UnitPose get pose => isSpace ? UnitPose.topDown : UnitPose.standing;
+
+  /// The numbers this world's battles are fought by: space for Space, the
+  /// ground balance (pawns, knights, rooks and kings up close) for every
+  /// world of figures. Worlds differ in looks, not numbers.
+  WorldBalance get balance => isSpace ? WorldBalance.space : WorldBalance.ground;
 
   /// Sold in the store rather than given to everyone.
   bool get premium => !free.contains(this);

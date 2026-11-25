@@ -110,6 +110,28 @@ void main() {
   });
 
   group('GameEvent serialization', () {
+    test('BattleResolvedEvent carries mutual destruction', () {
+      const event =
+          BattleResolvedEvent.mutualDestruction(attacker: PlayerColor.white);
+      final restored = GameEvent.fromJson(
+          jsonDecode(jsonEncode(event.toJson())) as Map<String, dynamic>);
+      expect(restored, isA<BattleResolvedEvent>());
+      final resolved = restored as BattleResolvedEvent;
+      expect(resolved.mutualDestruction, isTrue);
+      // What a version without the flag reads: the attacker won.
+      expect(resolved.winner, PlayerColor.white);
+    });
+
+    test('an older BattleResolvedEvent is a plain win', () {
+      final restored = GameEvent.fromJson(
+              {'type': 'battle_resolved', 'winner': 'black'})
+          as BattleResolvedEvent;
+      expect(restored.winner, PlayerColor.black);
+      expect(restored.mutualDestruction, isFalse);
+      expect(const BattleResolvedEvent(winner: PlayerColor.black).toJson(),
+          isNot(contains('mutualDestruction')));
+    });
+
     test('MoveMadeEvent round-trips through JSON', () {
       final event = MoveMadeEvent(
         move: Move(

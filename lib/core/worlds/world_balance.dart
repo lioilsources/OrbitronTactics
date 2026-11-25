@@ -27,12 +27,18 @@ class ArenaRules {
   /// Energy a melee hit wins back for maneuvers.
   final double energyPerHit;
 
+  /// A melee unit's maneuver strikes in contact: each burst is one blow
+  /// carrying the burst's damage times this. Below 1 because a blow lands
+  /// whenever the enemy is in reach, where most shots of a burst miss.
+  final double contactDamageScale;
+
   const ArenaRules({
     this.rangeTravelScale = 1.0,
     this.suddenDeathAfterMs = 45000,
     this.suddenDeathRampMs = 15000,
     this.suddenDeathMaxScale = 15,
     this.energyPerHit = 0,
+    this.contactDamageScale = 1,
   });
 
   /// Whether a battle at [elapsedMs] is in sudden death.
@@ -74,6 +80,7 @@ class WorldBalance {
   /// to stay within 10 points of the same pairing in space.
   static const WorldBalance ground = WorldBalance(
     id: 'ground',
+    arena: ArenaRules(contactDamageScale: 0.15),
     units: {
       PieceType.pawn: UnitStats(
         maxHp: 45,
@@ -149,4 +156,8 @@ class WorldBalance {
   );
 
   static const List<WorldBalance> all = [space, ground];
+
+  /// The balance with [id]; space for an unknown one.
+  static WorldBalance byId(String id) =>
+      all.firstWhere((balance) => balance.id == id, orElse: () => space);
 }

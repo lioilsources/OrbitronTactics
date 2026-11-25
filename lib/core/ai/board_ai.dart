@@ -6,6 +6,7 @@ import '../game_logic/models/move.dart';
 import '../game_logic/models/piece.dart';
 import '../game_logic/models/position.dart';
 import '../game_logic/models/upgrade_profile.dart';
+import '../worlds/world_balance.dart';
 import 'ai_difficulty.dart';
 import 'battle_odds.dart';
 import 'board_evaluator.dart';
@@ -19,12 +20,14 @@ abstract class BoardAi {
   Move? chooseMove(GameState state, PlayerColor color);
 
   /// The board AI playing at [profile]'s difficulty with a fleet of
-  /// [ownUpgrades] against one of [oppUpgrades].
+  /// [ownUpgrades] against one of [oppUpgrades], its battles fought by
+  /// [balance].
   static BoardAi forProfile(
     AiProfile profile, {
     required Random random,
     UpgradeProfile ownUpgrades = const UpgradeProfile(),
     UpgradeProfile oppUpgrades = const UpgradeProfile(),
+    WorldBalance balance = WorldBalance.space,
   }) {
     if (profile.searchDepth > 0) {
       return SearchAi(
@@ -32,6 +35,7 @@ abstract class BoardAi {
         random: random,
         ownUpgrades: ownUpgrades,
         oppUpgrades: oppUpgrades,
+        balance: balance,
       );
     }
     return GreedyAi(
@@ -39,6 +43,7 @@ abstract class BoardAi {
       random: random,
       ownUpgrades: ownUpgrades,
       oppUpgrades: oppUpgrades,
+      balance: balance,
     );
   }
 }
@@ -59,24 +64,28 @@ class RandomAi implements BoardAi {
 
 /// Looks one ply ahead: scores the position after every move and plays the
 /// best, blurred by the profile's noise. A capture is a bet on its battle,
-/// scored as the odds-weighted average of winning and losing it.
+/// scored as the odds-weighted average of winning it, both units falling
+/// and losing it.
 class GreedyAi implements BoardAi {
   GreedyAi({
     required AiProfile profile,
     required Random random,
     required UpgradeProfile ownUpgrades,
     required UpgradeProfile oppUpgrades,
+    WorldBalance balance = WorldBalance.space,
   })  : _random = random,
         _noise = profile.evalNoise,
         _weights = _weightsFor(profile),
         _ownUpgrades = ownUpgrades,
-        _oppUpgrades = oppUpgrades;
+        _oppUpgrades = oppUpgrades,
+        _balance = balance;
 
   final Random _random;
   final double _noise;
   final EvalWeights _weights;
   final UpgradeProfile _ownUpgrades;
   final UpgradeProfile _oppUpgrades;
+  final WorldBalance _balance;
 
   @override
   Move? chooseMove(GameState state, PlayerColor color) {
@@ -86,7 +95,8 @@ class GreedyAi implements BoardAi {
 
     // Nothing below reads the history; don't copy it for every move.
     final root = state.copyWith(moveHistory: const []);
-    final odds = BattleOdds.table(_ownUpgrades, _oppUpgrades);
+    final odds =
+        BattleOdds.table(_ownUpgrades, _oppUpgrades, balance: _balance);
     return _pickBest(
       [
         for (final move in moves)
@@ -106,9 +116,12 @@ class GreedyAi implements BoardAi {
     if (captured == null) {
       return _evaluate(GameEngine.applyMove(state, move), color);
     }
-    final p = odds.of(move.piece.type, captured.type);
-    final (won, lost) = _battleOutcomes(state, move);
-    return p * _evaluate(won, color) + (1 - p) * _evaluate(lost, color);
+    final win = odds.winOf(move.piece.type, captured.type);
+    final draw = odds.drawOf(move.piece.type, captured.type);
+    final (won, lost, both) = _battleOutcomes(state, move, mutual: draw > 0);
+    return win * _evaluate(won, color) +
+        (both != null ? draw * _evaluate(both, color) : 0) +
+        (1 - win - draw) * _evaluate(lost, color);
   }
 
   double _evaluate(GameState state, PlayerColor color) =>
@@ -118,6 +131,7 @@ class GreedyAi implements BoardAi {
         w: _weights,
         povUpgrades: _ownUpgrades,
         oppUpgrades: _oppUpgrades,
+        balance: _balance,
       );
 
   double _drawNoise() =>
@@ -127,23 +141,26 @@ class GreedyAi implements BoardAi {
 /// Looks [AiProfile.searchDepth] plies ahead with negamax and alpha-beta,
 /// deepening iteratively until [AiProfile.timeBudgetMs] runs out.
 ///
-/// A capture is a chance node: the odds-weighted average of both battle
-/// outcomes, each searched with a full window — no pruning inside. Past
-/// the horizon, likely captures are followed one ply further.
+/// A capture is a chance node: the odds-weighted average of the battle's
+/// outcomes (won, both units fallen, lost), each searched with a full
+/// window — no pruning inside. Past the horizon, likely captures are
+/// followed one ply further.
 class SearchAi implements BoardAi {
   SearchAi({
     required AiProfile profile,
     required Random random,
     required UpgradeProfile ownUpgrades,
     required UpgradeProfile oppUpgrades,
+    WorldBalance balance = WorldBalance.space,
   })  : _maxDepth = max(1, profile.searchDepth),
         _timeBudgetMs = profile.timeBudgetMs,
         _random = random,
         _weights = _weightsFor(profile),
         _ownUpgrades = ownUpgrades,
         _oppUpgrades = oppUpgrades,
-        _ownOdds = BattleOdds.table(ownUpgrades, oppUpgrades),
-        _oppOdds = BattleOdds.table(oppUpgrades, ownUpgrades);
+        _balance = balance,
+        _ownOdds = BattleOdds.table(ownUpgrades, oppUpgrades, balance: balance),
+        _oppOdds = BattleOdds.table(oppUpgrades, ownUpgrades, balance: balance);
 
   /// Past the horizon, only captures at least this likely are followed...
   static const double _quiescenceMinOdds = 0.6;
@@ -161,6 +178,7 @@ class SearchAi implements BoardAi {
   final EvalWeights _weights;
   final UpgradeProfile _ownUpgrades;
   final UpgradeProfile _oppUpgrades;
+  final WorldBalance _balance;
   final OddsTable _ownOdds;
   final OddsTable _oppOdds;
 
@@ -246,14 +264,15 @@ class SearchAi implements BoardAi {
           -beta, -alpha, ply);
     }
 
-    final p = _oddsFor(toMove).of(move.piece.type, captured.type);
-    final (won, lost) = _battleOutcomes(state, move);
-    return p *
-            -_negamax(won, opponent, depth - 1, double.negativeInfinity,
-                double.infinity, ply) +
-        (1 - p) *
-            -_negamax(lost, opponent, depth - 1, double.negativeInfinity,
-                double.infinity, ply);
+    final odds = _oddsFor(toMove);
+    final win = odds.winOf(move.piece.type, captured.type);
+    final draw = odds.drawOf(move.piece.type, captured.type);
+    final (won, lost, both) = _battleOutcomes(state, move, mutual: draw > 0);
+    double value(GameState outcome) => -_negamax(outcome, opponent, depth - 1,
+        double.negativeInfinity, double.infinity, ply);
+    return win * value(won) +
+        (both != null ? draw * value(both) : 0) +
+        (1 - win - draw) * value(lost);
   }
 
   /// Value of [state] for [toMove], the side about to move.
@@ -315,13 +334,15 @@ class SearchAi implements BoardAi {
       final p = odds.of(move.piece.type, captured.type);
       if (p < _quiescenceMinOdds) continue;
 
-      final (won, lost) = _battleOutcomes(state, move);
-      final value = p *
-              -_quiesce(won, opponent, double.negativeInfinity,
-                  double.infinity, ply + 1, pliesLeft - 1) +
-          (1 - p) *
-              -_quiesce(lost, opponent, double.negativeInfinity,
-                  double.infinity, ply + 1, pliesLeft - 1);
+      final win = odds.winOf(move.piece.type, captured.type);
+      final draw = odds.drawOf(move.piece.type, captured.type);
+      final (won, lost, both) =
+          _battleOutcomes(state, move, mutual: draw > 0);
+      double after(GameState outcome) => -_quiesce(outcome, opponent,
+          double.negativeInfinity, double.infinity, ply + 1, pliesLeft - 1);
+      final value = win * after(won) +
+          (both != null ? draw * after(both) : 0) +
+          (1 - win - draw) * after(lost);
       if (value > best) best = value;
       if (best > alpha) alpha = best;
       if (alpha >= beta) break;
@@ -340,8 +361,9 @@ class SearchAi implements BoardAi {
       final captured = move.capturedPiece;
       if (captured != null) {
         return 4 +
-            odds.of(move.piece.type, captured.type) *
-                BoardEvaluator.pieceValue(captured, targetUpgrades);
+            odds.takesOf(move.piece.type, captured.type) *
+                BoardEvaluator.pieceValue(captured, targetUpgrades,
+                    balance: _balance);
       }
       final killer = killers.indexOf(move);
       if (killer >= 0) return 3 - killer * 0.5;
@@ -371,6 +393,7 @@ class SearchAi implements BoardAi {
       povUpgrades: own ? _ownUpgrades : _oppUpgrades,
       oppUpgrades: own ? _oppUpgrades : _ownUpgrades,
       povMoves: moves,
+      balance: _balance,
     );
   }
 
@@ -403,13 +426,19 @@ EvalWeights _weightsFor(AiProfile profile) => profile.useThreatTerm
     ? EvalWeights.standard
     : EvalWeights.standard.copyWith(threat: 0);
 
-/// The positions after [capture]'s battle: (attacker won, attacker lost).
-(GameState, GameState) _battleOutcomes(GameState state, Move capture) {
+/// The positions after [capture]'s battle: (attacker won, attacker lost,
+/// both fell); the last only when [mutual] asks for it.
+(GameState, GameState, GameState?) _battleOutcomes(
+  GameState state,
+  Move capture, {
+  bool mutual = false,
+}) {
   final battle = GameEngine.applyMove(state, capture, triggerBattle: true);
   final attacker = capture.piece.color;
   return (
     GameEngine.resolveBattle(battle, capture, attacker).$1,
     GameEngine.resolveBattle(battle, capture, attacker.opposite).$1,
+    mutual ? GameEngine.resolveBattle(battle, capture, null).$1 : null,
   );
 }
 

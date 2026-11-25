@@ -9,6 +9,7 @@ import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/projectile.dart';
 import 'package:orbitron_tactics/core/game_logic/models/upgrade_profile.dart';
 import 'package:orbitron_tactics/core/maneuvers/maneuver_catalog.dart';
+import 'package:orbitron_tactics/core/worlds/world_balance.dart';
 import 'package:orbitron_tactics/features/battle/data/unit_art.dart';
 import 'package:orbitron_tactics/features/battle/presentation/widgets/battle_arena_painter.dart';
 
@@ -199,6 +200,68 @@ void main() {
           reason: '${type.name} at $ms ms',
         );
       }
+    }
+  });
+
+  testWidgets('paints every phase of a melee strike, hit and block, '
+      'and mutual destruction', (tester) async {
+    final sprite = (await tester.runAsync(
+        () => createTestImage(width: 256, height: 256, cache: false)))!;
+    addTearDown(sprite.dispose);
+
+    // Two Roman pawns trading strikes, ticked through wind-up, lunge,
+    // contact and recovery, the defender's shield up halfway.
+    var state = BattleEngine.createBattle(
+      attacker: const Piece(type: PieceType.pawn, color: PlayerColor.white),
+      defender: const Piece(type: PieceType.king, color: PlayerColor.black),
+      attackerUpgrades: const UpgradeProfile(),
+      defenderUpgrades: const UpgradeProfile(),
+      balance: WorldBalance.ground,
+    );
+    state = state.copyWith(
+        attacker: state.attacker.copyWith(nextAttackMs: 0),
+        defender: state.defender.copyWith(nextAttackMs: 0));
+    var sawStrike = false;
+    var sawMelee = false;
+    for (var tick = 0; tick < 150 && !state.isFinished; tick++) {
+      if (tick == 60) state = BattleEngine.activateShield(state, false);
+      state = BattleEngine.tick(state, 16);
+      sawStrike |= state.attacker.strike != null;
+      sawMelee |= state.impacts.any((impact) => impact.melee);
+      for (final bottom in [true, false]) {
+        expect(
+          () => paint(BattleArenaPainter(state,
+              attackerAtBottom: bottom,
+              attackerSprite: sprite,
+              defenderSprite: sprite,
+              attackerPose: UnitPose.standing,
+              defenderPose: UnitPose.standing,
+              defenderMirrored: true)),
+          returnsNormally,
+          reason: 'tick $tick',
+        );
+      }
+    }
+    expect(sawStrike, isTrue);
+    expect(sawMelee, isTrue);
+
+    final mutual = BattleState(
+      attacker: state.attacker.copyWith(currentHp: 0),
+      defender: state.defender.copyWith(currentHp: 0),
+      elapsedMs: state.elapsedMs,
+      isFinished: true,
+      balance: WorldBalance.ground,
+    );
+    expect(mutual.isMutualDestruction, isTrue);
+    for (var ms = 0; ms <= BattleArenaPainter.destructionMs; ms += 100) {
+      expect(
+        () => paint(BattleArenaPainter(mutual,
+            attackerAtBottom: true,
+            attackerPose: UnitPose.standing,
+            defenderPose: UnitPose.standing,
+            nowMs: mutual.elapsedMs + ms)),
+        returnsNormally,
+      );
     }
   });
 }

@@ -46,7 +46,22 @@ extension ContentL10n on AppLocalizations {
         PieceType.king => unitKing,
       };
 
-  String maneuverName(Maneuver maneuver) => content(maneuver.name);
+  /// [maneuver]'s name; a [standing] figure leaps, tumbles and lets fly
+  /// a flurry where a ship loops, rolls and fires a volley. Ids and
+  /// gestures stay the same.
+  String maneuverName(Maneuver maneuver, {bool standing = false}) {
+    if (standing) {
+      switch (maneuver.name) {
+        case 'Loop':
+          return maneuverFamilyLeap;
+        case 'Barrel Roll':
+          return maneuverFamilyTumble;
+        case 'Volley':
+          return maneuverFamilyFlurry;
+      }
+    }
+    return content(maneuver.name);
+  }
 
   String maneuverDescription(Maneuver maneuver) =>
       content(maneuver.description);

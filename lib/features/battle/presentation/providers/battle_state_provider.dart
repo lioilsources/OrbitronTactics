@@ -102,8 +102,8 @@ class BattleStateNotifier extends StateNotifier<BattleState?> {
       _resolveSent = true;
       _timer?.cancel();
       _timer = null;
-      final winner = next.winner!;
-      _ref.read(gameStateProvider.notifier).resolveBattle(winner);
+      // No winner: both units fell together.
+      _ref.read(gameStateProvider.notifier).resolveBattle(next.winner);
     }
   }
 

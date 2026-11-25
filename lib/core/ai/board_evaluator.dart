@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import '../game_logic/board/board_geometry.dart';
-import '../game_logic/engine/unit_base_stats.dart';
 import '../game_logic/engine/upgrade_engine.dart';
 import '../game_logic/models/game_state.dart';
 import '../game_logic/models/move.dart';
 import '../game_logic/models/piece.dart';
 import '../game_logic/models/position.dart';
 import '../game_logic/models/upgrade_profile.dart';
+import '../worlds/world_balance.dart';
 import 'battle_odds.dart';
 import 'cell_set.dart';
 import 'move_generator.dart';
@@ -80,7 +80,7 @@ class BoardEvaluator {
   static const double _missingRoyalPenalty = 150;
   static const double _unstoppablePawnBonus = 200;
 
-  static final Map<int, List<double>> _valueTables = {};
+  static final Map<(String, int), List<double>> _valueTables = {};
 
   /// [povMoves] and [oppMoves] may pass in [MoveGenerator.generate]'s
   /// result for either side when the caller already has it.
@@ -92,6 +92,7 @@ class BoardEvaluator {
     UpgradeProfile? oppUpgrades,
     List<Move>? povMoves,
     List<Move>? oppMoves,
+    WorldBalance balance = WorldBalance.space,
   }) {
     if (s.isFinished) {
       if (s.winner == null) return 0;
@@ -104,14 +105,20 @@ class BoardEvaluator {
     final myMoves = povMoves ?? MoveGenerator.generate(s, pov);
     final theirMoves = oppMoves ?? MoveGenerator.generate(s, opp);
 
-    return _side(s, pov, w, myUpgrades, theirUpgrades, myMoves, theirMoves) -
-        _side(s, opp, w, theirUpgrades, myUpgrades, theirMoves, myMoves);
+    return _side(s, pov, w, myUpgrades, theirUpgrades, myMoves, theirMoves,
+            balance) -
+        _side(s, opp, w, theirUpgrades, myUpgrades, theirMoves, myMoves,
+            balance);
   }
 
   /// Combat strength × role: `sqrt(hp · dmg / interval / (1 − defense))`,
   /// scaled by [materialScale].
-  static double pieceValue(Piece p, UpgradeProfile up) =>
-      _valuesFor(up)[_valueIndex(p)];
+  static double pieceValue(
+    Piece p,
+    UpgradeProfile up, {
+    WorldBalance balance = WorldBalance.space,
+  }) =>
+      _valuesFor(up, balance)[_valueIndex(p)];
 
   /// Weighted score of [color]'s own terms (the penalties included).
   static double _side(
@@ -122,10 +129,11 @@ class BoardEvaluator {
     UpgradeProfile enemyUpgrades,
     List<Move> moves,
     List<Move> enemyMoves,
+    WorldBalance balance,
   ) {
     final board = s.board;
     final geometry = board.geometry;
-    final values = _valuesFor(upgrades);
+    final values = _valuesFor(upgrades, balance);
     final targets = _targetSet(moves, geometry);
     final enemyTargets = _targetSet(enemyMoves, geometry);
     final infiltrationRank = geometry.infiltrationRank(color);
@@ -184,12 +192,14 @@ class BoardEvaluator {
     // Pieces the enemy can attack, at the best attacker's odds
     var threat = 0.0;
     if (w.threat != 0) {
-      final odds = BattleOdds.table(enemyUpgrades, upgrades);
+      final odds =
+          BattleOdds.table(enemyUpgrades, upgrades, balance: balance);
       final worstOdds = <Position, double>{};
       for (final move in enemyMoves) {
         final target = move.capturedPiece;
         if (target == null) continue;
-        final p = odds.of(move.piece.type, target.type);
+        // Both falling together loses the piece too.
+        final p = odds.takesOf(move.piece.type, target.type);
         if (p > (worstOdds[move.to] ?? 0)) worstOdds[move.to] = p;
       }
       worstOdds.forEach((position, p) {
@@ -217,21 +227,22 @@ class BoardEvaluator {
     return set;
   }
 
-  static List<double> _valuesFor(UpgradeProfile up) {
-    return _valueTables[_levelsKey(up)] ??= [
+  static List<double> _valuesFor(UpgradeProfile up, WorldBalance balance) {
+    return _valueTables[(balance.id, _levelsKey(up))] ??= [
       for (final type in PieceType.values) ...[
-        _computeValue(type, up, lastWarrior: false),
-        _computeValue(type, up, lastWarrior: true),
+        _computeValue(type, up, balance, lastWarrior: false),
+        _computeValue(type, up, balance, lastWarrior: true),
       ],
     ];
   }
 
   static double _computeValue(
     PieceType type,
-    UpgradeProfile up, {
+    UpgradeProfile up,
+    WorldBalance balance, {
     required bool lastWarrior,
   }) {
-    final stats = UpgradeEngine.statsFor(type, up, unitBaseStats);
+    final stats = UpgradeEngine.statsFor(type, up, balance.units);
     final strength = sqrt(stats.maxHp *
         stats.damage /
         stats.attackIntervalMs /

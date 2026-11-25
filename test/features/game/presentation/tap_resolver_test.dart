@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orbitron_tactics/core/game_logic/board/board_spec.dart';
+import 'package:orbitron_tactics/core/game_logic/models/piece.dart';
 import 'package:orbitron_tactics/core/game_logic/models/position.dart';
 import 'package:orbitron_tactics/features/game/presentation/widgets/board/board_layout.dart';
 import 'package:orbitron_tactics/features/game/presentation/widgets/board/tap_resolver.dart';
@@ -129,6 +130,78 @@ void main() {
             resolveTap(layout, layout.centreOf(empty),
                 preferred: {target}),
             empty);
+      });
+    });
+
+    group('standing figures (flipped: $flipped)', () {
+      const hexTilt = BoardTilt(squash: 0.85, figureHeight: 1.25);
+      const squareTilt = BoardTilt(squash: 1.0, figureHeight: 1.25);
+      final hex = BoardLayout.fit(BoardSpec.hex6.geometry, 360,
+          flipped: flipped, tilt: hexTilt);
+      final square = BoardLayout.fit(BoardSpec.classic8.geometry, 360,
+          flipped: flipped, tilt: squareTilt);
+      // The king at the bottom (white's, black's on a flipped board) has
+      // an empty cell behind him on hex6, a pawn two rows back.
+      final king = Position(row: flipped ? 10 : 0, col: 6);
+      final pawn = Position(row: flipped ? 8 : 2, col: 6);
+      final heads = {king: PieceType.king, pawn: PieceType.pawn};
+
+      test('the king\'s head reaches over the empty cell behind him', () {
+        final head = hex.headOf(king, PieceType.king);
+        final under = hex.positionAt(head);
+        expect(under, isNot(king));
+        expect(under, isNot(pawn));
+        expect(resolveTap(hex, head, preferred: {pawn}, heads: heads), king);
+      });
+
+      test('a selectable piece under the finger beats a head', () {
+        final head = hex.headOf(king, PieceType.king);
+        final under = hex.positionAt(head)!;
+        expect(
+            resolveTap(hex, head,
+                preferred: {under}, heads: {king: PieceType.king}),
+            under);
+      });
+
+      test('a tap on the pawn behind picks the pawn', () {
+        for (final point in [
+          hex.centreOf(pawn),
+          hex.headOf(pawn, PieceType.pawn),
+        ]) {
+          expect(resolveTap(hex, point, preferred: {}, heads: heads), pawn);
+        }
+      });
+
+      test('without heads a head tap is an ordinary tap', () {
+        final head = hex.headOf(king, PieceType.king);
+        expect(resolveTap(hex, head, preferred: {}), hex.positionAt(head));
+      });
+
+      test('on a flat board heads are ignored', () {
+        final flat = BoardLayout.fit(BoardSpec.hex6.geometry, 360,
+            flipped: flipped);
+        final point = hex.headOf(king, PieceType.king);
+        expect(resolveTap(flat, point, preferred: {}, heads: heads, reach: 0),
+            flat.positionAt(point));
+      });
+
+      test('the square board catches a head too, its centres stay exact',
+          () {
+        final sqKing = Position(row: flipped ? 7 : 0, col: 4);
+        final head = square.headOf(sqKing, PieceType.king);
+        final under = square.positionAt(head)!;
+        expect(under, isNot(sqKing));
+        expect(
+            resolveTap(square, head,
+                preferred: {}, heads: {sqKing: PieceType.king}, reach: 0),
+            sqKing);
+        // A pawn that can be picked on the cell under the finger wins.
+        expect(
+            resolveTap(square, head,
+                preferred: {under},
+                heads: {sqKing: PieceType.king, under: PieceType.pawn},
+                reach: 0),
+            under);
       });
     });
   }

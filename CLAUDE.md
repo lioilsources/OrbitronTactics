@@ -56,6 +56,7 @@ release.example.json         # --dart-define-from-file keys for release builds
 - Threat indicators: red badge on pieces in danger
 - Local hot-seat mode: two players, one device
 - Battles in a figure world are fought by `WorldBalance.ground` (pawn, knight, rook, king melee) in hot-seat and single player; Space and network games by `WorldBalance.space`. Both units falling in one tick removes both pieces (`BattleState.isMutualDestruction`)
+- Figure worlds tilt the board (`BoardTilt`, one table `standingTilts` by board id in `board_layout.dart`); figures stand over the cells behind them. Space stays flat
 - The world (`PieceSkin`, stored as `piece_skin`) sets both the board pieces and the arena units: `classic` is Space (chess symbols on the board, fleet ships in the arena); figure worlds send their board figures into the arena standing (`unitArt`, `UnitPose`). `PieceSkin.free` is the one list of free worlds, the rest sell as `world_<slug>`
 
 ## Platforms

@@ -12,6 +12,9 @@ class BoardBackgroundPainter extends CustomPainter {
   final double glowOpacity;
   final bool flipBoard;
 
+  /// How the board leans back; null keeps it flat.
+  final BoardTilt? tilt;
+
   /// Square colors; a piece skin pack brings its own.
   final Color lightSquare;
   final Color darkSquare;
@@ -21,6 +24,7 @@ class BoardBackgroundPainter extends CustomPainter {
     required this.board,
     required this.glowOpacity,
     this.flipBoard = false,
+    this.tilt,
     this.lightSquare = BoardTheme.lightSquare,
     this.darkSquare = BoardTheme.darkSquare,
   });
@@ -28,7 +32,8 @@ class BoardBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final layout =
-        BoardLayout.fit(board.geometry, size.width, flipped: flipBoard);
+        BoardLayout.fit(board.geometry, size.width,
+        flipped: flipBoard, tilt: tilt);
     final shades = layout.isHex
         ? [lightSquare, Color.lerp(lightSquare, darkSquare, 0.5)!, darkSquare]
         : [lightSquare, darkSquare];
@@ -73,10 +78,12 @@ class BoardBackgroundPainter extends CustomPainter {
       // Diamond symbol in center
       final center = layout.centreOf(pf.position);
       final diamondSize = layout.cellSize * 0.15;
+      // Lying on the board, squashed with it.
+      final diamondHeight = layout.cellRect(pf.position).height * 0.15;
       final diamondPath = Path()
-        ..moveTo(center.dx, center.dy - diamondSize)
+        ..moveTo(center.dx, center.dy - diamondHeight)
         ..lineTo(center.dx + diamondSize, center.dy)
-        ..lineTo(center.dx, center.dy + diamondSize)
+        ..lineTo(center.dx, center.dy + diamondHeight)
         ..lineTo(center.dx - diamondSize, center.dy)
         ..close();
       canvas.drawPath(
@@ -92,6 +99,7 @@ class BoardBackgroundPainter extends CustomPainter {
         board != oldDelegate.board ||
         glowOpacity != oldDelegate.glowOpacity ||
         flipBoard != oldDelegate.flipBoard ||
+        tilt != oldDelegate.tilt ||
         lightSquare != oldDelegate.lightSquare ||
         darkSquare != oldDelegate.darkSquare;
   }

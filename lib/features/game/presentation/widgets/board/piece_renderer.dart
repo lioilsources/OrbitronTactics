@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/game_logic/models/piece.dart';
 import '../../../../../core/theme/board_theme.dart';
 import '../../../data/piece_skin.dart';
+import 'board_layout.dart' show StandingFigure;
 
 /// Renders a piece: in the [PieceSkin.classic] skin as a styled text symbol
 /// with a colored circle background, in an image pack as its figure.
@@ -21,15 +22,24 @@ class PieceRenderer {
 
   /// [piece] in a [size]-wide square, drawn in [skin]. [classicMarks] adds
   /// the classic symbol in a corner of an image pack's figure.
+  ///
+  /// With a [figureHeight] an image pack's figure stands on a tilted board:
+  /// its picture fills a square [figureHeight] on a side (see
+  /// [StandingFigure]), and the badges keep the size of a [size]-wide cell.
   static Widget build(
     Piece piece,
     double size, {
     bool isThreatened = false,
     PieceSkin skin = PieceSkin.classic,
     bool classicMarks = false,
+    double? figureHeight,
   }) {
+    final standing = figureHeight != null && skin.isImagePack;
     final pieceWidget = skin.isImagePack
-        ? _imagePiece(piece, size, skin, classicMarks: classicMarks)
+        ? _imagePiece(piece, size, skin,
+            classicMarks: classicMarks,
+            extent: standing ? figureHeight : size * 0.85,
+            standing: standing)
         : _classicPiece(piece, size);
 
     if (!isThreatened) return pieceWidget;
@@ -39,8 +49,15 @@ class PieceRenderer {
       children: [
         pieceWidget,
         Positioned(
-          right: -2,
-          top: -2,
+          right: standing
+              ? figureHeight *
+                      (1 - StandingFigure.widthOf(piece.type)) /
+                      2 -
+                  2
+              : -2,
+          top: standing
+              ? figureHeight * StandingFigure.topOf(piece.type) - 2
+              : -2,
           child: Container(
             width: size * 0.3,
             height: size * 0.3,
@@ -111,16 +128,18 @@ class PieceRenderer {
     return pieceWidget;
   }
 
-  /// An image pack's figure, bottom-aligned in the square. The black army
-  /// is mirrored so it faces the white one.
+  /// An image pack's figure, bottom-aligned in an [extent]-wide square.
+  /// The black army is mirrored so it faces the white one. A [standing]
+  /// figure glows around its plinth rather than across its whole square.
   static Widget _imagePiece(
     Piece piece,
     double size,
     PieceSkin skin, {
     required bool classicMarks,
+    required double extent,
+    required bool standing,
   }) {
     final isWhite = piece.color == PlayerColor.white;
-    final extent = size * 0.85;
     final asset = skin.assetFor(piece.type, piece.color)!;
 
     return SizedBox(
@@ -130,11 +149,19 @@ class PieceRenderer {
         clipBehavior: Clip.none,
         children: [
           if (piece.isLastWarrior)
-            Positioned.fill(
+            Positioned(
+              left: standing ? extent * 0.15 : 0,
+              right: standing ? extent * 0.15 : 0,
+              top: standing ? extent * 0.8 : 0,
+              bottom: 0,
               child: DecoratedBox(
                 key: const ValueKey('last-warrior-glow'),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  shape: standing ? BoxShape.rectangle : BoxShape.circle,
+                  borderRadius: standing
+                      ? BorderRadius.all(Radius.elliptical(
+                          extent * 0.35, extent * 0.1))
+                      : null,
                   color: BoardTheme.lastWarriorGlow.withValues(alpha: 0.25),
                   border: Border.all(
                       color: BoardTheme.lastWarriorGlow, width: 2.5),

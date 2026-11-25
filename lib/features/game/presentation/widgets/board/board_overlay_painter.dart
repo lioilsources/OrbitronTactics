@@ -14,6 +14,9 @@ class BoardOverlayPainter extends CustomPainter {
   final BoardState board;
   final bool flipBoard;
 
+  /// How the board leans back; null keeps it flat.
+  final BoardTilt? tilt;
+
   const BoardOverlayPainter({
     required this.selectedPosition,
     required this.validMoves,
@@ -21,12 +24,14 @@ class BoardOverlayPainter extends CustomPainter {
     required this.lastMoveTo,
     required this.board,
     this.flipBoard = false,
+    this.tilt,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final layout =
-        BoardLayout.fit(board.geometry, size.width, flipped: flipBoard);
+        BoardLayout.fit(board.geometry, size.width,
+        flipped: flipBoard, tilt: tilt);
 
     void highlight(Position pos, Color color) =>
         canvas.drawPath(layout.cellPath(pos), Paint()..color = color);
@@ -45,11 +50,9 @@ class BoardOverlayPainter extends CustomPainter {
       if (board.pieceAt(move) != null) {
         _drawCaptureIndicator(canvas, layout, move);
       } else {
-        canvas.drawCircle(
-          layout.centreOf(move),
-          layout.cellSize * 0.15,
-          Paint()..color = BoardTheme.validMoveIndicator,
-        );
+        // A dot lying on the board, squashed with it.
+        final dot = layout.cellRect(move, inset: layout.cellSize * 0.35);
+        canvas.drawOval(dot, Paint()..color = BoardTheme.validMoveIndicator);
       }
     }
   }
@@ -66,10 +69,11 @@ class BoardOverlayPainter extends CustomPainter {
       return;
     }
 
-    final rect = layout.pieceBox(pos);
+    final rect = layout.cellRect(pos);
     final cornerSize = layout.cellSize * 0.25;
     final inset = layout.cellSize * 0.05;
     final inner = rect.deflate(inset);
+    final cornerHeight = cornerSize * rect.height / rect.width;
     for (final (corner, dx, dy) in [
       (inner.topLeft, 1.0, 1.0),
       (inner.topRight, -1.0, 1.0),
@@ -77,7 +81,7 @@ class BoardOverlayPainter extends CustomPainter {
       (inner.bottomRight, -1.0, -1.0),
     ]) {
       canvas.drawLine(corner, corner + Offset(dx * cornerSize, 0), paint);
-      canvas.drawLine(corner, corner + Offset(0, dy * cornerSize), paint);
+      canvas.drawLine(corner, corner + Offset(0, dy * cornerHeight), paint);
     }
   }
 
@@ -88,6 +92,7 @@ class BoardOverlayPainter extends CustomPainter {
         lastMoveFrom != oldDelegate.lastMoveFrom ||
         lastMoveTo != oldDelegate.lastMoveTo ||
         board != oldDelegate.board ||
-        flipBoard != oldDelegate.flipBoard;
+        flipBoard != oldDelegate.flipBoard ||
+        tilt != oldDelegate.tilt;
   }
 }

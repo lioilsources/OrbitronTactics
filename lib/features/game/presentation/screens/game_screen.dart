@@ -243,7 +243,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 Expanded(
                   child: Center(
                     child: AspectRatio(
-                      aspectRatio: _boardAspectRatio(gameState.board.geometry),
+                      aspectRatio: _boardAspectRatio(gameState.board.geometry,
+                          boardTiltFor(gameState.board.spec, skin)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
@@ -830,8 +831,9 @@ class _GameOverOverlayState extends State<_GameOverOverlay>
   }
 }
 
-/// Width over height of the board itself; the frame's padding is ignored.
-double _boardAspectRatio(BoardGeometry geometry) {
-  final size = BoardLayout.fit(geometry, 1).size;
+/// Width over height of the board itself, tilted by [tilt] with room for
+/// standing figures; the frame's padding is ignored.
+double _boardAspectRatio(BoardGeometry geometry, BoardTilt? tilt) {
+  final size = BoardLayout.fit(geometry, 1, tilt: tilt).size;
   return size.width / size.height;
 }

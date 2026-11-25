@@ -1,6 +1,7 @@
 # Changelog
 
 ## [24/11/2026]
+- In a world of figures the board leans back and the figures stand on it, taller than their cells, about half again as tall as before; a tap on a figure's head picks it. Space keeps its flat board with symbols
 - In the worlds of figures, played on one device, pawns, knights, rooks and kings fight up close: the wind-up marks where the blow lands, the figure lunges at its enemy and slashes it, a raised shield blocks the blow with sparks and throws the striker back; bishops and queens keep shooting. Space and network games are unchanged
 - When both units fall at the same moment, both pieces leave the board and the battle earns no credits; the result says so
 - A melee unit's maneuvers strike in contact instead of firing; for figures the Loop is a Leap, the Barrel Roll a Tumble and the Volley a Flurry
